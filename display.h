@@ -10,17 +10,13 @@ public:
     Display();
 
     void buildParts();
-    bool isEarlier(Point &aFirst, Point &aLast) const;
-    void showTrains(Graphics g, int aWidth, int aHeight, Point &aTime);
-    void show(Graphics g, int aWidth, int aHeight);
-    void quickShow(Graphics g, int aWidth, int aHeight);
-
-private:
-    int getMinutes(Point aFirst, Point aLast);
+    //void showTrains(Graphics g, int aWidth, int aHeight, Point &aTime);
+    //void show(Graphics g, int aWidth, int aHeight);
+    //void quickShow(Graphics g, int aWidth, int aHeight);
 
 private:
     Map mMap;
-    QVector<SolidBrush> mParts;
+    //QVector<SolidBrush> mParts;
 };
 
 #endif // DISPLAY_H

@@ -1,7 +1,7 @@
 #ifndef MAP_H
 #define MAP_H
 
-#include "Point.h"
+#include "TimePoint.h"
 #include "Station.h"
 #include "Train.h"
 
@@ -21,13 +21,14 @@ public:
     void newGame();
     int distance(int aI, int aJ) const;
     void fillColors();
-    Point findTrainPosition(Train &aTrain) const;
+    Point findTrainPosition(const Train &aTrain, const TimePoint &aTime) const;
 
 private:
     void init(int aXd, int aYd, int aXq, int aYq, int aQ);
     void globalConnection(int aI0, int aI1);
     bool foundConnection(int aI, int aJ, int aK);
     bool madeConnection(int &i, int j, int &d);
+    int getMinutes(const Point &aFirst, const Point &aLast) const;
 
 private:
     Point mDimention;

@@ -28,17 +28,17 @@ int Point::size() const
     return mX * mY;
 }
 
-Point Point::operator*(Point &p) const
+Point Point::operator*(const Point &p) const
 {
     return Point(mX * p.mX, mY * p.mY);
 }
 
-Point Point::operator/(Point &p) const
+Point Point::operator/(const Point &p) const
 {
     return Point(mX / p.mX, mY / p.mY);
 }
 
-int Point::distance(Point &p) const
+int Point::distance(const Point &p) const
 {
     int dx = mX - p.mX;
     int dy = mY - p.mY;

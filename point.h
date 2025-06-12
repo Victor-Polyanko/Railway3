@@ -9,11 +9,11 @@ public:
     int getX() const;
     int getY() const;
     int size() const;
-    Point operator*(Point &p) const;
-    Point operator/(Point &p) const;
-    int distance(Point &p) const;
+    Point operator*(const Point &p) const;
+    Point operator/(const Point &p) const;
+    int distance(const Point &p) const;
 
-private:
+protected:
     int mX;
     int mY;
 };

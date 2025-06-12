@@ -9,17 +9,18 @@
 class Train
 {
 public:
-    enum Status {Fast, Passenger, Local};
+    enum Type {None, Fast, Passenger, Local};
 
 public:
     Train();
     Train(int N);
+    int getStationsQuantity() const;
+    Schedule getStation(int i) const;
 
 private:
     int mNumber;
-    Status mStatus;
+    Type mType;
     Point mStartTime;
-    int mStationQuantity;
     QVector<Schedule> mStations;
 };
 
