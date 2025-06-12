@@ -1,18 +1,20 @@
 #include "station.h"
 
+const QString cDefaultName("Місто N");
+
 Station::Station()
     : mStatus(Status::None)
     , mConnectionsSize(0)
-    , mName("місто N")
+    , mName(cDefaultName)
 {
 }
 
 Station::Station(int aX, int aY, Status &aStatus, int aN) : Point(aX, aY)
     , mStatus(aStatus)
     , mConnectionsSize(0)
-    , mName("місто N")
+    , mName(cDefaultName)
 {
-    mTrains.reserve(aN);
+    mTrains.resize(aN);
 }
 
 int Station::getConnectionsSize() const

@@ -10,17 +10,18 @@
 class Map
 {
 public:
+    enum Color {LavenderBlush, Lavender, Honeydew, MistyRose};
+public:
     Map();
     Map(int aXd, int aYd, int aXq, int aYq, int aQ);
 
+    QVector<Color> getColors() const;
+    QVector<Train> getTrains() const;
+    QVector<Point> getWays() const;
     void newGame();
     int distance(int aI, int aJ) const;
-    void buildParts();
-    bool isEarlier(Point aFirst, Point aLast);
-    int getMinutes(Point aFirst, Point aLast);
-    void showTrains(Graphics g, int aWidth, int aHeight, Point aTime);
-    void show(Graphics g, int aWidth, int aHeight);
-    void quickShow(Graphics g, int aWidth, int aHeight);
+    void fillColors();
+    Point findTrainPosition(Train &aTrain) const;
 
 private:
     void init(int aXd, int aYd, int aXq, int aYq, int aQ);
@@ -35,7 +36,7 @@ private:
     QVector<Station> mStations;
     QVector<Point> mWays;
     QVector<Train> mTrains;
-    SolidBrush[] mPart;
+    QVector<Color> mColors;
     Point mTime;
 };
 

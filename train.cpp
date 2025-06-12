@@ -1,9 +1,11 @@
 #include "train.h"
 
+const Point cDefaultTime(12, 0);
+
 Train::Train(int N)
     : mNumber(0)
     , mStatus(Status::Fast)
-    , mStartTime(Point(12, 0))
+    , mStartTime(cDefaultTime)
 {
-    mStations.reserve(N);
+    mStations.resize(N);
 }

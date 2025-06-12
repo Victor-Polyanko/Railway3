@@ -31,6 +31,7 @@ if(${QT_VERSION_MAJOR} GREATER_EQUAL 6)
         schedule.h schedule.cpp
         station.h station.cpp
         map.h map.cpp
+        display.h display.cpp
 
     )
 # Define target properties for Android with Qt 6 as:

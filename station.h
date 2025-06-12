@@ -5,6 +5,7 @@
 #include "Schedule.h"
 
 #include <qstring.h>
+#include <qvector.h>
 
 class Station : public Point
 {
