@@ -33,6 +33,17 @@ void MainWindow::addFileMenu()
     QAction *exitAction = new QAction("Вийти");
     fileMenu->addAction(exitAction);
 
+    QObject::connect(generateAction, &QAction::triggered, [&]() {
+        mDisplay.generate();
+        //QMessageBox msgBox;
+        //QString text = "ways = " + QString::number(mDisplay.mMap.getWays().size())\
+        //    + "\n = " + QString::number(mDisplay.mMap.getColors().size());
+        //msgBox.setText(text);
+        //msgBox.setWindowTitle("Message Box Title");
+        //msgBox.exec();
+        //mDisplay.show(mPainter);
+        this->show();
+    });
     QObject::connect(exitAction, &QAction::triggered, [&]() { QApplication::quit(); });
 }
 
@@ -92,4 +103,10 @@ void MainWindow::addAboutMenu(QWidget *parent)
             "як дістатися з однієї станції до іншої.\n\n" \
             "Приємного часопроведення! :-)");
     });
+}
+
+void MainWindow::paintEvent(QPaintEvent *event)  {
+    QPainter painter(this);
+    if (!mDisplay.mMap.getWays().empty())
+        mDisplay.show(painter);
 }

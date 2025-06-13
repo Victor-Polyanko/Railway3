@@ -1,28 +1,35 @@
 #include "display.h"
 
+const int cStep = 3;
+const int cStep2 = cStep * cStep;
+const int cPartWidth = 20;
+const int cPartHeight = 20;
+const int cHalfWidth = cPartWidth / 2;
+const int cHalfHeight = cPartHeight / 2;
+
 Display::Display() {}
 
-void Display::buildParts()
+void Display::generate()
 {
-    mMap.fillColors();
-    //mParts.reserve(mMap.getColors().size());
-    //for (auto &color : mMap.getColors())
-    //    switch (color)
-    //    {
-    //    case Map.Color::LavenderBlush:
-    //        mParts.emplace_back(new SolidBrush(Color.LavenderBlush));
-    //        break;
-    //    case Map.Color::Lavender:
-    //        mParts.emplace_back(new SolidBrush(Color.Lavender));
-    //        break;
-    //    case Map.Color::Honeydew:
-    //        mParts.emplace_back(new SolidBrush(Color.Honeydew));
-    //        break;
-    //    case Map.Color::MistyRose:
-    //        mParts.emplace_back(new SolidBrush(Color.MistyRose));
-    //        break;
-    //    default: break;
-    //    }
+    mMap.generate();
+    mParts.reserve(mMap.getColors().size());
+    for (auto &color : mMap.getColors())
+        switch (color)
+        {
+        case Map::Color::LavenderBlush:
+            mParts.emplace_back(QBrush(QColor(255, 240, 245)));
+            break;
+        case Map::Color::Lavender:
+            mParts.emplace_back(QBrush(QColor(230, 230, 250)));
+            break;
+        case Map::Color::Honeydew:
+            mParts.emplace_back(QBrush(QColor(240,255,240)));
+            break;
+        case Map::Color::MistyRose:
+            mParts.emplace_back(QBrush(QColor(255, 228, 225)));
+            break;
+        default: break;
+        }
 }
 
 //void Display::showTrains(Graphics g, int w, int h, Point &aTime){
@@ -58,22 +65,27 @@ void Display::buildParts()
 //        }
 //    }
 //}
-//
-//void Display::show(Graphics g, int w, int h)
-//{
-//    double kx = (double)(w) / mDimention.getX();
-//    double ky = (double)(h * 3) / mDimention.getY();
-//    SolidBrush brush = new SolidBrush(Color.White);
-//    for(int i = 0; i < mDimention.getX(); i += 3)
-//    {
-//        int kxi = (int)(kx * i) - 10;
-//        int n = i * mDimention.getY() / 9;
-//        for(int j = 0; j < mDimention.getY() / 3; j++)
-//            g.FillRectangle(mPart[n + j], kxi, (int)(ky * j) - 10, 20, 20);
-//    }
-//    QuickShow(g, w, h);
-//}
-//
+
+void Display::show(QPainter &aPainter) const
+{
+    double width = static_cast<double>(aPainter.window().width());
+    double height = static_cast<double>(aPainter.window().height());
+    double kx = width / mMap.getDimention().getX();
+    double ky = height * 3 / mMap.getDimention().getY();
+    for(int i = 0; i < mMap.getDimention().getX(); i += cStep)
+    {
+        int kxi = (int)(kx * i) - cHalfWidth;
+        int n = i * mMap.getDimention().getY() / cStep2;
+        for(int j = 0; j < mMap.getDimention().getY() / cStep; j++)
+        {
+            aPainter.setBrush(mParts[n + j]);
+            aPainter.setPen(mParts[n + j].color());
+            aPainter.drawRect(kxi, (int)(ky * j) - cHalfHeight, cPartWidth, cPartHeight);
+        }
+    }
+    //QuickShow(g, w, h);
+}
+
 //void Display::quickShow(Graphics g, int w, int h)
 //{
 //    int diametr = mDimention.getX() / mDistrictQuantity.getX() / 20;

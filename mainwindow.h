@@ -3,6 +3,8 @@
 
 #include <QMainWindow>
 
+#include "display.h"
+
 QT_BEGIN_NAMESPACE
 namespace Ui {
 class MainWindow;
@@ -17,6 +19,9 @@ public:
     MainWindow(QWidget *parent = nullptr);
     ~MainWindow();
 
+public:
+    void paintEvent(QPaintEvent *event) override;
+
 private:
     void addFileMenu();
     void addTrainMenu();
@@ -26,5 +31,6 @@ private:
 
 private:
     Ui::MainWindow *ui;
+    Display mDisplay;
 };
 #endif // MAINWINDOW_H

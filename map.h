@@ -6,6 +6,7 @@
 #include "Train.h"
 
 #include <qvector.h>
+#include <QSharedPointer>
 
 class Map
 {
@@ -18,17 +19,16 @@ public:
     QVector<Color> getColors() const;
     QVector<Train> getTrains() const;
     QVector<Point> getWays() const;
-    void newGame();
-    int distance(int aI, int aJ) const;
-    void fillColors();
+    Point getDimention() const;
+    void generate();
     Point findTrainPosition(const Train &aTrain, const TimePoint &aTime) const;
 
 private:
     void init(int aXd, int aYd, int aXq, int aYq, int aQ);
-    void globalConnection(int aI0, int aI1);
-    bool foundConnection(int aI, int aJ, int aK);
-    bool madeConnection(int &i, int j, int &d);
-    int getMinutes(const Point &aFirst, const Point &aLast) const;
+    void generateStations();
+    void globalConnection();
+    void updateStationsStatuses();
+    void fillColors();
 
 private:
     Point mDimention;
