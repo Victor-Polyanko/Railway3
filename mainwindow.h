@@ -18,6 +18,13 @@ public:
     ~MainWindow();
 
 private:
+    void addFileMenu();
+    void addTrainMenu();
+    void addWaysMenu();
+    void addLaunchMenu();
+    void addAboutMenu(QWidget *parent);
+
+private:
     Ui::MainWindow *ui;
 };
 #endif // MAINWINDOW_H
