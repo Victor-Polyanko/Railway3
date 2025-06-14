@@ -17,9 +17,11 @@ public:
     Map(int aXd, int aYd, int aXq, int aYq, int aQ);
 
     QVector<Color> getColors() const;
+    QVector<Station> getStations() const;
     QVector<Train> getTrains() const;
     QVector<Point> getWays() const;
     Point getDimention() const;
+    int getDistrictsQuantity() const;
     void generate();
     Point findTrainPosition(const Train &aTrain, const TimePoint &aTime) const;
 

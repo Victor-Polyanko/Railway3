@@ -108,5 +108,8 @@ void MainWindow::addAboutMenu(QWidget *parent)
 void MainWindow::paintEvent(QPaintEvent *event)  {
     QPainter painter(this);
     if (!mDisplay.mMap.getWays().empty())
-        mDisplay.show(painter);
+    {
+        mDisplay.showDistricts(painter);
+        mDisplay.showStationsAndWays(painter);
+    }
 }

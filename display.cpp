@@ -1,11 +1,20 @@
 #include "display.h"
 
+#include <QPen>
+
 const int cStep = 3;
 const int cStep2 = cStep * cStep;
 const int cPartWidth = 20;
 const int cPartHeight = 20;
 const int cHalfWidth = cPartWidth / 2;
 const int cHalfHeight = cPartHeight / 2;
+const int cLineWidth = 5;
+
+const QColor cLavenderBlush(255, 240, 245);
+const QColor cLavender(230, 230, 250);
+const QColor cHoneydew(240,255,240);
+const QColor cMistyRose(255, 228, 225);
+const QColor cNavy(0, 0, 128);
 
 Display::Display() {}
 
@@ -17,16 +26,16 @@ void Display::generate()
         switch (color)
         {
         case Map::Color::LavenderBlush:
-            mParts.emplace_back(QBrush(QColor(255, 240, 245)));
+            mParts.emplace_back(QBrush(cLavenderBlush));
             break;
         case Map::Color::Lavender:
-            mParts.emplace_back(QBrush(QColor(230, 230, 250)));
+            mParts.emplace_back(QBrush(cLavender));
             break;
         case Map::Color::Honeydew:
-            mParts.emplace_back(QBrush(QColor(240,255,240)));
+            mParts.emplace_back(QBrush(cHoneydew));
             break;
         case Map::Color::MistyRose:
-            mParts.emplace_back(QBrush(QColor(255, 228, 225)));
+            mParts.emplace_back(QBrush(cMistyRose));
             break;
         default: break;
         }
@@ -66,7 +75,7 @@ void Display::generate()
 //    }
 //}
 
-void Display::show(QPainter &aPainter) const
+void Display::showDistricts(QPainter &aPainter) const
 {
     double width = static_cast<double>(aPainter.window().width());
     double height = static_cast<double>(aPainter.window().height());
@@ -74,46 +83,54 @@ void Display::show(QPainter &aPainter) const
     double ky = height * 3 / mMap.getDimention().getY();
     for(int i = 0; i < mMap.getDimention().getX(); i += cStep)
     {
-        int kxi = (int)(kx * i) - cHalfWidth;
+        int kxi = static_cast<int>(kx * i) - cHalfWidth;
         int n = i * mMap.getDimention().getY() / cStep2;
         for(int j = 0; j < mMap.getDimention().getY() / cStep; j++)
         {
             aPainter.setBrush(mParts[n + j]);
             aPainter.setPen(mParts[n + j].color());
-            aPainter.drawRect(kxi, (int)(ky * j) - cHalfHeight, cPartWidth, cPartHeight);
+            aPainter.drawRect(kxi, static_cast<int>(ky * j) - cHalfHeight, cPartWidth, cPartHeight);
         }
     }
-    //QuickShow(g, w, h);
 }
 
-//void Display::quickShow(Graphics g, int w, int h)
-//{
-//    int diametr = mDimention.getX() / mDistrictQuantity.getX() / 20;
-//    int radius;
-//    double kx = (double)(w) / mDimention.getX();
-//    double ky = (double)(h) / mDimention.getY();
-//    SolidBrush brush = new SolidBrush(Color.Navy);
-//    Pen pen = new Pen(brush, 5);
-//    Font f;
-//    PointF p;
-//    int diakx =(int)(kx * diametr / 3);
-//    for (auto &station : mStations)
-//    {
-//        radius = diakx * station.getStatus();
-//        g.DrawEllipse(pen, (int)(kx * station.getX() - radius), (int)(ky * station.getY() - radius), 2 * radius, 2 * radius);
-//        p = new PointF((float)(kx * station.getX() + radius), (float)(ky * station.getY()));
-//        switch(station.getStatus())
-//        {
-//        case Station::Status::Town: f = new Font("Arial", 10, FontStyle.Regular);break;
-//        case Station::Status::City: f = new Font("Arial", 10, FontStyle.Underline);break;
-//        default: f = new Font("Arial", 15, FontStyle.Underline);break;
-//        }
-//        g.DrawString(station.getName(), f, brush, p);
-//    }
-//    for (auto &way : mMap.getWays())
-//    {
-//        g.DrawLine(pen, (int)(kx * mStations[way.getX()].getX()), (int)(ky * mStations[way.getX()].getY()),
-//                   (int)(kx * mStations[way.getY()].getX()), (int)(ky * mStations[way.getY()].getY()));
-//    }
-//}
+void Display::showStationsAndWays(QPainter &aPainter) const
+{
+    int diametr = mMap.getDimention().getX() / mMap.getDistrictsQuantity() / 20;
+    double width = static_cast<double>(aPainter.window().width());
+    double height = static_cast<double>(aPainter.window().height());
+    double kx = width / mMap.getDimention().getX();
+    double ky = height * cStep / mMap.getDimention().getY();
+    QPen pen;
+    pen.setColor(cNavy);
+    pen.setWidth(cLineWidth);
+    aPainter.setPen(pen);
+    int diakx = static_cast<int>(kx * diametr / cStep);
+    for (auto &station : mMap.getStations())
+    {
+        int radius = diakx * station.getStatus();
+        int diameter = radius * 2;
+        aPainter.drawEllipse(static_cast<int>(kx * station.getX() - radius), static_cast<int>(ky * station.getY() - radius), diameter, diameter);
+        QPointF point(static_cast<float>(kx * station.getX() + radius), static_cast<float>(ky * station.getY()));
+        QFont font;
+        font.setUnderline(true);
+        switch(station.getStatus())
+        {
+            case Station::Status::Capital: font = QFont("Arial", 15);
+                break;
+            case Station::Status::City: font = QFont("Arial", 10);
+                break;
+            default: font = QFont("Arial", 10);
+                font.setUnderline(false);
+                break;
+        }
+        aPainter.setFont(font);
+        aPainter.drawText(point, station.getName());
+    }
+    for (auto &way : mMap.getWays())
+        aPainter.drawLine(static_cast<int>(kx * mMap.getStations()[way.getX()].getX()),
+                          static_cast<int>(ky * mMap.getStations()[way.getX()].getY()),
+                          static_cast<int>(kx * mMap.getStations()[way.getY()].getX()),
+                          static_cast<int>(ky * mMap.getStations()[way.getY()].getY()));
+}
 

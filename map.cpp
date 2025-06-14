@@ -37,6 +37,11 @@ QVector<Map::Color> Map::getColors() const
     return mColors;
 }
 
+QVector<Station> Map::getStations() const
+{
+    return mStations;
+}
+
 QVector<Train> Map::getTrains() const
 {
     return mTrains;
@@ -50,6 +55,11 @@ QVector<Point> Map::getWays() const
 Point Map::getDimention() const
 {
     return mDimention;
+}
+
+int Map::getDistrictsQuantity() const
+{
+    return mDistrictStationsQuantity;
 }
 
 void Map::generate()

@@ -16,8 +16,8 @@ public:
     void generate();
     void buildParts();
     //void showTrains(Graphics g, int aWidth, int aHeight, Point &aTime);
-    void show(QPainter &aPainter) const;
-    //void quickShow(Graphics g, int aWidth, int aHeight);
+    void showDistricts(QPainter &aPainter) const;
+    void showStationsAndWays(QPainter &aPainter) const;
     Map mMap;
 private:
     //Map mMap;
