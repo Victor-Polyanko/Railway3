@@ -7,6 +7,7 @@ class TimePoint : Point
 {
 public:
     TimePoint();
+    TimePoint(int aMinutes, int aHours);
 
     void addMinutes(int minutes);
     void substractMinutes(int minutes);

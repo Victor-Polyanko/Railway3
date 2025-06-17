@@ -9,6 +9,8 @@ TimePoint::TimePoint()
     mY = -1;
 }
 
+TimePoint::TimePoint(int aMinutes, int aHours) : Point(aHours, aMinutes) {}
+
 void TimePoint::addMinutes(int minutes)
 {
     mY += minutes % cMinutesInHour;

@@ -1,6 +1,7 @@
 #include "mainwindow.h"
 #include "ui_mainwindow.h"
 
+#include <QFileDialog>
 #include <QMessageBox>
 
 MainWindow::MainWindow(QWidget *parent)
@@ -33,17 +34,21 @@ void MainWindow::addFileMenu()
     QAction *exitAction = new QAction("Вийти");
     fileMenu->addAction(exitAction);
 
-    QObject::connect(generateAction, &QAction::triggered, [&]() {
-        mDisplay.generate();
-        //QMessageBox msgBox;
-        //QString text = "ways = " + QString::number(mDisplay.mMap.getWays().size())\
-        //    + "\n = " + QString::number(mDisplay.mMap.getColors().size());
-        //msgBox.setText(text);
-        //msgBox.setWindowTitle("Message Box Title");
-        //msgBox.exec();
-        //mDisplay.show(mPainter);
-        this->show();
-    });
+    QObject::connect(generateAction, &QAction::triggered, [&]() { mDisplay.generate(); });
+    QObject::connect(loadAction, &QAction::triggered, [&]() {
+        QString fileName = QFileDialog::getOpenFileName(this, "Завантажити файл", "", "Railway Files (*.rw1)");
+        if (!fileName.isEmpty())
+        {
+            QString result = mDisplay.load(fileName);
+            if (!result.isEmpty())
+            {
+                QMessageBox msgBox;
+                msgBox.setText(result);
+                msgBox.setWindowTitle("Помилка при відкритті файлу");
+                msgBox.exec();
+            }
+        }
+     });
     QObject::connect(exitAction, &QAction::triggered, [&]() { QApplication::quit(); });
 }
 
@@ -105,11 +110,9 @@ void MainWindow::addAboutMenu(QWidget *parent)
     });
 }
 
-void MainWindow::paintEvent(QPaintEvent *event)  {
+void MainWindow::paintEvent(QPaintEvent *event)
+{
     QPainter painter(this);
-    if (!mDisplay.mMap.getWays().empty())
-    {
-        mDisplay.showDistricts(painter);
-        mDisplay.showStationsAndWays(painter);
-    }
+    //mDisplay.showDistricts(painter);
+    //mDisplay.showStationsAndWays(painter);
 }

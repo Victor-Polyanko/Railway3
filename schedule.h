@@ -7,6 +7,7 @@ class Schedule
 {
 public:
     Schedule();
+    Schedule(int aArriveHours, int aArriveMinutes, int aWait, int aDepartHours, int aDepartMinutes, int aNumber);
 
     TimePoint getArrive() const;
     TimePoint getDepart() const;

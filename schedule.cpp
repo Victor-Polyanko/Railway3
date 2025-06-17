@@ -6,6 +6,13 @@ Schedule::Schedule()
 {
 }
 
+Schedule::Schedule(int aArriveHours, int aArriveMinutes, int aWait, int aDepartHours, int aDepartMinutes, int aNumber)
+    : mArrive(aArriveHours, aArriveMinutes)
+    , mWait(aWait)
+    , mDepart(aDepartHours, aDepartMinutes)
+    , mNumber(aNumber)
+{}
+
 TimePoint Schedule::getArrive() const
 {
     return mArrive;

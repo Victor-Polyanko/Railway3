@@ -1,7 +1,7 @@
 #ifndef TRAIN_H
 #define TRAIN_H
 
-#include "Point.h"
+#include "TimePoint.h"
 #include "Schedule.h"
 
 #include <qvector.h>
@@ -14,13 +14,15 @@ public:
 public:
     Train();
     Train(int N);
+    Train(int aNumber, int aHours, int aMinutes, int aStations, Type aType);
     int getStationsQuantity() const;
-    Schedule getStation(int i) const;
+    Schedule getStation(int aI) const;
+    void setStation(int aI, int aArriveHours, int aArriveMinutes, int aWait, int aDepartHours, int aDepartMinutes, int aNumber);
 
 private:
     int mNumber;
     Type mType;
-    Point mStartTime;
+    TimePoint mStartTime;
     QVector<Schedule> mStations;
 };
 

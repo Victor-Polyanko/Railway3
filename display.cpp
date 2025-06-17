@@ -1,5 +1,6 @@
 #include "display.h"
 
+#include <QFile>
 #include <QPen>
 
 const int cStep = 3;
@@ -39,6 +40,26 @@ void Display::generate()
             break;
         default: break;
         }
+}
+
+QString Display::load(const QString &aFileName)
+{
+    QFile file(aFileName);
+
+    if (!file.open(QIODevice::ReadOnly))
+        return " Файл не знайдено.\n Спробуйте вiдкрити iнший файл або почнiть нову гру.";
+    try
+    {   QDataStream stream(&file);
+        stream.setByteOrder(QDataStream::LittleEndian);
+        mMap.load(stream);
+        //MessageBox.Show(" Зчитування iнформацiї з файлу " + openFileDialog.FileName + " вiдбулося успiшно.");
+        file.close();
+    }
+    catch (...)
+    {
+        return " Сталася помилка зчитування даних. \n Причина: Невiдповiднiсть форматiв даних.\n Спробуйте вiдкрити iнший файл або почнiть нову гру.";
+    }
+    return "";
 }
 
 //void Display::showTrains(Graphics g, int w, int h, Point &aTime){
@@ -96,7 +117,7 @@ void Display::showDistricts(QPainter &aPainter) const
 
 void Display::showStationsAndWays(QPainter &aPainter) const
 {
-    int diametr = mMap.getDimention().getX() / mMap.getDistrictsQuantity() / 20;
+    int diametr = mMap.getDimention().getX() / mMap.getDistrictsStationsQuantity() / 20;
     double width = static_cast<double>(aPainter.window().width());
     double height = static_cast<double>(aPainter.window().height());
     double kx = width / mMap.getDimention().getX();
@@ -128,9 +149,8 @@ void Display::showStationsAndWays(QPainter &aPainter) const
         aPainter.drawText(point, station.getName());
     }
     for (auto &way : mMap.getWays())
-        aPainter.drawLine(static_cast<int>(kx * mMap.getStations()[way.getX()].getX()),
-                          static_cast<int>(ky * mMap.getStations()[way.getX()].getY()),
-                          static_cast<int>(kx * mMap.getStations()[way.getY()].getX()),
-                          static_cast<int>(ky * mMap.getStations()[way.getY()].getY()));
+        aPainter.drawLine(static_cast<int>(kx * mMap.getStations()[way.first].getX()),
+                          static_cast<int>(ky * mMap.getStations()[way.first].getY()),
+                          static_cast<int>(kx * mMap.getStations()[way.second].getX()),
+                          static_cast<int>(ky * mMap.getStations()[way.second].getY()));
 }
-

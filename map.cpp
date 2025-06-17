@@ -1,6 +1,8 @@
 #include "map.h"
+#include "Station.h"
 #include <cstdlib>
 #include <ctime>
+#include <qiodevice>
 
 const int cDefaultXDimention = 300;
 const int cDefaultYDimention = 300;
@@ -15,20 +17,13 @@ Map::Map()
          cDefaultDistrictStationsQuantity);
 }
 
-Map::Map(int aXd, int aYd, int aXq, int aYq, int aQuantity)
-{
-    init(aXd, aYd, aXq, aYq, aQuantity);
-}
-
 void Map::init(int aXd, int aYd, int aXq, int aYq, int aDistrictStationsQuantity)
 {
     mDimention = Point(aXd, aYd);
     mDistrictQuantity = Point(aXq, aYq);
     mDistrictStationsQuantity = aDistrictStationsQuantity;
-    auto stationsQuantity = mDistrictQuantity.size() * mDistrictStationsQuantity;
+    auto stationsQuantity = aXq * aYq * mDistrictStationsQuantity;
     mStations.resize(stationsQuantity);
-    mWays.reserve(stationsQuantity * stationsQuantity);
-    mTrains.reserve(stationsQuantity * stationsQuantity);
     mTime = Point( -1, -1);
 }
 
@@ -47,7 +42,7 @@ QVector<Train> Map::getTrains() const
     return mTrains;
 }
 
-QVector<Point> Map::getWays() const
+QVector<Way> Map::getWays() const
 {
     return mWays;
 }
@@ -57,9 +52,75 @@ Point Map::getDimention() const
     return mDimention;
 }
 
-int Map::getDistrictsQuantity() const
+Point Map::getDistrictsQuantity() const
+{
+    return mDistrictQuantity;
+}
+
+int Map::getDistrictsStationsQuantity() const
 {
     return mDistrictStationsQuantity;
+}
+
+void Map::load(QDataStream &aStream)
+{
+    int xDimention, yDimention, xQuantity, yQuantity;
+    aStream >> xDimention >> yDimention >> xQuantity >> yQuantity >> mDistrictStationsQuantity;
+    init(cDefaultXDimention, cDefaultYDimention, yQuantity, yQuantity, mDistrictStationsQuantity);
+    int waysQuantity, trainsQuantity;
+    aStream >> waysQuantity >> trainsQuantity;
+    auto stationsQuantity = xQuantity * yQuantity * mDistrictStationsQuantity;
+    loadStations(aStream, stationsQuantity);
+    loadWays(aStream, waysQuantity);
+    loadTrains(aStream, trainsQuantity);
+    fillColors();
+}
+
+void Map::loadStations(QDataStream &aStream, int aQuantity)
+{
+    for (auto &station : mStations)
+    {
+        int x, y, s, connections;
+        aStream >> x >> y >> connections >> s;
+        Station::Status status = static_cast<Station::Status>(s);
+        quint8 length;
+        aStream >> length;
+        QByteArray stringData(length, Qt::Uninitialized);
+        aStream.readRawData(stringData.data(), length);
+        QString name = QString::fromUtf8(stringData);
+        station = Station(x, y, connections, status, name);
+    }
+}
+
+void Map::loadWays(QDataStream &aStream, int aQuantity)
+{
+    mWays.clear();
+    mWays.resize(aQuantity);
+    for (auto &way : mWays)
+    {
+        int x, y;
+        aStream >> x >> y;
+        way = Way(x, y);
+    }
+}
+
+void Map::loadTrains(QDataStream &aStream, int aQuantity)
+{
+    mTrains.clear();
+    mTrains.resize(aQuantity);
+    for (auto &train : mTrains)
+    {
+        int number, hours, minutes, stations, t;
+        aStream >> number >> hours >> minutes >> stations >> t;
+        Train::Type type = static_cast<Train::Type>(t);
+        train = Train(number, hours, minutes, stations, type);
+        for (int i = 0; i < train.getStationsQuantity(); ++i)
+        {
+            int arriveHours, arriveMinutes, wait, departHours, departMinutes, number;
+            aStream >> arriveHours >> arriveMinutes >> wait >> departHours >> departMinutes >> number;
+            train.setStation(i, arriveHours, arriveMinutes, wait, departHours, departMinutes, number);
+        }
+    }
 }
 
 void Map::generate()
@@ -78,7 +139,6 @@ void Map::generateStations()
     int stationsQuantity2 = mStations.size() * mStations.size();
     for (int i = 0; i < mDistrictQuantity.getX(); i++)
         for (int j = 0; j < mDistrictQuantity.getY(); j++)
-        {
             for (int k = 0; k < mDistrictStationsQuantity; k++)
             {
                 auto index = (i * mDistrictQuantity.getY() + j) * mDistrictStationsQuantity + k;
@@ -86,9 +146,8 @@ void Map::generateStations()
                 int x = i * districtSize.getX() + randomPoint.getX() + 5;
                 int y = j * districtSize.getY() + randomPoint.getY() + 5;
                 Station::Status s = Station::Status::Town;
-                mStations[index] = Station(x, y, s, stationsQuantity2);
+                mStations[index] = Station(x, y, stationsQuantity2, s);
             }
-        }
 }
 
 void Map::globalConnection()
@@ -126,7 +185,7 @@ void Map::globalConnection()
             }
         auto firstId = currDistance - minDistances.begin();
         auto secondId = (*currDistance)->second;
-        mWays.push_back(Point(firstId, secondId));
+        mWays.push_back(Way(firstId, secondId));
         if (groups[firstId] == 0)
             ++minDistances[firstId];
         if (groups[secondId] == 0)

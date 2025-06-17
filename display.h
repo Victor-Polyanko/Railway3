@@ -14,6 +14,8 @@ public:
     Display();
 
     void generate();
+    QString load(const QString &aFileName);
+
     void buildParts();
     //void showTrains(Graphics g, int aWidth, int aHeight, Point &aTime);
     void showDistricts(QPainter &aPainter) const;
