@@ -113,6 +113,6 @@ void MainWindow::addAboutMenu(QWidget *parent)
 void MainWindow::paintEvent(QPaintEvent *event)
 {
     QPainter painter(this);
-    //mDisplay.showDistricts(painter);
-    //mDisplay.showStationsAndWays(painter);
+    mDisplay.showDistricts(painter);
+    mDisplay.showStationsAndWays(painter);
 }

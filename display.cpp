@@ -52,12 +52,11 @@ QString Display::load(const QString &aFileName)
     {   QDataStream stream(&file);
         stream.setByteOrder(QDataStream::LittleEndian);
         mMap.load(stream);
-        //MessageBox.Show(" Зчитування iнформацiї з файлу " + openFileDialog.FileName + " вiдбулося успiшно.");
         file.close();
     }
     catch (...)
     {
-        return " Сталася помилка зчитування даних. \n Причина: Невiдповiднiсть форматiв даних.\n Спробуйте вiдкрити iнший файл або почнiть нову гру.";
+        return " Сталася помилка зчитування даних. \n Причина: Невiдповiднiсть форматiв даних.\n Оберіть iнший файл або почнiть нову гру.";
     }
     return "";
 }
@@ -98,15 +97,19 @@ QString Display::load(const QString &aFileName)
 
 void Display::showDistricts(QPainter &aPainter) const
 {
+    if (mMap.getDimention().getX() <= 0 ||
+        mMap.getDimention().getY() <= 0 ||
+        mParts.empty())
+        return;
     double width = static_cast<double>(aPainter.window().width());
     double height = static_cast<double>(aPainter.window().height());
     double kx = width / mMap.getDimention().getX();
-    double ky = height * 3 / mMap.getDimention().getY();
-    for(int i = 0; i < mMap.getDimention().getX(); i += cStep)
+    double ky = height * cStep / mMap.getDimention().getY();
+    for(int i = 0; i < mMap.getDimention().getX() - cStep; i += cStep)
     {
         int kxi = static_cast<int>(kx * i) - cHalfWidth;
         int n = i * mMap.getDimention().getY() / cStep2;
-        for(int j = 0; j < mMap.getDimention().getY() / cStep; j++)
+        for(int j = 0; j < mMap.getDimention().getY() / cStep; ++j)
         {
             aPainter.setBrush(mParts[n + j]);
             aPainter.setPen(mParts[n + j].color());
@@ -121,12 +124,12 @@ void Display::showStationsAndWays(QPainter &aPainter) const
     double width = static_cast<double>(aPainter.window().width());
     double height = static_cast<double>(aPainter.window().height());
     double kx = width / mMap.getDimention().getX();
-    double ky = height * cStep / mMap.getDimention().getY();
+    double ky = height / mMap.getDimention().getY();
     QPen pen;
     pen.setColor(cNavy);
     pen.setWidth(cLineWidth);
     aPainter.setPen(pen);
-    int diakx = static_cast<int>(kx * diametr / cStep);
+    int diakx = static_cast<int>(kx * diametr);
     for (auto &station : mMap.getStations())
     {
         int radius = diakx * station.getStatus();

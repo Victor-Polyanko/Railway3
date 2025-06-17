@@ -20,9 +20,9 @@ public:
     //void showTrains(Graphics g, int aWidth, int aHeight, Point &aTime);
     void showDistricts(QPainter &aPainter) const;
     void showStationsAndWays(QPainter &aPainter) const;
-    Map mMap;
+
 private:
-    //Map mMap;
+    Map mMap;
     QVector<QBrush> mParts;
 };
 
