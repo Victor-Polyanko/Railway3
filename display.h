@@ -4,8 +4,7 @@
 #include "Map.h"
 #include "Point.h"
 
-
-#include <QBrush>
+#include <QColor>
 #include <QPainter>
 
 class Display
@@ -22,8 +21,11 @@ public:
     void showStationsAndWays(QPainter &aPainter) const;
 
 private:
+    void convertColors();
+
+private:
     Map mMap;
-    QVector<QBrush> mParts;
+    QVector<QColor> mColors;
 };
 
 #endif // DISPLAY_H

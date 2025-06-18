@@ -22,21 +22,26 @@ Display::Display() {}
 void Display::generate()
 {
     mMap.generate();
-    mParts.reserve(mMap.getColors().size());
+    convertColors();
+}
+
+void Display::convertColors()
+{
+    mColors.reserve(mMap.getColors().size());
     for (auto &color : mMap.getColors())
         switch (color)
         {
         case Map::Color::LavenderBlush:
-            mParts.emplace_back(QBrush(cLavenderBlush));
+            mColors.emplace_back(QColor(cLavenderBlush));
             break;
         case Map::Color::Lavender:
-            mParts.emplace_back(QBrush(cLavender));
+            mColors.emplace_back(QColor(cLavender));
             break;
         case Map::Color::Honeydew:
-            mParts.emplace_back(QBrush(cHoneydew));
+            mColors.emplace_back(QColor(cHoneydew));
             break;
         case Map::Color::MistyRose:
-            mParts.emplace_back(QBrush(cMistyRose));
+            mColors.emplace_back(QColor(cMistyRose));
             break;
         default: break;
         }
@@ -52,6 +57,7 @@ QString Display::load(const QString &aFileName)
     {   QDataStream stream(&file);
         stream.setByteOrder(QDataStream::LittleEndian);
         mMap.load(stream);
+        convertColors();
         file.close();
     }
     catch (...)
@@ -99,7 +105,7 @@ void Display::showDistricts(QPainter &aPainter) const
 {
     if (mMap.getDimention().getX() <= 0 ||
         mMap.getDimention().getY() <= 0 ||
-        mParts.empty())
+        mColors.empty())
         return;
     double width = static_cast<double>(aPainter.window().width());
     double height = static_cast<double>(aPainter.window().height());
@@ -111,8 +117,8 @@ void Display::showDistricts(QPainter &aPainter) const
         int n = i * mMap.getDimention().getY() / cStep2;
         for(int j = 0; j < mMap.getDimention().getY() / cStep; ++j)
         {
-            aPainter.setBrush(mParts[n + j]);
-            aPainter.setPen(mParts[n + j].color());
+            aPainter.setBrush(mColors[n + j]);
+            aPainter.setPen(mColors[n + j]);
             aPainter.drawRect(kxi, static_cast<int>(ky * j) - cHalfHeight, cPartWidth, cPartHeight);
         }
     }
