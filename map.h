@@ -29,10 +29,10 @@ public:
     Point findTrainPosition(const Train &aTrain, const TimePoint &aTime) const;
 
 private:
-    void init(int aXd, int aYd, int aXq, int aYq, int aQ);
-    void loadStations(QDataStream &aStream, int aQuantity);
-    void loadWays(QDataStream &aStream, int aQuantity);
-    void loadTrains(QDataStream &aStream, int aQuantity);
+    void init(int aXd, int aYd, int aXq, int aYq, int aQ, int aWaysQuantity = 0, int aTrainsQuantity = 0);
+    void loadStations(QDataStream &aStream);
+    void loadWays(QDataStream &aStream);
+    void loadTrains(QDataStream &aStream);
     void generateStations();
     void globalConnection();
     void updateStationsStatuses();

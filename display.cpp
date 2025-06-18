@@ -50,7 +50,6 @@ void Display::convertColors()
 QString Display::load(const QString &aFileName)
 {
     QFile file(aFileName);
-
     if (!file.open(QIODevice::ReadOnly))
         return " Файл не знайдено.\n Спробуйте вiдкрити iнший файл або почнiть нову гру.";
     try

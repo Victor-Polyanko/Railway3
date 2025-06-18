@@ -17,13 +17,18 @@ Map::Map()
          cDefaultDistrictStationsQuantity);
 }
 
-void Map::init(int aXd, int aYd, int aXq, int aYq, int aDistrictStationsQuantity)
+void Map::init(int aXd, int aYd, int aXq, int aYq, int aDistrictStationsQuantity, int aWaysQuantity, int aTrainsQuantity)
 {
     mDimention = Point(aXd, aYd);
     mDistrictQuantity = Point(aXq, aYq);
     mDistrictStationsQuantity = aDistrictStationsQuantity;
     auto stationsQuantity = aXq * aYq * mDistrictStationsQuantity;
+    mStations.clear();
     mStations.resize(stationsQuantity);
+    mWays.clear();
+    mWays.resize(aWaysQuantity);
+    mTrains.clear();
+    mTrains.resize(aTrainsQuantity);
     mTime = Point( -1, -1);
 }
 
@@ -64,19 +69,16 @@ int Map::getDistrictsStationsQuantity() const
 
 void Map::load(QDataStream &aStream)
 {
-    int xDimention, yDimention, xQuantity, yQuantity;
-    aStream >> xDimention >> yDimention >> xQuantity >> yQuantity >> mDistrictStationsQuantity;
-    init(cDefaultXDimention, cDefaultYDimention, yQuantity, yQuantity, mDistrictStationsQuantity);
-    int waysQuantity, trainsQuantity;
-    aStream >> waysQuantity >> trainsQuantity;
-    auto stationsQuantity = xQuantity * yQuantity * mDistrictStationsQuantity;
-    loadStations(aStream, stationsQuantity);
-    loadWays(aStream, waysQuantity);
-    loadTrains(aStream, trainsQuantity);
+    int xDimention, yDimention, xQuantity, yQuantity, waysQuantity, trainsQuantity;
+    aStream >> xDimention >> yDimention >> xQuantity >> yQuantity >> mDistrictStationsQuantity >> waysQuantity >> trainsQuantity;
+    init(cDefaultXDimention, cDefaultYDimention, yQuantity, yQuantity, mDistrictStationsQuantity, waysQuantity, trainsQuantity);
+    loadStations(aStream);
+    loadWays(aStream);
+    loadTrains(aStream);
     fillColors();
 }
 
-void Map::loadStations(QDataStream &aStream, int aQuantity)
+void Map::loadStations(QDataStream &aStream)
 {
     for (auto &station : mStations)
     {
@@ -92,10 +94,8 @@ void Map::loadStations(QDataStream &aStream, int aQuantity)
     }
 }
 
-void Map::loadWays(QDataStream &aStream, int aQuantity)
+void Map::loadWays(QDataStream &aStream)
 {
-    mWays.clear();
-    mWays.resize(aQuantity);
     for (auto &way : mWays)
     {
         int x, y;
@@ -104,10 +104,8 @@ void Map::loadWays(QDataStream &aStream, int aQuantity)
     }
 }
 
-void Map::loadTrains(QDataStream &aStream, int aQuantity)
+void Map::loadTrains(QDataStream &aStream)
 {
-    mTrains.clear();
-    mTrains.resize(aQuantity);
     for (auto &train : mTrains)
     {
         int number, hours, minutes, stations, t;
