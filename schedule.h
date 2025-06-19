@@ -3,21 +3,15 @@
 
 #include "TimePoint.h"
 
-class Schedule
+struct Schedule
 {
-public:
     Schedule();
     Schedule(int aArriveHours, int aArriveMinutes, int aWait, int aDepartHours, int aDepartMinutes, int aNumber);
 
-    TimePoint getArrive() const;
-    TimePoint getDepart() const;
-    int getNumber() const;
-
-private:
-    TimePoint mArrive;
-    int mWait;
-    TimePoint mDepart;
-    int mNumber;
+    TimePoint arrive;
+    int wait;
+    TimePoint depart;
+    int number;
 };
 
 #endif // SCHEDULE_H

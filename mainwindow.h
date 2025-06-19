@@ -28,6 +28,7 @@ private:
     void addWaysMenu();
     void addLaunchMenu();
     void addAboutMenu(QWidget *parent);
+    void showError(const QString &aTitle, const QString &aText) const;
 
 private:
     Ui::MainWindow *ui;

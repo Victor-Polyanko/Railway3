@@ -18,6 +18,7 @@ public:
     Map();
     void generate();
     void load(QDataStream &aStream);
+    void save(QDataStream &aStream) const;
 
     QVector<Color> getColors() const;
     QVector<Station> getStations() const;
@@ -33,6 +34,10 @@ private:
     void loadStations(QDataStream &aStream);
     void loadWays(QDataStream &aStream);
     void loadTrains(QDataStream &aStream);
+    void saveHeader(QDataStream &aStream) const;
+    void saveStations(QDataStream &aStream) const;
+    void saveWays(QDataStream &aStream) const;
+    void saveTrains(QDataStream &aStream) const;
     void generateStations();
     void globalConnection();
     void updateStationsStatuses();

@@ -30,14 +30,19 @@ Train::Type Train::getType() const
     return mType;
 }
 
+TimePoint Train::getStartTime() const
+{
+    return mStartTime;
+}
+
 int Train::getStationsQuantity() const
 {
     return mStations.size();
 }
 
-Schedule Train::getStation(int aI) const
+QVector<Schedule> Train::getStations() const
 {
-    return mStations[aI];
+    return mStations;
 }
 
 void Train::setStation(int aI, int aArriveHours, int aArriveMinutes,

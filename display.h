@@ -14,6 +14,7 @@ public:
 
     void generate();
     QString load(const QString &aFileName);
+    QString save(const QString &aFileName);
 
     void buildParts();
     void showTrains(QPainter &aPainter, const TimePoint &aTime) const;

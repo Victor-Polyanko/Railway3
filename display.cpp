@@ -70,6 +70,24 @@ QString Display::load(const QString &aFileName)
     return "";
 }
 
+QString Display::save(const QString &aFileName)
+{
+    QFile file(aFileName);
+    if (!file.open(QIODevice::WriteOnly))
+        return "Сталася помилка пiдготовки до запису.\n Спробуйте iншу назву файл або змініть розташування.";
+    try
+    {   QDataStream stream(&file);
+        //stream.setByteOrder(QDataStream::LittleEndian);
+        mMap.save(stream);
+        file.close();
+    }
+    catch (...)
+    {
+        return "Сталася помилка запису даних.";
+    }
+    return "";
+}
+
 void Display::showTrains(QPainter &aPainter, const TimePoint &aTime) const
 {
     if (!aTime.isSet())

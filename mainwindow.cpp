@@ -41,14 +41,18 @@ void MainWindow::addFileMenu()
         {
             QString result = mDisplay.load(fileName);
             if (!result.isEmpty())
-            {
-                QMessageBox msgBox;
-                msgBox.setText(result);
-                msgBox.setWindowTitle("Помилка при відкритті файлу");
-                msgBox.exec();
-            }
+                showError("Помилка при відкритті файлу", result);
         }
      });
+    QObject::connect(saveAction, &QAction::triggered, [&]() {
+        QString fileName = QFileDialog::getSaveFileName(this, "Зберегти файл", "", "Railway Files (*.rw1)");
+        if (!fileName.isEmpty())
+        {
+            QString result = mDisplay.save(fileName);
+            if (!result.isEmpty())
+                showError("Помилка при збереженні файлу", result);
+        }
+    });
     QObject::connect(exitAction, &QAction::triggered, [&]() { QApplication::quit(); });
 }
 
@@ -108,6 +112,14 @@ void MainWindow::addAboutMenu(QWidget *parent)
             "як дістатися з однієї станції до іншої.\n\n" \
             "Приємного часопроведення! :-)");
     });
+}
+
+void MainWindow::showError(const QString &aTitle, const QString &aText) const
+{
+    QMessageBox msgBox;
+    msgBox.setText(aText);
+    msgBox.setWindowTitle(aTitle);
+    msgBox.exec();
 }
 
 void MainWindow::paintEvent(QPaintEvent *event)

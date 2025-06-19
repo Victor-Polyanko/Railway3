@@ -121,6 +121,67 @@ void Map::loadTrains(QDataStream &aStream)
     }
 }
 
+void Map::save(QDataStream &aStream) const
+{
+    saveHeader(aStream);
+    saveStations(aStream);
+    saveWays(aStream);
+    saveTrains(aStream);
+}
+
+void Map::saveHeader(QDataStream &aStream) const
+{
+    aStream << mDimention.getX();
+    aStream << mDimention.getY();
+    aStream << mDistrictQuantity.getX();
+    aStream << mDistrictQuantity.getY();
+    aStream << mDistrictStationsQuantity;
+    aStream << mWays.size();
+    aStream << mTrains.size();
+}
+
+void Map::saveStations(QDataStream &aStream) const
+{
+    for (const auto &station : mStations)
+    {
+        aStream << station.getX();
+        aStream << station.getY();
+        aStream << station.getConnectionsSize();
+        aStream << station.getStatus();
+        aStream << station.getName();
+    }
+}
+
+void Map::saveWays(QDataStream &aStream) const
+{
+    for (const auto &way : mWays)
+    {
+        aStream << way.first;
+        aStream << way.second;
+    }
+}
+
+void Map::saveTrains(QDataStream &aStream) const
+{
+    for (const auto &train : mTrains)
+    {
+        aStream << train.getNumber();
+        aStream << train.getStartTime().getX();
+        aStream << train.getStartTime().getY();
+        aStream << train.getStationsQuantity();
+        aStream << train.getType();
+        for (const auto &station : train.getStations())
+        {
+            aStream << station.arrive.getX();
+            aStream << station.arrive.getY();
+            aStream << station.wait;
+            aStream << station.depart.getX();
+            aStream << station.depart.getY();
+            aStream << station.number;
+        }
+    }
+}
+
 void Map::generate()
 {
     generateStations();
@@ -270,36 +331,42 @@ Point Map::findTrainPosition(const Train &aTrain, const TimePoint &aTime) const
 {
     auto trainXY = Point(-1,-1);
     //пошук на проміжних станціях
-    for (int j = 1; j < aTrain.getStationsQuantity() - 1; j++)
-        if (aTrain.getStation(j).getArrive().isEarlierThan(aTime) && aTime.isEarlierThan(aTrain.getStation(j).getDepart()))
+    if (aTrain.getStations().size() > 2)
+    for (auto station = aTrain.getStations().begin() + 1; station != aTrain.getStations().end() - 1; ++station)
+        if (station->arrive.isEarlierThan(aTime) && aTime.isEarlierThan(station->depart))
         {
-            trainXY = Point(mStations[aTrain.getStation(j).getNumber()]);
+            trainXY = Point(mStations[station->number]);
             break;
         }
     //пошук між станціями
     if (trainXY.getX() == -1)
-        for (int j = 1; j < aTrain.getStationsQuantity(); j++)
-            if (aTime.isEarlierThan(aTrain.getStation(j).getArrive()) && aTrain.getStation(j - 1).getDepart().isEarlierThan(aTime))
+    {
+        auto prevStation = aTrain.getStations().begin();
+        for (auto station = prevStation + 1; station != aTrain.getStations().end(); ++station, prevStation = station)
+            if (aTime.isEarlierThan(station->arrive) && prevStation->depart.isEarlierThan(aTime))
             {
-                int trainMinutes = aTrain.getStation(j - 1).getDepart().getMinutesTo(aTime);
-                int stationMinutes = aTrain.getStation(j - 1).getDepart().getMinutesTo(aTrain.getStation(j).getArrive());
+                int trainMinutes = prevStation->depart.getMinutesTo(aTime);
+                int stationMinutes = prevStation->depart.getMinutesTo(station->arrive);
                 float relation = (float)trainMinutes / stationMinutes;
-                trainXY = Point(mStations[aTrain.getStation(j - 1).getNumber()].getX() + (int)((mStations[aTrain.getStation(j).getNumber()].getX() - mStations[aTrain.getStation(j - 1).getNumber()].getX()) * relation),
-                                mStations[aTrain.getStation(j - 1).getNumber()].getY() + (int)((mStations[aTrain.getStation(j).getNumber()].getY() - mStations[aTrain.getStation(j - 1).getNumber()].getY()) * relation));
+                trainXY = Point(mStations[prevStation->number].getX() + (int)((mStations[station->number].getX() - mStations[prevStation->number].getX()) * relation),
+                                mStations[prevStation->number].getY() + (int)((mStations[station->number].getY() - mStations[prevStation->number].getY()) * relation));
             }
+    }
     //пошук на кінцевих станціях
     if(trainXY.getX() == -1 )
     {
-        int minutes = aTrain.getStation(aTrain.getStationsQuantity() - 1).getArrive().getMinutesTo(aTrain.getStation(0).getDepart());
+        auto firstStation = aTrain.getStations().front();
+        auto secondStation = aTrain.getStations().back();
+        int minutes = secondStation.arrive.getMinutesTo(firstStation.depart);
         TimePoint::correctMinutes(minutes);
-        TimePoint firstTime = aTrain.getStation(0).getDepart();
+        TimePoint firstTime = firstStation.depart;
         firstTime.substractMinutes(minutes);
-        TimePoint secondTime = aTrain.getStation(aTrain.getStationsQuantity() - 1).getArrive();
+        TimePoint secondTime = secondStation.arrive;
         secondTime.addMinutes(minutes);
         if (aTime.isEarlierThan(firstTime) && TimePoint::isLessThanHour(aTime.getMinutesTo(firstTime)))
-            trainXY = Point(mStations[aTrain.getStation(0).getNumber()]);
+            trainXY = Point(mStations[firstStation.number]);
         else if (secondTime.isEarlierThan(aTime) && TimePoint::isLessThanHour(secondTime.getMinutesTo(aTime)))
-            trainXY = Point(mStations[aTrain.getStation(aTrain.getStationsQuantity() - 1).getNumber()]);
+            trainXY = Point(mStations[secondStation.number]);
     }
     return trainXY;
 }
