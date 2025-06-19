@@ -15,6 +15,8 @@ public:
     Train();
     Train(int N);
     Train(int aNumber, int aHours, int aMinutes, int aStations, Type aType);
+    int getNumber() const;
+    Type getType() const;
     int getStationsQuantity() const;
     Schedule getStation(int aI) const;
     void setStation(int aI, int aArriveHours, int aArriveMinutes, int aWait, int aDepartHours, int aDepartMinutes, int aNumber);

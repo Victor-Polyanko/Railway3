@@ -16,6 +16,10 @@ const QColor cLavender(230, 230, 250);
 const QColor cHoneydew(240,255,240);
 const QColor cMistyRose(255, 228, 225);
 const QColor cNavy(0, 0, 128);
+const QColor cWhite(255, 255, 255);
+const QColor cRed(0, 0, 128);
+const QColor cBlue(0, 0, 128);
+const QColor cOrange(0, 0, 128);
 
 Display::Display() {}
 
@@ -66,39 +70,51 @@ QString Display::load(const QString &aFileName)
     return "";
 }
 
-//void Display::showTrains(Graphics g, int w, int h, Point &aTime){
-//    g.FillRectangle(new SolidBrush(Color.White),0,0,w,h);
-//    Show(g, w, h);
-//    double kx = (double)(w) / mDimention.getX();
-//    double ky = (double)(h) / mDimention.getY();
-//    SolidBrush brush;
-//    Pen pen;
-//    Font f = new Font("Arial", 8, FontStyle.Regular);
-//    PointF p;
-//    cPoint trainXY;
-//    int radius =(int)(kx * mDimention.getX() / mDistrictQuantity.getX() / 120);
-//    for (auto &train : mMaps.getTrains())
-//    {
-//        trainXY = mMap.findTrainPosition(train);
-//        if(trainXY.getX() != -1)
-//        {
-//            switch(train.status)
-//            {
-//                case TrainStatus.Fast: brush = new SolidBrush(Color.Red);
-//                    break;
-//                case TrainStatus.Passenger: brush = new SolidBrush(Color.Blue);
-//                    break;
-//                default: brush = new SolidBrush(Color.Green);
-//                    break;
-//            }
-//            pen = new Pen(brush, 8);
-//            g.DrawEllipse(pen, (int)(kx * trainXY.getX() - radius), (int)(ky * trainXY.getY() - radius), 2 * radius, 2 * radius);
-//            p = new PointF((float)(kx * trainXY.getX() - ((train.number < 10) ? 3 : 5) * radius / 2), (float)(ky * trainXY.getY() - 5 * radius / 2));
-//            brush = new SolidBrush(Color.White);
-//            g.DrawString(train.number.ToString(), f, brush, p);
-//        }
-//    }
-//}
+void Display::showTrains(QPainter &aPainter, const TimePoint &aTime) const
+{
+    if (!aTime.isSet())
+        return;
+    float width = static_cast<double>(aPainter.window().width());
+    float height = static_cast<double>(aPainter.window().height());
+    float kx = width / mMap.getDimention().getX();
+    float ky = height / mMap.getDimention().getY();
+
+    QPen textPen;
+    textPen.setColor(cWhite);
+    QFont font = QFont("Arial", 8);
+    aPainter.setFont(font);
+    int radius = static_cast<int>(kx * mMap.getDimention().getX() / mMap.getDistrictsQuantity().getX() / 120);
+    int diameter = 2 * radius;
+    for (auto &train : mMap.getTrains())
+    {
+        Point trainXY = mMap.findTrainPosition(train, aTime);
+        if(trainXY.getX() != -1)
+        {
+            QPen pen;
+            if (mLastTime.isSet())
+            switch(train.getType())
+            {
+                case Train::Fast: pen.setColor(cRed);
+                    break;
+                case Train::Passenger: pen.setColor(cBlue);
+                    break;
+                default: pen.setColor(cOrange);
+                    break;
+            }
+            else
+                pen.setColor(cWhite);
+            float x = kx * trainXY.getX();
+            float y = ky * trainXY.getY();
+            pen.setWidth(8);
+            aPainter.setPen(pen);
+            aPainter.drawEllipse(static_cast<int>(x - radius), static_cast<int>(y - radius), diameter, diameter);
+            QPointF point(static_cast<float>(x - ((train.getNumber() < 10) ? 3 : 5) * radius / 2),
+                          static_cast<float>(y - 5 * radius / 2));
+            aPainter.setPen(textPen);
+            aPainter.drawText(point, QString::number(train.getNumber()));
+        }
+    }
+}
 
 void Display::showDistricts(QPainter &aPainter) const
 {
@@ -161,4 +177,9 @@ void Display::showStationsAndWays(QPainter &aPainter) const
                           static_cast<int>(ky * mMap.getStations()[way.first].getY()),
                           static_cast<int>(kx * mMap.getStations()[way.second].getX()),
                           static_cast<int>(ky * mMap.getStations()[way.second].getY()));
+}
+
+void Display::updateLastTime(const TimePoint &aTime)
+{
+    mLastTime = aTime;
 }

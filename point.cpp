@@ -4,13 +4,20 @@
 Point::Point()
     : mX(0)
     , mY(0)
+    , mIsSet(false)
 {
 }
 
 Point::Point(int aX, int aY)
     : mX(aX)
     , mY(aY)
+    , mIsSet(true)
 {
+}
+
+bool Point::isSet() const
+{
+    return mIsSet;
 }
 
 int Point::getX() const

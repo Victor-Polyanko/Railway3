@@ -2,7 +2,7 @@
 #define DISPLAY_H
 
 #include "Map.h"
-#include "Point.h"
+#include "TimePoint.h"
 
 #include <QColor>
 #include <QPainter>
@@ -16,9 +16,10 @@ public:
     QString load(const QString &aFileName);
 
     void buildParts();
-    //void showTrains(Graphics g, int aWidth, int aHeight, Point &aTime);
+    void showTrains(QPainter &aPainter, const TimePoint &aTime) const;
     void showDistricts(QPainter &aPainter) const;
     void showStationsAndWays(QPainter &aPainter) const;
+    void updateLastTime(const TimePoint &aTime);
 
 private:
     void convertColors();
@@ -26,6 +27,7 @@ private:
 private:
     Map mMap;
     QVector<QColor> mColors;
+    TimePoint mLastTime;
 };
 
 #endif // DISPLAY_H

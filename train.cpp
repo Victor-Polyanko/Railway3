@@ -20,6 +20,16 @@ Train::Train(int aNumber, int aHours, int aMinutes, int aStations, Type aType)
     mStations.resize(aStations);
 }
 
+int Train::getNumber() const
+{
+    return mNumber;
+}
+
+Train::Type Train::getType() const
+{
+    return mType;
+}
+
 int Train::getStationsQuantity() const
 {
     return mStations.size();

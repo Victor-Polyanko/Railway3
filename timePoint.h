@@ -3,7 +3,7 @@
 
 #include "point.h"
 
-class TimePoint : Point
+class TimePoint : public Point
 {
 public:
     TimePoint();

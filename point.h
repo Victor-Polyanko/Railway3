@@ -6,6 +6,7 @@ class Point
 public:
     Point();
     Point(int aX, int aY);
+    bool isSet() const;
     int getX() const;
     int getY() const;
     int size() const;
@@ -16,6 +17,7 @@ public:
 protected:
     int mX;
     int mY;
+    bool mIsSet;
 };
 
 #endif // POINT_H
