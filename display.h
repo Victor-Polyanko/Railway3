@@ -1,6 +1,8 @@
 #ifndef DISPLAY_H
 #define DISPLAY_H
 
+#define DEBUG_MODE //comment for release
+
 #include "Map.h"
 #include "TimePoint.h"
 
@@ -25,8 +27,14 @@ public:
 private:
     void convertColors();
 
+#ifdef DEBUG_MODE
+public:
+#else
 private:
+#endif
     Map mMap;
+
+private:
     QVector<QColor> mColors;
     TimePoint mLastTime;
 };

@@ -40,8 +40,7 @@ void MainWindow::addFileMenu()
         if (!fileName.isEmpty())
         {
             QString result = mDisplay.load(fileName);
-            if (!result.isEmpty())
-                showError("Помилка при відкритті файлу", result);
+            showInfo(result);
         }
      });
     QObject::connect(saveAction, &QAction::triggered, [&]() {
@@ -49,8 +48,7 @@ void MainWindow::addFileMenu()
         if (!fileName.isEmpty())
         {
             QString result = mDisplay.save(fileName);
-            if (!result.isEmpty())
-                showError("Помилка при збереженні файлу", result);
+            showInfo(result);
         }
     });
     QObject::connect(exitAction, &QAction::triggered, [&]() { QApplication::quit(); });
@@ -114,15 +112,73 @@ void MainWindow::addAboutMenu(QWidget *parent)
     });
 }
 
-void MainWindow::showError(const QString &aTitle, const QString &aText) const
+void MainWindow::showInfo(const QString &aText) const
+{
+#ifdef DEBUG_MODE
+    QString result = aText;
+    result += "\nРозміри мапи: x = " + QString::number(mDisplay.mMap.getDimention().getX());
+    result += " y = " + QString::number(mDisplay.mMap.getDimention().getY());
+    result += "\nКількість регіонів: x = " + QString::number(mDisplay.mMap.getDistrictsQuantity().getX());
+    result += " y = " + QString::number(mDisplay.mMap.getDistrictsQuantity().getX());
+    result += "\nКількість міст в регіоні: " + QString::number(mDisplay.mMap.getDistrictsStationsQuantity());
+    result += "\nКількість станцій: " + QString::number(mDisplay.mMap.getStations().size());
+    result += "\nКількість шляхів: " + QString::number(mDisplay.mMap.getWays().size());
+    result += "\nКількість потягів: " + QString::number(mDisplay.mMap.getTrains().size());
+    QString details = "Станції:";
+    for (const auto &station : mDisplay.mMap.getStations())
+    {
+        switch(station.getStatus())
+        {
+        case 3: details += "\nСтолиця "; break;
+        case 2: details += "\nОблцентр "; break;
+        case 1: details += "\nМісто "; break;
+        default: details += "\nКазна що "; break;
+        }
+        details += station.getName() + " x = " + QString::number(station.getX()) + " y = " + QString::number(station.getY());
+        details += " має " + QString::number(station.getConnectionsSize()) + " сполучень\t";
+    }
+    details += "\n\nШляхи:\n";
+    for (const auto &way : mDisplay.mMap.getWays())
+        details += mDisplay.mMap.getStations()[way.first].getName() + " - " +
+                   mDisplay.mMap.getStations()[way.second].getName() + "\t";
+
+    details += "\n\nПотяги:\n";
+    for (const auto &train : mDisplay.mMap.getTrains())
+    {
+        switch(train.getType())
+        {
+        case Train::Fast: details += "\nШвидкий"; break;
+        case Train::Passenger: details += "\nПасажирський"; break;
+        case Train::Local: details += "\nПриміський"; break;
+        default: details += "\nКазна який"; break;
+        }
+        details += " потяг №" + QString::number(train.getNumber()) + " ";
+        details += mDisplay.mMap.getStations()[train.getStations().front().number].getName() + " - " +
+                   mDisplay.mMap.getStations()[train.getStations().back().number].getName();
+        details += " вирушає о " + QString::number(train.getStartTime().getX()) +
+                   ":" + QString::number(train.getStartTime().getY());
+    }
+    showMessage("Деталі при відкритті файлу", result, details);
+#else
+    if (!aText.isEmpty())
+        showMessage("Помилка", aText);
+#endif
+}
+
+void MainWindow::showMessage(const QString &aTitle, const QString &aText, const QString &aDetails) const
 {
     QMessageBox msgBox;
-    msgBox.setText(aText);
     msgBox.setWindowTitle(aTitle);
+    msgBox.setText(aText);
+    if (!aDetails.isEmpty())
+    {
+        msgBox.setDetailedText(aDetails);
+        msgBox.setStyleSheet("QLabel{min-width: 400px;}");
+    }
     msgBox.exec();
 }
 
-void MainWindow::paintEvent(QPaintEvent *event)
+void MainWindow::paintEvent(QPaintEvent*)
 {
     QPainter painter(this);
     mDisplay.showDistricts(painter);

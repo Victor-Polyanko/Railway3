@@ -14,7 +14,7 @@ public:
 
 public:
     Station();
-    Station(int x, int y, int connections, Status &status, QString name = "");
+    Station(int aX, int aY, int aConnections, Status &aStatus, QString aName = "");
     int getConnectionsSize() const;
     void incConnectionsSize();
     void setStatus(int s);

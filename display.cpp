@@ -77,7 +77,7 @@ QString Display::save(const QString &aFileName)
         return "Сталася помилка пiдготовки до запису.\n Спробуйте iншу назву файл або змініть розташування.";
     try
     {   QDataStream stream(&file);
-        //stream.setByteOrder(QDataStream::LittleEndian);
+        stream.setByteOrder(QDataStream::LittleEndian);
         mMap.save(stream);
         file.close();
     }

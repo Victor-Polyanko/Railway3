@@ -9,12 +9,11 @@ Station::Station()
 {
 }
 
-Station::Station(int aX, int aY, int aN, Status &aStatus, QString aName) : Point(aX, aY)
+Station::Station(int aX, int aY, int aConnections, Status &aStatus, QString aName) : Point(aX, aY)
     , mStatus(aStatus)
-    , mConnectionsSize(0)
+    , mConnectionsSize(aConnections)
     , mName(aName.isEmpty() ? cDefaultName : aName)
 {
-    mTrains.resize(aN);
 }
 
 int Station::getConnectionsSize() const

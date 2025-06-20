@@ -6,7 +6,7 @@ Train::Train() {}
 
 Train::Train(int N)
     : mNumber(0)
-    , mType(Type::None)
+    , mType(Type::Local)
     , mStartTime(cDefaultTime)
 {
     mStations.resize(N);

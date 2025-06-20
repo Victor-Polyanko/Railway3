@@ -9,7 +9,7 @@
 class Train
 {
 public:
-    enum Type {None, Fast, Passenger, Local};
+    enum Type {Fast, Passenger, Local};
 
 public:
     Train();

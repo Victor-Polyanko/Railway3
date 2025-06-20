@@ -20,7 +20,7 @@ public:
     ~MainWindow();
 
 public:
-    void paintEvent(QPaintEvent *event) override;
+    void paintEvent(QPaintEvent *) override;
 
 private:
     void addFileMenu();
@@ -28,7 +28,8 @@ private:
     void addWaysMenu();
     void addLaunchMenu();
     void addAboutMenu(QWidget *parent);
-    void showError(const QString &aTitle, const QString &aText) const;
+    void showInfo(const QString &aText) const;
+    void showMessage(const QString &aTitle, const QString &aText, const QString &aDetails = "") const;
 
 private:
     Ui::MainWindow *ui;
