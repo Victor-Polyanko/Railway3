@@ -4,11 +4,14 @@
 #include <QFileDialog>
 #include <QMessageBox>
 
+const QString cDefaultTitle = "Залізниці 3.0";
+
 MainWindow::MainWindow(QWidget *parent)
     : QMainWindow(parent)
     , ui(new Ui::MainWindow)
 {
     ui->setupUi(this);
+    this->setWindowTitle(cDefaultTitle);
     addFileMenu();
     addTrainMenu();
     addWaysMenu();
@@ -30,24 +33,40 @@ void MainWindow::addFileMenu()
     fileMenu->addAction(loadAction);
     QAction *saveAction = new QAction("Зберегти мапу");
     fileMenu->addAction(saveAction);
+    QAction *saveAsAction = new QAction("Зберегти мапу як...");
+    fileMenu->addAction(saveAsAction);
     fileMenu->addSeparator();
     QAction *exitAction = new QAction("Вийти");
     fileMenu->addAction(exitAction);
 
-    QObject::connect(generateAction, &QAction::triggered, [&]() { mDisplay.generate(); });
+    QObject::connect(generateAction, &QAction::triggered, [&]() {
+        mDisplay.generate();
+        updateFileName("");
+    });
     QObject::connect(loadAction, &QAction::triggered, [&]() {
         QString fileName = QFileDialog::getOpenFileName(this, "Завантажити файл", "", "Railway Files (*.rw1)");
         if (!fileName.isEmpty())
         {
             QString result = mDisplay.load(fileName);
+            updateFileName(fileName);
             showInfo(result);
         }
-     });
+    });
     QObject::connect(saveAction, &QAction::triggered, [&]() {
-        QString fileName = QFileDialog::getSaveFileName(this, "Зберегти файл", "", "Railway Files (*.rw1)");
+        if (mFileName.isEmpty())
+            mFileName = QFileDialog::getSaveFileName(this, "Зберегти файл", "", "Railway Files (*.rw1)");
+        if (!mFileName.isEmpty())
+        {
+            QString result = mDisplay.save(mFileName);
+            showInfo(result);
+        }
+    });
+    QObject::connect(saveAsAction, &QAction::triggered, [&]() {
+        QString fileName = QFileDialog::getSaveFileName(this, "Зберегти файл як...", "", "Railway Files (*.rw1)");
         if (!fileName.isEmpty())
         {
             QString result = mDisplay.save(fileName);
+            updateFileName(fileName);
             showInfo(result);
         }
     });
@@ -176,6 +195,12 @@ void MainWindow::showMessage(const QString &aTitle, const QString &aText, const 
         msgBox.setStyleSheet("QLabel{min-width: 400px;}");
     }
     msgBox.exec();
+}
+
+void MainWindow::updateFileName(const QString &aFileName)
+{
+    mFileName = aFileName;
+    this->setWindowTitle(cDefaultTitle + " " + mFileName);
 }
 
 void MainWindow::paintEvent(QPaintEvent*)

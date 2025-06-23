@@ -30,9 +30,11 @@ private:
     void addAboutMenu(QWidget *parent);
     void showInfo(const QString &aText) const;
     void showMessage(const QString &aTitle, const QString &aText, const QString &aDetails = "") const;
+    void updateFileName(const QString &aFileName);
 
 private:
     Ui::MainWindow *ui;
+    QString mFileName;
     Display mDisplay;
 };
 #endif // MAINWINDOW_H
