@@ -87,9 +87,15 @@ void Map::loadStations(QDataStream &aStream)
         Station::Status status = static_cast<Station::Status>(s);
         quint8 length;
         aStream >> length;
-        QByteArray stringData(length, Qt::Uninitialized);
-        aStream.readRawData(stringData.data(), length);
-        QString name = QString::fromUtf8(stringData);
+        QString name;
+        if (length)
+        {
+            QByteArray stringData(length, Qt::Uninitialized);
+            aStream.readRawData(stringData.data(), length);
+            name = QString::fromUtf8(stringData);
+        }
+        else
+            aStream >> name;
         station = Station(x, y, connections, status, name);
     }
 }
@@ -136,8 +142,8 @@ void Map::saveHeader(QDataStream &aStream) const
     aStream << mDistrictQuantity.getX();
     aStream << mDistrictQuantity.getY();
     aStream << mDistrictStationsQuantity;
-    aStream << mWays.size();
-    aStream << mTrains.size();
+    aStream << static_cast<int>(mWays.size());
+    aStream << static_cast<int>(mTrains.size());
 }
 
 void Map::saveStations(QDataStream &aStream) const
@@ -148,6 +154,8 @@ void Map::saveStations(QDataStream &aStream) const
         aStream << station.getY();
         aStream << station.getConnectionsSize();
         aStream << station.getStatus();
+        quint8 compatibilityByte = 0;
+        aStream << compatibilityByte;
         aStream << station.getName();
     }
 }
