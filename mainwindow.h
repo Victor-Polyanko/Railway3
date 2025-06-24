@@ -2,6 +2,7 @@
 #define MAINWINDOW_H
 
 #include <QMainWindow>
+#include <QCloseEvent>
 
 #include "display.h"
 
@@ -20,7 +21,8 @@ public:
     ~MainWindow();
 
 public:
-    void paintEvent(QPaintEvent *) override;
+    virtual void paintEvent(QPaintEvent *) override;
+    virtual void closeEvent(QCloseEvent *) override;
 
 private:
     void addFileMenu();
@@ -28,9 +30,15 @@ private:
     void addWaysMenu();
     void addLaunchMenu();
     void addAboutMenu(QWidget *parent);
+    void generateMap();
+    void loadMap();
+    void saveMap(const QString &aFileName = "");
     void showInfo(const QString &aText) const;
     void showMessage(const QString &aTitle, const QString &aText, const QString &aDetails = "") const;
+    bool keepGoing();
     void updateFileName(const QString &aFileName);
+    bool areNotSavedChanges() const;
+    void markTitleWithChanges();
 
 private:
     Ui::MainWindow *ui;

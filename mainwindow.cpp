@@ -4,6 +4,7 @@
 #include <QFileDialog>
 #include <QMessageBox>
 
+const QString cNewPrefix = "* ";
 const QString cDefaultTitle = "Залізниці 3.0";
 
 MainWindow::MainWindow(QWidget *parent)
@@ -39,37 +40,10 @@ void MainWindow::addFileMenu()
     QAction *exitAction = new QAction("Вийти");
     fileMenu->addAction(exitAction);
 
-    QObject::connect(generateAction, &QAction::triggered, [&]() {
-        mDisplay.generate();
-        updateFileName("");
-    });
-    QObject::connect(loadAction, &QAction::triggered, [&]() {
-        QString fileName = QFileDialog::getOpenFileName(this, "Завантажити файл", "", "Railway Files (*.rw1)");
-        if (!fileName.isEmpty())
-        {
-            QString result = mDisplay.load(fileName);
-            updateFileName(fileName);
-            showInfo(result);
-        }
-    });
-    QObject::connect(saveAction, &QAction::triggered, [&]() {
-        if (mFileName.isEmpty())
-            mFileName = QFileDialog::getSaveFileName(this, "Зберегти файл", "", "Railway Files (*.rw1)");
-        if (!mFileName.isEmpty())
-        {
-            QString result = mDisplay.save(mFileName);
-            showInfo(result);
-        }
-    });
-    QObject::connect(saveAsAction, &QAction::triggered, [&]() {
-        QString fileName = QFileDialog::getSaveFileName(this, "Зберегти файл як...", "", "Railway Files (*.rw1)");
-        if (!fileName.isEmpty())
-        {
-            QString result = mDisplay.save(fileName);
-            updateFileName(fileName);
-            showInfo(result);
-        }
-    });
+    QObject::connect(generateAction, &QAction::triggered, [&]() { generateMap(); });
+    QObject::connect(loadAction, &QAction::triggered, [&]() { loadMap(); });
+    QObject::connect(saveAction, &QAction::triggered, [&]() { saveMap(mFileName); });
+    QObject::connect(saveAsAction, &QAction::triggered, [&]() { saveMap(); });
     QObject::connect(exitAction, &QAction::triggered, [&]() { QApplication::quit(); });
 }
 
@@ -131,6 +105,42 @@ void MainWindow::addAboutMenu(QWidget *parent)
     });
 }
 
+void MainWindow::generateMap()
+{
+    if (!keepGoing())
+        return;
+    mDisplay.generate();
+    updateFileName("");
+}
+
+void MainWindow::loadMap()
+{
+    if (!keepGoing())
+        return;
+    QString fileName = QFileDialog::getOpenFileName(this, "Завантажити файл", "", "Railway Files (*.rw1)");
+    if (!fileName.isEmpty())
+    {
+        QString result = mDisplay.load(fileName);
+        updateFileName(fileName);
+        showInfo(result);
+    }
+}
+
+void MainWindow::saveMap(const QString &aFileName)
+{
+    if (!areNotSavedChanges() && aFileName.isEmpty())
+        return;
+    auto name = aFileName.isEmpty()
+        ? QFileDialog::getSaveFileName(this, "Зберегти файл як...", "", "Railway Files (*.rw1)")
+        : aFileName;
+    if (!name.isEmpty())
+    {
+        QString result = mDisplay.save(name);
+        updateFileName(name);
+        showInfo(result);
+    }
+}
+
 void MainWindow::showInfo(const QString &aText) const
 {
 #ifdef DEBUG_MODE
@@ -177,7 +187,7 @@ void MainWindow::showInfo(const QString &aText) const
         details += " вирушає о " + QString::number(train.getStartTime().getX()) +
                    ":" + QString::number(train.getStartTime().getY());
     }
-    showMessage("Деталі при відкритті файлу", result, details);
+    showMessage("Деталі файлу", result, details);
 #else
     if (!aText.isEmpty())
         showMessage("Помилка", aText);
@@ -197,10 +207,50 @@ void MainWindow::showMessage(const QString &aTitle, const QString &aText, const 
     msgBox.exec();
 }
 
+bool MainWindow::keepGoing()
+{
+    bool doNext = true;
+    if (areNotSavedChanges())
+    {
+        QMessageBox msgBox;
+        msgBox.setText("Бажаєте спершу зберегти зміни?");
+        msgBox.setStandardButtons(QMessageBox::Save | QMessageBox::Discard | QMessageBox::Cancel);
+        msgBox.setDefaultButton(QMessageBox::Save);
+
+        switch (msgBox.exec())
+        {
+        case QMessageBox::Save:
+            saveMap(mFileName);
+            break;
+        case QMessageBox::Discard:
+            break;
+        case QMessageBox::Cancel:
+            doNext = false;
+            break;
+        default:
+            break;
+        }
+    }
+    return doNext;
+}
+
 void MainWindow::updateFileName(const QString &aFileName)
 {
     mFileName = aFileName;
-    this->setWindowTitle(cDefaultTitle + " " + mFileName);
+    auto title = aFileName.isEmpty()
+                     ? (cNewPrefix + cDefaultTitle)
+                     : (cDefaultTitle + " - " + mFileName);
+    this->setWindowTitle(title);
+}
+
+bool MainWindow::areNotSavedChanges() const
+{
+    return this->windowTitle().startsWith(cNewPrefix);
+}
+
+void MainWindow::markTitleWithChanges()
+{
+    this->setWindowTitle(cNewPrefix + this->windowTitle());
 }
 
 void MainWindow::paintEvent(QPaintEvent*)
@@ -208,4 +258,12 @@ void MainWindow::paintEvent(QPaintEvent*)
     QPainter painter(this);
     mDisplay.showDistricts(painter);
     mDisplay.showStationsAndWays(painter);
+}
+
+void MainWindow::closeEvent(QCloseEvent *aEvent)
+{
+    if (keepGoing())
+        aEvent->accept();
+    else
+        aEvent->ignore();
 }
