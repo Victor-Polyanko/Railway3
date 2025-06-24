@@ -10,6 +10,35 @@ const int cDefaultXQuantity = 3;
 const int cDefaultYQuantity = 3;
 const int cDefaultDistrictStationsQuantity = 5;
 
+const QVector<QVector<QVector<QString>>> cNames = {
+    {{"Луцьк", "Ковель", "Володимир", "Камінь-Каширський", "Ківерці"},
+     {"Рівне", "Вараш", "Дубно", "Сарни", "Костопіль"},
+     {"Житомир", "Коростень", "Новоград-Волинський", "Малин", "Бердичів"}},
+    {{"Київ", "Буча", "Біла Церква", "Вишгород", "Боярка"},
+     {"Київ", "Вишневе", "Фастів", "Бориспіль", "Обухів"},
+     {"Київ", "Ірпінь", "Васильків", "Бровари", "Переяслав"}},
+    {{"Чернігів", "Корюківка", "Ніжин", "Новгород-Сіверський", "Прилуки"},
+     {"Суми", "Конотоп", "Ромни", "Шостка", "Охтирка"},
+     {"Полтава", "Лубни", "Кременчук", "Миргород", "Горішні Плавні"}},
+    {{"Львів", "Самбір", "Дрогобич","Шептицький","Стрий"},
+     {"Тернопіль", "Бережани", "Чортків", "Кременець", "Збараж"},
+     {"Хмельницький", "Нетішин", "Славута", "Шепетівка", "Кам'янець-Подільський"}},
+    {{"Вінниця", "Жмеринка", "Могилів-Подільський", "Хмільник", "Гайсин"},
+     {"Черкаси", "Звенигородка", "Умань", "Канів", "Золотоноша"},
+     {"Кропивницький", "Знам'янка", "Долинська", "Світловодськ", "Олександрія"}},
+    {{"Дніпро", "Кам'янське", "Кривий Ріг", "Павлоград", "Нікополь"},
+     {"Харків", "Первомайський", "Лозова", "Чугуїв", "Ізюм"},
+     {"Луганськ", "Лисичанськ", "Алчевськ", "Сіверськодонецьк", "Хрустальний"}},
+    {{"Ужгород", "Мукачеве", "Берегове", "Хуст", "Виноградів"},
+     {"Івано-Франківськ", "Калуш", "Надвірна", "Коломия", "Косів"},
+     {"Чернівці", "Сторожинець", "Красноїльськ", "Новодністровськ", "Хотин"}},
+    {{"Одеса", "Подільськ", "Ізмаїл", "Чорноморськ", "Білгород-Дністровський"},
+     {"Миколаїв", "Первомайськ", "Південноукраїнськ", "Новий Буг", "Вознесенськ"},
+     {"Сімферополь", "Євпаторія", "Севастополь", "Керч", "Ялта"}},
+    {{"Херсон", "Берислав", "Скадовськ", "Нова Каховка", "Генічеськ"},
+     {"Запоріжжя", "Василівка", "Мелітополь", "Пологи", "Бердянськ"},
+     {"Донецьк", "Краматорськ", "Маріуполь", "Горлівка", "Макіївка"}}};
+
 Map::Map()
 {
     init(cDefaultXDimention, cDefaultYDimention,
@@ -220,6 +249,7 @@ void Map::generateStations()
     auto width = half.getX() - shift;
     auto height = half.getY() - shift;
     auto centerCalculation = districtSize.getX() + districtSize.getY() - 4 * centerBorder;
+    auto names = cNames.begin();
     for (int i = 0; i < mDistrictQuantity.getY(); i++)
     {
         auto top = i * districtSize.getY();
@@ -234,21 +264,22 @@ void Map::generateStations()
             auto xMiddleBorder = xMiddle + centerBorder;
             auto limit = districtSize.getX() - 2 * centerBorder;
             auto center = rand() % centerCalculation;
+            auto name = (*names++)[rand() % 3].begin();
             if (center < limit)
-                *station++ = Station(left + center + centerBorder, yMiddle, stationsQuantity2, centerStatus);
+                *station++ = Station(left + center + centerBorder, yMiddle, stationsQuantity2, centerStatus, *name++);
             else
-                *station++ = Station(xMiddle, top + center - limit + centerBorder, stationsQuantity2, centerStatus);
+                *station++ = Station(xMiddle, top + center - limit + centerBorder, stationsQuantity2, centerStatus, *name++);
             auto findXY = [&](int aLeft, int aTop) {
                 return Point (aLeft + rand() % width, aTop + rand() % height);
             };
             auto position = findXY(leftBorder, topBorder);
-            *station++ = Station(position, stationsQuantity2, defaultStatus);
+            *station++ = Station(position, stationsQuantity2, defaultStatus, *name++);
             position = findXY(leftBorder, yMiddleBorder);
-            *station++ = Station(position, stationsQuantity2, defaultStatus);
+            *station++ = Station(position, stationsQuantity2, defaultStatus, *name++);
             position = findXY(xMiddleBorder, topBorder);
-            *station++ = Station(position, stationsQuantity2, defaultStatus);
+            *station++ = Station(position, stationsQuantity2, defaultStatus, *name++);
             position = findXY(xMiddleBorder, yMiddleBorder);
-            *station++ = Station(position, stationsQuantity2, defaultStatus);
+            *station++ = Station(position, stationsQuantity2, defaultStatus, *name++);
         }
     }
     mStations[mDistrictStationsQuantity].setStatus(static_cast<int>(Station::Status::Capital));
