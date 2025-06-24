@@ -21,7 +21,7 @@ void Map::init(int aXd, int aYd, int aXq, int aYq, int aDistrictStationsQuantity
 {
     mDimention = Point(aXd, aYd);
     mDistrictQuantity = Point(aXq, aYq);
-    mDistrictStationsQuantity = aDistrictStationsQuantity;
+    mDistrictStationsQuantity = cDefaultDistrictStationsQuantity; // default is set intentionally
     auto stationsQuantity = aXq * aYq * mDistrictStationsQuantity;
     mStations.clear();
     mStations.resize(stationsQuantity);
@@ -30,6 +30,9 @@ void Map::init(int aXd, int aYd, int aXq, int aYq, int aDistrictStationsQuantity
     mTrains.clear();
     mTrains.resize(aTrainsQuantity);
     mTime = Point( -1, -1);
+    auto multiplier = mDimention.getX() / mDistrictStationsQuantity / 20;
+    for (auto i = 0; i < 4; ++i)
+        mStationRadius.emplace_back(i * multiplier);
 }
 
 QVector<Map::Color> Map::getColors() const
@@ -67,6 +70,11 @@ int Map::getDistrictsStationsQuantity() const
     return mDistrictStationsQuantity;
 }
 
+int Map::getStationRadius(int aStatus) const
+{
+    return mStationRadius[aStatus];
+}
+
 void Map::load(QDataStream &aStream)
 {
     int xDimention, yDimention, xQuantity, yQuantity, waysQuantity, trainsQuantity;
@@ -75,7 +83,7 @@ void Map::load(QDataStream &aStream)
     loadStations(aStream);
     loadWays(aStream);
     loadTrains(aStream);
-    fillColors();
+    fillDistricts();
 }
 
 void Map::loadStations(QDataStream &aStream)
@@ -193,31 +201,60 @@ void Map::saveTrains(QDataStream &aStream) const
 void Map::generate()
 {
     generateStations();
-    //Створюємо глобальну мережу сполучень
-    globalConnection();
-    updateStationsStatuses();
-    fillColors();
+    buildWays();
+    fillDistricts();
 }
 
 void Map::generateStations()
 {
     Point districtSize = mDimention / mDistrictQuantity;
-    //srand(time(0));
+    srand(time(0));
     int stationsQuantity2 = mStations.size() * mStations.size();
-    for (int i = 0; i < mDistrictQuantity.getX(); i++)
-        for (int j = 0; j < mDistrictQuantity.getY(); j++)
-            for (int k = 0; k < mDistrictStationsQuantity; k++)
-            {
-                auto index = (i * mDistrictQuantity.getY() + j) * mDistrictStationsQuantity + k;
-                Point randomPoint(rand() % (districtSize.getX() - 10), rand() % (districtSize.getY() - 10));
-                int x = i * districtSize.getX() + randomPoint.getX() + 5;
-                int y = j * districtSize.getY() + randomPoint.getY() + 5;
-                Station::Status s = Station::Status::Town;
-                mStations[index] = Station(x, y, stationsQuantity2, s);
-            }
+    auto station = mStations.begin();
+    auto defaultStatus = Station::Status::Town;
+    auto centerStatus = Station::Status::City;
+    auto border = mStationRadius[defaultStatus];
+    auto centerBorder = mStationRadius[Station::Status::Capital];
+    auto half = Point(districtSize.getX() / 2, districtSize.getY() / 2);
+    auto shift = 2 * border + centerBorder;
+    auto width = half.getX() - shift;
+    auto height = half.getY() - shift;
+    auto centerCalculation = districtSize.getX() + districtSize.getY() - 4 * centerBorder;
+    for (int i = 0; i < mDistrictQuantity.getY(); i++)
+    {
+        auto top = i * districtSize.getY();
+        auto topBorder = top + border;
+        auto yMiddle = top + half.getY();
+        auto yMiddleBorder = yMiddle + centerBorder;
+        for (int j = 0; j < mDistrictQuantity.getX(); j++)
+        {
+            auto left = j * districtSize.getX();
+            auto leftBorder = left + border;
+            auto xMiddle = left + half.getX();
+            auto xMiddleBorder = xMiddle + centerBorder;
+            auto limit = districtSize.getX() - 2 * centerBorder;
+            auto center = rand() % centerCalculation;
+            if (center < limit)
+                *station++ = Station(left + center + centerBorder, yMiddle, stationsQuantity2, centerStatus);
+            else
+                *station++ = Station(xMiddle, top + center - limit + centerBorder, stationsQuantity2, centerStatus);
+            auto findXY = [&](int aLeft, int aTop) {
+                return Point (aLeft + rand() % width, aTop + rand() % height);
+            };
+            auto position = findXY(leftBorder, topBorder);
+            *station++ = Station(position, stationsQuantity2, defaultStatus);
+            position = findXY(leftBorder, yMiddleBorder);
+            *station++ = Station(position, stationsQuantity2, defaultStatus);
+            position = findXY(xMiddleBorder, topBorder);
+            *station++ = Station(position, stationsQuantity2, defaultStatus);
+            position = findXY(xMiddleBorder, yMiddleBorder);
+            *station++ = Station(position, stationsQuantity2, defaultStatus);
+        }
+    }
+    mStations[mDistrictStationsQuantity].setStatus(static_cast<int>(Station::Status::Capital));
 }
 
-void Map::globalConnection()
+void Map::buildWays()
 {
     QVector<QVector<QPair<int, int>>> distances;
     distances.reserve(mStations.size() - 1);
@@ -276,27 +313,7 @@ void Map::globalConnection()
     }
 }
 
-void Map::updateStationsStatuses()
-{
-    auto halfPoint = Point(2, 2);
-    for (int i = 0; i < mDistrictQuantity.getX(); i++)
-        for (int j = 0; j < mDistrictQuantity.getY(); j++)
-        {
-            Point p = Point(2 * i + 1, 2 * j + 1) * mDimention / mDistrictQuantity / halfPoint;
-            int n0 = (i * mDistrictQuantity.getY() + j) * mDistrictStationsQuantity;
-            int n = n0;
-            for (int k = 1; k < mDistrictStationsQuantity; k++)
-                if ((mStations[n0 + k].getConnectionsSize() > mStations[n].getConnectionsSize()) ||
-                    ((mStations[n0 + k].getConnectionsSize() == mStations[n].getConnectionsSize())
-                        && (p.distance(mStations[n0 + k]) < p.distance(mStations[n]))))
-                {
-                    n = n0 + k;
-                }
-            mStations[n].setStatus((mDistrictQuantity.getX() / 2 == i && mDistrictQuantity.getY() / 2 == j) ? 3 : 2);
-        }
-}
-
-void Map::fillColors()
+void Map::fillDistricts()
 {
     const int step = 3;
     const int step2 = step * step;

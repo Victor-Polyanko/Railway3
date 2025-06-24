@@ -27,6 +27,7 @@ public:
     Point getDimention() const;
     Point getDistrictsQuantity() const;
     int getDistrictsStationsQuantity() const;
+    int getStationRadius(int aStatus) const;
     Point findTrainPosition(const Train &aTrain, const TimePoint &aTime) const;
 
 private:
@@ -39,9 +40,8 @@ private:
     void saveWays(QDataStream &aStream) const;
     void saveTrains(QDataStream &aStream) const;
     void generateStations();
-    void globalConnection();
-    void updateStationsStatuses();
-    void fillColors();
+    void buildWays();
+    void fillDistricts();
 
 private:
     Point mDimention;
@@ -52,6 +52,7 @@ private:
     QVector<Train> mTrains;
     QVector<Color> mColors;
     Point mTime;
+    QVector<int> mStationRadius;
 };
 
 #endif // MAP_H

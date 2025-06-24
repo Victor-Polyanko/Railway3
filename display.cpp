@@ -159,7 +159,6 @@ void Display::showDistricts(QPainter &aPainter) const
 
 void Display::showStationsAndWays(QPainter &aPainter) const
 {
-    int diametr = mMap.getDimention().getX() / mMap.getDistrictsStationsQuantity() / 20;
     double width = static_cast<double>(aPainter.window().width());
     double height = static_cast<double>(aPainter.window().height());
     double kx = width / mMap.getDimention().getX();
@@ -168,10 +167,9 @@ void Display::showStationsAndWays(QPainter &aPainter) const
     pen.setColor(cNavy);
     pen.setWidth(cLineWidth);
     aPainter.setPen(pen);
-    int diakx = static_cast<int>(kx * diametr);
     for (auto &station : mMap.getStations())
     {
-        int radius = diakx * station.getStatus();
+        int radius = static_cast<int>(kx * mMap.getStationRadius(station.getStatus()));
         int diameter = radius * 2;
         aPainter.drawEllipse(static_cast<int>(kx * station.getX() - radius), static_cast<int>(ky * station.getY() - radius), diameter, diameter);
         QPointF point(static_cast<float>(kx * station.getX() + radius), static_cast<float>(ky * station.getY()));

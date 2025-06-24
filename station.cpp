@@ -16,6 +16,13 @@ Station::Station(int aX, int aY, int aConnections, Status &aStatus, QString aNam
 {
 }
 
+Station::Station(Point aPosition, int aConnections, Status &aStatus, QString aName) : Point(aPosition)
+    , mStatus(aStatus)
+    , mConnectionsSize(aConnections)
+    , mName(aName.isEmpty() ? cDefaultName : aName)
+{
+}
+
 int Station::getConnectionsSize() const
 {
     return mConnectionsSize;
