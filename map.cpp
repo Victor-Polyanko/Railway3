@@ -4,7 +4,7 @@
 #include <ctime>
 #include <qiodevice>
 
-const int cDefaultXDimention = 300;
+const int cDefaultXDimention = 400;
 const int cDefaultYDimention = 300;
 const int cDefaultXQuantity = 3;
 const int cDefaultYQuantity = 3;
@@ -270,7 +270,7 @@ void Map::generateStations()
             else
                 *station++ = Station(xMiddle, top + center - limit + centerBorder, stationsQuantity2, centerStatus, *name++);
             auto findXY = [&](int aLeft, int aTop) {
-                return Point (aLeft + rand() % width, aTop + rand() % height);
+                return Point(aLeft + rand() % width, aTop + rand() % height);
             };
             auto position = findXY(leftBorder, topBorder);
             *station++ = Station(position, stationsQuantity2, defaultStatus, *name++);
@@ -287,44 +287,53 @@ void Map::generateStations()
 
 void Map::buildWays()
 {
+    auto waysSize = mStations.size() - 1;
     QVector<QVector<QPair<int, int>>> distances;
-    distances.reserve(mStations.size() - 1);
-    QVector<QVector<QPair<int, int>>::Iterator> minDistances;
-    minDistances.reserve(mStations.size() - 1);
+    distances.reserve(waysSize);
+    QVector<int> nearestStationId(waysSize, 0);
     for (auto station = mStations.begin(); station != mStations.end() - 1; ++station)
     {
         int i = distances.size() + 1;
         QVector<QPair<int, int>> currentDistances;
-        currentDistances.reserve(mStations.size() - i);
+        currentDistances.reserve(waysSize);
         for (auto anotherStation = station + 1; anotherStation != mStations.end(); ++anotherStation)
             currentDistances.push_back(QPair<int, int>(station->distance(*anotherStation), i++));
         std::sort(currentDistances.begin(), currentDistances.end(),
                   [](const QPair<int, int>& a, const QPair<int, int>& b) {
                       return a.first < b.first;
                   });
-        minDistances.push_back(currentDistances.begin());
         distances.push_back(currentDistances);
     }
-
     QVector<int> groups(mStations.size(), 0);
     int newGroup = 1;
+    auto nearestDistanceFor = [&](int id) { return distances[id][nearestStationId[id]].first; };
+    auto nearestIdFor = [&](int id) { return distances[id][nearestStationId[id]].second; };
     mWays.clear();
-    mWays.reserve(distances.size());
-    while (mWays.size() < distances.size())
+    mWays.reserve(waysSize);
+    while (mWays.size() < waysSize)
     {
-        auto currDistance = minDistances.begin();
-        for (auto dist = currDistance + 1; dist != minDistances.end(); ++dist)
-            if ((*currDistance)->first > (*dist)->first)
+        auto minId = 0;
+        auto minDistance = std::numeric_limits<int>::max();
+        for (auto id = minId; id < waysSize; ++id)
+        {
+            auto stillHaveWays = [&]() {return nearestStationId[id] < waysSize - id;};
+            auto stationsInTheSameGroup = [&]() {return groups[id] && groups[id] == groups[nearestIdFor(id)];};
+            while (stillHaveWays() && stationsInTheSameGroup())
+                ++nearestStationId[id];
+            if (stillHaveWays())
             {
-                currDistance = dist;
+                auto currDistance = nearestDistanceFor(id);
+                if (minDistance > currDistance)
+                {
+                    minDistance = currDistance;
+                    minId = id;
+                }
             }
-        auto firstId = currDistance - minDistances.begin();
-        auto secondId = (*currDistance)->second;
+        }
+        int firstId = minId;
+        int secondId = nearestIdFor(minId);
         mWays.push_back(Way(firstId, secondId));
-        if (groups[firstId] == 0)
-            ++minDistances[firstId];
-        if (groups[secondId] == 0)
-            ++minDistances[secondId];
+        nearestStationId[minId]++;
         if (groups[firstId] == 0 && groups[secondId] == 0)
         {
             groups[firstId] = newGroup;
@@ -337,9 +346,11 @@ void Map::buildWays()
             groups[secondId] = groups[firstId];
         else
         {
+            auto oldValue = groups[firstId];
+            auto newValue = groups[secondId];
             for (auto &g : groups)
-                if (g == groups[firstId])
-                    g = groups[secondId];
+                if (g == oldValue)
+                    g = newValue;
         }
     }
 }

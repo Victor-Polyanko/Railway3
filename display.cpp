@@ -167,6 +167,7 @@ void Display::showStationsAndWays(QPainter &aPainter) const
     pen.setColor(cNavy);
     pen.setWidth(cLineWidth);
     aPainter.setPen(pen);
+    aPainter.setBrush(cWhite);
     for (auto &station : mMap.getStations())
     {
         int radius = static_cast<int>(kx * mMap.getStationRadius(station.getStatus()));

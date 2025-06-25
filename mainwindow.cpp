@@ -5,7 +5,7 @@
 #include <QMessageBox>
 
 const QString cNewPrefix = "* ";
-const QString cDefaultTitle = "Залізниці 3.0";
+const QString cDefaultTitle = "Залізниця 3.0";
 
 MainWindow::MainWindow(QWidget *parent)
     : QMainWindow(parent)
@@ -88,7 +88,7 @@ void MainWindow::addAboutMenu(QWidget *parent)
 
     QObject::connect(aboutSoftAction, &QAction::triggered, [&]() {
         QMessageBox::information(parent, "Про програму",
-            "Програму 'Залізниця-3' стоврив\nВіктор Полянко\n" \
+            "Програму '" + cDefaultTitle + "' стоврив\nВіктор Полянко\n" \
             "11-15 червня 2025 року.\nPolyanko_Victor@ukr.net");
     });
     QObject::connect(aboutGameAction, &QAction::triggered, [&]() {
