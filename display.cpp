@@ -9,7 +9,6 @@ const int cPartWidth = 20;
 const int cPartHeight = 20;
 const int cHalfWidth = cPartWidth / 2;
 const int cHalfHeight = cPartHeight / 2;
-const int cLineWidth = 5;
 
 const QColor cLavenderBlush(255, 240, 245);
 const QColor cLavender(230, 230, 250);
@@ -31,6 +30,7 @@ void Display::generate()
 
 void Display::convertColors()
 {
+    mColors.clear();
     mColors.reserve(mMap.getColors().size());
     for (auto &color : mMap.getColors())
         switch (color)
@@ -165,7 +165,7 @@ void Display::showStationsAndWays(QPainter &aPainter) const
     double ky = height / mMap.getDimention().getY();
     QPen pen;
     pen.setColor(cNavy);
-    pen.setWidth(cLineWidth);
+    pen.setWidth(static_cast<int>(kx + ky));
     aPainter.setPen(pen);
     aPainter.setBrush(cWhite);
     for (auto &station : mMap.getStations())
@@ -180,7 +180,7 @@ void Display::showStationsAndWays(QPainter &aPainter) const
         {
             case Station::Status::Capital: font = QFont("Arial", 15);
                 break;
-            case Station::Status::City: font = QFont("Arial", 10);
+            case Station::Status::City: font = QFont("Arial", 12);
                 break;
             default: font = QFont("Arial", 10);
                 font.setUnderline(false);
