@@ -41,6 +41,9 @@ private:
     void saveTrains(QDataStream &aStream) const;
     void generateStations();
     void buildWays();
+    QVector<QVector<QPair<int, int>>> findAllDistances() const;
+    Way findMinWay(QVector<QVector<QPair<int, int>>> &aDistances, QVector<int> &aGroups, QVector<int> &aNearestStationId) const;
+    void ConnectAlonesInDistricts();
     void fillDistricts();
 
 private:

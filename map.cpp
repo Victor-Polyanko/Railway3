@@ -287,53 +287,19 @@ void Map::generateStations()
 
 void Map::buildWays()
 {
+    auto distances = findAllDistances();
     auto waysSize = mStations.size() - 1;
-    QVector<QVector<QPair<int, int>>> distances;
-    distances.reserve(waysSize);
     QVector<int> nearestStationId(waysSize, 0);
-    for (auto station = mStations.begin(); station != mStations.end() - 1; ++station)
-    {
-        int i = distances.size() + 1;
-        QVector<QPair<int, int>> currentDistances;
-        currentDistances.reserve(waysSize);
-        for (auto anotherStation = station + 1; anotherStation != mStations.end(); ++anotherStation)
-            currentDistances.push_back(QPair<int, int>(station->distance(*anotherStation), i++));
-        std::sort(currentDistances.begin(), currentDistances.end(),
-                  [](const QPair<int, int>& a, const QPair<int, int>& b) {
-                      return a.first < b.first;
-                  });
-        distances.push_back(currentDistances);
-    }
     QVector<int> groups(mStations.size(), 0);
     int newGroup = 1;
-    auto nearestDistanceFor = [&](int id) { return distances[id][nearestStationId[id]].first; };
-    auto nearestIdFor = [&](int id) { return distances[id][nearestStationId[id]].second; };
     mWays.clear();
     mWays.reserve(waysSize);
     while (mWays.size() < waysSize)
     {
-        auto minId = 0;
-        auto minDistance = std::numeric_limits<int>::max();
-        for (auto id = minId; id < waysSize; ++id)
-        {
-            auto stillHaveWays = [&]() {return nearestStationId[id] < waysSize - id;};
-            auto stationsInTheSameGroup = [&]() {return groups[id] && groups[id] == groups[nearestIdFor(id)];};
-            while (stillHaveWays() && stationsInTheSameGroup())
-                ++nearestStationId[id];
-            if (stillHaveWays())
-            {
-                auto currDistance = nearestDistanceFor(id);
-                if (minDistance > currDistance)
-                {
-                    minDistance = currDistance;
-                    minId = id;
-                }
-            }
-        }
-        int firstId = minId;
-        int secondId = nearestIdFor(minId);
-        mWays.push_back(Way(firstId, secondId));
-        nearestStationId[minId]++;
+        mWays.push_back(findMinWay(distances, groups, nearestStationId));
+        int firstId = mWays.back().first;
+        int secondId = mWays.back().second;
+        nearestStationId[firstId]++;
         if (groups[firstId] == 0 && groups[secondId] == 0)
         {
             groups[firstId] = newGroup;
@@ -351,6 +317,97 @@ void Map::buildWays()
             for (auto &g : groups)
                 if (g == oldValue)
                     g = newValue;
+        }
+    }
+    ConnectAlonesInDistricts();
+}
+
+QVector<QVector<QPair<int, int>>> Map::findAllDistances() const
+{
+    auto waysSize = mStations.size() - 1;
+    QVector<QVector<QPair<int, int>>> distances;
+    distances.reserve(waysSize);
+    for (auto station = mStations.begin(); station != mStations.end() - 1; ++station)
+    {
+        int i = distances.size() + 1;
+        QVector<QPair<int, int>> currentDistances;
+        currentDistances.reserve(waysSize);
+        for (auto anotherStation = station + 1; anotherStation != mStations.end(); ++anotherStation)
+            currentDistances.push_back(QPair<int, int>(station->distance(*anotherStation), i++));
+        std::sort(currentDistances.begin(), currentDistances.end(),
+                  [](const QPair<int, int>& a, const QPair<int, int>& b) {
+                      return a.first < b.first;
+                  });
+        distances.push_back(currentDistances);
+    }
+    return distances;
+}
+
+Way Map::findMinWay(QVector<QVector<QPair<int, int>>> &aDistances, QVector<int> &aGroups, QVector<int> &aNearestStationId) const
+{
+    auto minId = 0;
+    auto minDistance = std::numeric_limits<int>::max();
+    auto nearestDistanceFor = [&](int id) { return aDistances[id][aNearestStationId[id]].first; };
+    auto nearestIdFor = [&](int id) { return aDistances[id][aNearestStationId[id]].second; };
+    for (auto id = minId; id < aNearestStationId.size(); ++id)
+    {
+        auto stillHaveWays = [&]() {return aNearestStationId[id] < aNearestStationId.size() - id;};
+        auto stationsInTheSameGroup = [&]() {return aGroups[id] && aGroups[id] == aGroups[nearestIdFor(id)];};
+        while (stillHaveWays() && stationsInTheSameGroup())
+            ++aNearestStationId[id];
+        if (stillHaveWays())
+        {
+            auto currDistance = nearestDistanceFor(id);
+            if (minDistance > currDistance)
+            {
+                minDistance = currDistance;
+                minId = id;
+            }
+        }
+    }
+    return Way(minId, nearestIdFor(minId));
+}
+
+void Map::ConnectAlonesInDistricts()
+{
+    auto allDistricts = mDistrictQuantity.getX() * mDistrictQuantity.getY();
+    for (int districtId = 0; districtId < allDistricts; ++districtId)
+    {
+        int firstId = districtId * mDistrictStationsQuantity;
+        int lastId = firstId + mDistrictStationsQuantity;
+        for (int currentId = firstId; currentId < lastId; ++currentId)
+        {
+            bool isConnected = false;
+            for (int i = firstId; i < currentId; ++i)
+                if (mWays.contains(Way(i, currentId)))
+                {
+                    isConnected = true;
+                    break;
+                }
+            if (isConnected)
+                continue;
+            for (int i = currentId + 1; i < lastId; ++i)
+                if (mWays.contains(Way(currentId, i)))
+                {
+                    isConnected = true;
+                    break;
+                }
+            if (isConnected)
+                continue;
+            int minId = 0;
+            int minDistance = std::numeric_limits<int>::max();
+            for (int id = firstId; id < lastId; ++id)
+            {
+                if (id == currentId)
+                    continue;
+                auto distance = mStations[id].distance(mStations[currentId]);
+                if (minDistance > distance)
+                {
+                    minDistance = distance;
+                    minId = id;
+                }
+            }
+            mWays.emplace_back(Way(currentId, minId));
         }
     }
 }
