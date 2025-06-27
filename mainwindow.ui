@@ -23,8 +23,129 @@
      <height>25</height>
     </rect>
    </property>
+   <widget class="QMenu" name="fileMenu">
+    <property name="title">
+     <string>Головне меню</string>
+    </property>
+    <addaction name="generateAction"/>
+    <addaction name="loadAction"/>
+    <addaction name="saveAction"/>
+    <addaction name="saveAsAction"/>
+    <addaction name="separator"/>
+    <addaction name="exitAction"/>
+   </widget>
+   <widget class="QMenu" name="trainMenu">
+    <property name="title">
+     <string>Потяги</string>
+    </property>
+    <addaction name="createTrainAction"/>
+    <addaction name="deleteTrainAction"/>
+    <addaction name="watchTrainAction"/>
+    <addaction name="changeTimeAction"/>
+   </widget>
+   <widget class="QMenu" name="wayMenu">
+    <property name="title">
+     <string>Колії</string>
+    </property>
+    <addaction name="createWayAction"/>
+    <addaction name="deleteWayAction"/>
+    <addaction name="watchStationAction"/>
+    <addaction name="watchRouteAction"/>
+   </widget>
+   <widget class="QMenu" name="launchMenu">
+    <property name="title">
+     <string>Запуск</string>
+    </property>
+   </widget>
+   <widget class="QMenu" name="aboutMenu">
+    <property name="title">
+     <string>Інформація</string>
+    </property>
+    <addaction name="aboutSoftAction"/>
+    <addaction name="aboutGameAction"/>
+   </widget>
+   <addaction name="fileMenu"/>
+   <addaction name="trainMenu"/>
+   <addaction name="wayMenu"/>
+   <addaction name="launchMenu"/>
+   <addaction name="aboutMenu"/>
   </widget>
   <widget class="QStatusBar" name="statusbar"/>
+  <action name="generateAction">
+   <property name="text">
+    <string>Згенерувати Україну</string>
+   </property>
+  </action>
+  <action name="loadAction">
+   <property name="text">
+    <string>Завантажити мапу</string>
+   </property>
+  </action>
+  <action name="saveAction">
+   <property name="text">
+    <string>Зберегти мапу</string>
+   </property>
+  </action>
+  <action name="saveAsAction">
+   <property name="text">
+    <string>Зберегти мапу як...</string>
+   </property>
+  </action>
+  <action name="exitAction">
+   <property name="text">
+    <string>Вийти</string>
+   </property>
+  </action>
+  <action name="createTrainAction">
+   <property name="text">
+    <string>Створити потяг</string>
+   </property>
+  </action>
+  <action name="deleteTrainAction">
+   <property name="text">
+    <string>Знищити потяг</string>
+   </property>
+  </action>
+  <action name="watchTrainAction">
+   <property name="text">
+    <string>Проглянути потяг</string>
+   </property>
+  </action>
+  <action name="changeTimeAction">
+   <property name="text">
+    <string>Змінити час відправлення</string>
+   </property>
+  </action>
+  <action name="createWayAction">
+   <property name="text">
+    <string>Прокласти колію</string>
+   </property>
+  </action>
+  <action name="deleteWayAction">
+   <property name="text">
+    <string>Розібрати колію</string>
+   </property>
+  </action>
+  <action name="watchStationAction">
+   <property name="text">
+    <string>Проглянути станцію</string>
+   </property>
+  </action>
+  <action name="watchRouteAction">
+   <property name="text">
+    <string>Як проїхати між...</string>
+   </property>
+  </action>
+  <action name="aboutSoftAction">
+   <property name="text">
+    <string>Про програму</string>
+   </property>
+  </action>
+  <action name="aboutGameAction">
+   <property name="text">
+    <string>Про гру</string>
+   </property>
+  </action>
  </widget>
  <resources/>
  <connections/>

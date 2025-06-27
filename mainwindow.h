@@ -25,11 +25,6 @@ public:
     virtual void closeEvent(QCloseEvent *) override;
 
 private:
-    void addFileMenu();
-    void addTrainMenu();
-    void addWaysMenu();
-    void addLaunchMenu();
-    void addAboutMenu(QWidget *parent);
     void generateMap();
     void loadMap();
     void saveMap(const QString &aFileName = "");
