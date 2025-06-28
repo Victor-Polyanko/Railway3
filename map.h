@@ -28,7 +28,9 @@ public:
     Point getDistrictsQuantity() const;
     int getDistrictsStationsQuantity() const;
     int getStationRadius(int aStatus) const;
+    QStringList getAllNames() const;
     Point findTrainPosition(const Train &aTrain, const TimePoint &aTime) const;
+    void addWay(const Way &aWay);
 
 private:
     void init(int aXd, int aYd, int aXq, int aYq, int aQ, int aWaysQuantity = 0, int aTrainsQuantity = 0);
@@ -44,6 +46,7 @@ private:
     QVector<QVector<QPair<int, int>>> findAllDistances() const;
     Way findMinWay(QVector<QVector<QPair<int, int>>> &aDistances, QVector<int> &aGroups, QVector<int> &aNearestStationId) const;
     void ConnectAlonesInDistricts();
+    void collectAllNames();
     void fillDistricts();
 
 private:
@@ -56,6 +59,7 @@ private:
     QVector<Color> mColors;
     Point mTime;
     QVector<int> mStationRadius;
+    QStringList mAllNames;
 };
 
 #endif // MAP_H

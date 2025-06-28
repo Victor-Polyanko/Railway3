@@ -1,5 +1,6 @@
 #include "mainwindow.h"
 #include "ui_mainwindow.h"
+#include "dialog.h"
 
 #include <QFileDialog>
 #include <QMessageBox>
@@ -31,10 +32,13 @@ MainWindow::MainWindow(QWidget *parent)
     QObject::connect(ui->saveAction, &QAction::triggered, [&]() { saveMap(mFileName); });
     QObject::connect(ui->saveAsAction, &QAction::triggered, [&]() { saveMap(); });
     QObject::connect(ui->exitAction, &QAction::triggered, [&]() { QApplication::quit(); });
+    QObject::connect(ui->createWayAction, &QAction::triggered, [&]() {
+        launchDialog("Створення колії", "Введіть початкову станцію", "Введіть кінцеву станцію"); });
     QObject::connect(ui->aboutSoftAction, &QAction::triggered, [&]() {
         QMessageBox::information(parent, "Про програму", cAboutSoft); });
     QObject::connect(ui->aboutGameAction, &QAction::triggered, [&]() {
         QMessageBox::information(parent, "Про гру", cAboutGame); });
+    ui->wayMenu->setEnabled(false);
 }
 
 MainWindow::~MainWindow()
@@ -178,6 +182,7 @@ void MainWindow::updateFileName(const QString &aFileName)
                      ? (cNewPrefix + cDefaultTitle)
                      : (cDefaultTitle + " - " + mFileName);
     this->setWindowTitle(title);
+    ui->wayMenu->setEnabled(!mDisplay.getAllNames().isEmpty());
 }
 
 bool MainWindow::areNotSavedChanges() const
@@ -193,6 +198,7 @@ void MainWindow::markTitleWithChanges()
 void MainWindow::paintEvent(QPaintEvent*)
 {
     QPainter painter(this);
+    mDisplay.calculateScale(painter);
     mDisplay.showDistricts(painter);
     mDisplay.showStationsAndWays(painter);
 }
@@ -203,4 +209,12 @@ void MainWindow::closeEvent(QCloseEvent *aEvent)
         aEvent->accept();
     else
         aEvent->ignore();
+}
+
+void MainWindow::launchDialog(const QString &aTitle, const QString &aFirstText, const QString &aSecondText)
+{
+    Dialog *dialog = new Dialog(aTitle, aFirstText, aSecondText, mDisplay.getAllNames(), this);
+    connect(dialog, &Dialog::getResult, this, [this](Way &way){ mDisplay.addWay(way); });
+    dialog->setAttribute(Qt::WA_DeleteOnClose);
+    dialog->show();
 }

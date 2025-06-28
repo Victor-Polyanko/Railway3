@@ -88,20 +88,23 @@ QString Display::save(const QString &aFileName)
     return "";
 }
 
+void Display::calculateScale(QPainter &aPainter)
+{
+    double width = static_cast<double>(aPainter.window().width());
+    double height = static_cast<double>(aPainter.window().height());
+    mScale.first = width / mMap.getDimention().getX();
+    mScale.second = height / mMap.getDimention().getY();
+}
+
 void Display::showTrains(QPainter &aPainter, const TimePoint &aTime) const
 {
     if (!aTime.isSet())
         return;
-    float width = static_cast<double>(aPainter.window().width());
-    float height = static_cast<double>(aPainter.window().height());
-    float kx = width / mMap.getDimention().getX();
-    float ky = height / mMap.getDimention().getY();
-
     QPen textPen;
     textPen.setColor(cWhite);
     QFont font = QFont("Arial", 8);
     aPainter.setFont(font);
-    int radius = static_cast<int>(kx * mMap.getDimention().getX() / mMap.getDistrictsQuantity().getX() / 120);
+    int radius = static_cast<int>(mScale.first * mMap.getDimention().getX() / mMap.getDistrictsQuantity().getX() / 120);
     int diameter = 2 * radius;
     for (auto &train : mMap.getTrains())
     {
@@ -121,8 +124,8 @@ void Display::showTrains(QPainter &aPainter, const TimePoint &aTime) const
             }
             else
                 pen.setColor(cWhite);
-            float x = kx * trainXY.getX();
-            float y = ky * trainXY.getY();
+            float x = mScale.first * trainXY.getX();
+            float y = mScale.second * trainXY.getY();
             pen.setWidth(8);
             aPainter.setPen(pen);
             aPainter.drawEllipse(static_cast<int>(x - radius), static_cast<int>(y - radius), diameter, diameter);
@@ -140,10 +143,8 @@ void Display::showDistricts(QPainter &aPainter) const
         mMap.getDimention().getY() <= 0 ||
         mColors.empty())
         return;
-    double width = static_cast<double>(aPainter.window().width());
-    double height = static_cast<double>(aPainter.window().height());
-    double kx = width / mMap.getDimention().getX();
-    double ky = height * cStep / mMap.getDimention().getY();
+    auto kx = mScale.first;
+    auto ky = mScale.second * cStep;
     for(int i = 0; i < mMap.getDimention().getX() - cStep; i += cStep)
     {
         int kxi = static_cast<int>(kx * i) - cHalfWidth;
@@ -159,21 +160,19 @@ void Display::showDistricts(QPainter &aPainter) const
 
 void Display::showStationsAndWays(QPainter &aPainter) const
 {
-    double width = static_cast<double>(aPainter.window().width());
-    double height = static_cast<double>(aPainter.window().height());
-    double kx = width / mMap.getDimention().getX();
-    double ky = height / mMap.getDimention().getY();
     QPen pen;
     pen.setColor(cNavy);
-    pen.setWidth(static_cast<int>(kx + ky));
+    pen.setWidth(static_cast<int>(mScale.first + mScale.second));
     aPainter.setPen(pen);
     aPainter.setBrush(cWhite);
     for (auto &station : mMap.getStations())
     {
-        int radius = static_cast<int>(kx * mMap.getStationRadius(station.getStatus()));
+        int radius = static_cast<int>(mScale.first * mMap.getStationRadius(station.getStatus()));
         int diameter = radius * 2;
-        aPainter.drawEllipse(static_cast<int>(kx * station.getX() - radius), static_cast<int>(ky * station.getY() - radius), diameter, diameter);
-        QPointF point(static_cast<float>(kx * station.getX() + radius), static_cast<float>(ky * station.getY()));
+        aPainter.drawEllipse(static_cast<int>(mScale.first * station.getX() - radius),
+                             static_cast<int>(mScale.second * station.getY() - radius), diameter, diameter);
+        QPointF point(static_cast<float>(mScale.first * station.getX() + radius),
+                      static_cast<float>(mScale.second * station.getY()));
         QFont font;
         font.setUnderline(true);
         switch(station.getStatus())
@@ -190,13 +189,23 @@ void Display::showStationsAndWays(QPainter &aPainter) const
         aPainter.drawText(point, station.getName());
     }
     for (auto &way : mMap.getWays())
-        aPainter.drawLine(static_cast<int>(kx * mMap.getStations()[way.first].getX()),
-                          static_cast<int>(ky * mMap.getStations()[way.first].getY()),
-                          static_cast<int>(kx * mMap.getStations()[way.second].getX()),
-                          static_cast<int>(ky * mMap.getStations()[way.second].getY()));
+        aPainter.drawLine(static_cast<int>(mScale.first * mMap.getStations()[way.first].getX()),
+                          static_cast<int>(mScale.second * mMap.getStations()[way.first].getY()),
+                          static_cast<int>(mScale.first * mMap.getStations()[way.second].getX()),
+                          static_cast<int>(mScale.second * mMap.getStations()[way.second].getY()));
 }
 
 void Display::updateLastTime(const TimePoint &aTime)
 {
     mLastTime = aTime;
+}
+
+QStringList Display::getAllNames() const
+{
+    return mMap.getAllNames();
+}
+
+void Display::addWay(const Way &aWay)
+{
+    mMap.addWay(aWay);
 }

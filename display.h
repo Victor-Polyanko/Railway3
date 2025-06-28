@@ -9,6 +9,8 @@
 #include <QColor>
 #include <QPainter>
 
+typedef QPair<double, double> Scale;
+
 class Display
 {
 public:
@@ -19,10 +21,13 @@ public:
     QString save(const QString &aFileName);
 
     void buildParts();
+    void calculateScale(QPainter &aPainter);
     void showTrains(QPainter &aPainter, const TimePoint &aTime) const;
     void showDistricts(QPainter &aPainter) const;
     void showStationsAndWays(QPainter &aPainter) const;
     void updateLastTime(const TimePoint &aTime);
+    QStringList getAllNames() const;
+    void addWay(const Way &aWay);
 
 private:
     void convertColors();
@@ -37,6 +42,7 @@ private:
 private:
     QVector<QColor> mColors;
     TimePoint mLastTime;
+    Scale mScale;
 };
 
 #endif // DISPLAY_H

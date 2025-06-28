@@ -104,6 +104,11 @@ int Map::getStationRadius(int aStatus) const
     return mStationRadius[aStatus];
 }
 
+QStringList Map::getAllNames() const
+{
+    return mAllNames;
+}
+
 void Map::load(QDataStream &aStream)
 {
     int xDimention, yDimention, xQuantity, yQuantity, waysQuantity, trainsQuantity;
@@ -112,6 +117,7 @@ void Map::load(QDataStream &aStream)
     loadStations(aStream);
     loadWays(aStream);
     loadTrains(aStream);
+    collectAllNames();
     fillDistricts();
 }
 
@@ -231,6 +237,7 @@ void Map::generate()
 {
     generateStations();
     buildWays();
+    collectAllNames();
     fillDistricts();
 }
 
@@ -412,6 +419,14 @@ void Map::ConnectAlonesInDistricts()
     }
 }
 
+void Map::collectAllNames()
+{
+    mAllNames.clear();
+    mAllNames.reserve(mStations.size());
+    for (auto &station : mStations)
+        mAllNames.emplace_back(station.getName());
+}
+
 void Map::fillDistricts()
 {
     const int step = 3;
@@ -493,4 +508,9 @@ Point Map::findTrainPosition(const Train &aTrain, const TimePoint &aTime) const
             trainXY = Point(mStations[secondStation.number]);
     }
     return trainXY;
+}
+
+void Map::addWay(const Way &aWay)
+{
+    mWays.emplace_back(aWay);
 }
