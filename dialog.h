@@ -5,6 +5,7 @@
 #include <QWidget>
 
 #include "display.h"
+#include "train.h"
 
 QT_BEGIN_NAMESPACE
 namespace Ui {
@@ -12,6 +13,7 @@ class Dialog;
 }
 QT_END_NAMESPACE
 
+const QString cAddTrain = "Створення потяга №";
 const QString cAddWay = "Створення колії";
 const QString cDelWay = "Розбирання колії";
 
@@ -19,11 +21,8 @@ class Dialog : public QDialog
 {
     Q_OBJECT
 public:
-    explicit Dialog(const QString &aType, const QString &aFirstText, const QString &aSecondText, Display *mDisplay, QWidget *aParent = nullptr);
+    explicit Dialog(const QString &aType, Display *mDisplay, QWidget *aParent = nullptr);
     ~Dialog();
-
-signals:
-    void getResult(QPair<int, int> &aResult);
 
 private:
     void accept();
@@ -33,7 +32,8 @@ private:
     QString mType;
     QString mSecondText;
     Display *mDisplay;
-    QPair<int, int> mResult;
+    QPair<int, int> mWayResult;
+    Train mTrainResult;
 };
 
 #endif // DIALOG_H

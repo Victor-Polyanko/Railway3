@@ -29,6 +29,7 @@ public:
     QStringList getAllNames() const;
     QStringList getNamesForStation(int aStationId) const;
     int getStationIdForConnection(int aStationId, int aConnectionId) const;
+    QVector<Train> getTrains() const;
     void addWay(const Way &aWay);
     void delWay(const Way &aWay);
 

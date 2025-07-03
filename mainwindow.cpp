@@ -32,15 +32,16 @@ MainWindow::MainWindow(QWidget *parent)
     QObject::connect(ui->saveAction, &QAction::triggered, [&]() { saveMap(mFileName); });
     QObject::connect(ui->saveAsAction, &QAction::triggered, [&]() { saveMap(); });
     QObject::connect(ui->exitAction, &QAction::triggered, [&]() { QApplication::quit(); });
-    QObject::connect(ui->createWayAction, &QAction::triggered, [&]() {
-        launchDialog(cAddWay, "Введіть початкову станцію", "Введіть кінцеву станцію"); });
-    QObject::connect(ui->deleteWayAction, &QAction::triggered, [&]() {
-        launchDialog(cDelWay, "Введіть початкову станцію", "Введіть кінцеву станцію"); });
+    QObject::connect(ui->createTrainAction, &QAction::triggered, [&]() { launchDialog(cAddTrain); });
+    QObject::connect(ui->createWayAction, &QAction::triggered, [&]() { launchDialog(cAddWay); });
+    QObject::connect(ui->deleteWayAction, &QAction::triggered, [&]() { launchDialog(cDelWay); });
     QObject::connect(ui->aboutSoftAction, &QAction::triggered, [&]() {
         QMessageBox::information(parent, "Про програму", cAboutSoft); });
     QObject::connect(ui->aboutGameAction, &QAction::triggered, [&]() {
         QMessageBox::information(parent, "Про гру", cAboutGame); });
+    ui->trainMenu->setEnabled(false);
     ui->wayMenu->setEnabled(false);
+    ui->launchMenu->setEnabled(false);
 }
 
 MainWindow::~MainWindow()
@@ -184,7 +185,9 @@ void MainWindow::updateFileName(const QString &aFileName)
                      ? (cNewPrefix + cDefaultTitle)
                      : (cDefaultTitle + " - " + mFileName);
     this->setWindowTitle(title);
+    ui->trainMenu->setEnabled(!mDisplay.getAllNames().isEmpty());
     ui->wayMenu->setEnabled(!mDisplay.getAllNames().isEmpty());
+    ui->launchMenu->setEnabled(!mDisplay.getTrains().isEmpty());
 }
 
 bool MainWindow::areNotSavedChanges() const
@@ -213,15 +216,9 @@ void MainWindow::closeEvent(QCloseEvent *aEvent)
         aEvent->ignore();
 }
 
-void MainWindow::launchDialog(const QString &aTitle, const QString &aFirstText, const QString &aSecondText)
+void MainWindow::launchDialog(const QString &aTitle)
 {
-    Dialog *dialog = new Dialog(aTitle, aFirstText, aSecondText, &mDisplay, this);
-    connect(dialog, &Dialog::getResult, this, [&](Way &way){
-        if (aTitle == cAddWay)
-            mDisplay.addWay(way);
-        else if (aTitle == cDelWay)
-                mDisplay.delWay(way);
-        });
+    Dialog *dialog = new Dialog(aTitle, &mDisplay, this);
     dialog->setAttribute(Qt::WA_DeleteOnClose);
     dialog->show();
 }

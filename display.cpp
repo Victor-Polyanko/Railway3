@@ -215,6 +215,11 @@ int Display::getStationIdForConnection(int aStationId, int aConnectionId) const
     return mMap.getStations()[aStationId].getConnections()[aConnectionId];
 }
 
+QVector<Train> Display::getTrains() const
+{
+    return mMap.getTrains();
+}
+
 void Display::addWay(const Way &aWay)
 {
     mMap.addWay(aWay);

@@ -34,7 +34,7 @@ private:
     void updateFileName(const QString &aFileName);
     bool areNotSavedChanges() const;
     void markTitleWithChanges();
-    void launchDialog(const QString &aTitle, const QString &aFirstText, const QString &aSecondText);
+    void launchDialog(const QString &aTitle);
 
 private:
     Ui::MainWindow *ui;
