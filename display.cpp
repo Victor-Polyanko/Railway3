@@ -205,7 +205,22 @@ QStringList Display::getAllNames() const
     return mMap.getAllNames();
 }
 
+QStringList Display::getNamesForStation(int aStationId) const
+{
+    return mMap.getNamesForStation(aStationId);
+}
+
+int Display::getStationIdForConnection(int aStationId, int aConnectionId) const
+{
+    return mMap.getStations()[aStationId].getConnections()[aConnectionId];
+}
+
 void Display::addWay(const Way &aWay)
 {
     mMap.addWay(aWay);
+}
+
+void Display::delWay(const Way &aWay)
+{
+    mMap.delWay(aWay);
 }

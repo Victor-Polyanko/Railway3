@@ -33,7 +33,9 @@ MainWindow::MainWindow(QWidget *parent)
     QObject::connect(ui->saveAsAction, &QAction::triggered, [&]() { saveMap(); });
     QObject::connect(ui->exitAction, &QAction::triggered, [&]() { QApplication::quit(); });
     QObject::connect(ui->createWayAction, &QAction::triggered, [&]() {
-        launchDialog("Створення колії", "Введіть початкову станцію", "Введіть кінцеву станцію"); });
+        launchDialog(cAddWay, "Введіть початкову станцію", "Введіть кінцеву станцію"); });
+    QObject::connect(ui->deleteWayAction, &QAction::triggered, [&]() {
+        launchDialog(cDelWay, "Введіть початкову станцію", "Введіть кінцеву станцію"); });
     QObject::connect(ui->aboutSoftAction, &QAction::triggered, [&]() {
         QMessageBox::information(parent, "Про програму", cAboutSoft); });
     QObject::connect(ui->aboutGameAction, &QAction::triggered, [&]() {
@@ -105,7 +107,7 @@ void MainWindow::showInfo(const QString &aText) const
         default: details += "\nКазна що "; break;
         }
         details += station.getName() + " x = " + QString::number(station.getX()) + " y = " + QString::number(station.getY());
-        details += " має " + QString::number(station.getConnectionsSize()) + " сполучень\t";
+        details += " має " + QString::number(station.getConnections().size()) + " сполучень\t";
     }
     details += "\n\nШляхи:\n";
     for (const auto &way : mDisplay.mMap.getWays())
@@ -213,8 +215,13 @@ void MainWindow::closeEvent(QCloseEvent *aEvent)
 
 void MainWindow::launchDialog(const QString &aTitle, const QString &aFirstText, const QString &aSecondText)
 {
-    Dialog *dialog = new Dialog(aTitle, aFirstText, aSecondText, mDisplay.getAllNames(), this);
-    connect(dialog, &Dialog::getResult, this, [this](Way &way){ mDisplay.addWay(way); });
+    Dialog *dialog = new Dialog(aTitle, aFirstText, aSecondText, &mDisplay, this);
+    connect(dialog, &Dialog::getResult, this, [&](Way &way){
+        if (aTitle == cAddWay)
+            mDisplay.addWay(way);
+        else if (aTitle == cDelWay)
+                mDisplay.delWay(way);
+        });
     dialog->setAttribute(Qt::WA_DeleteOnClose);
     dialog->show();
 }

@@ -29,8 +29,10 @@ public:
     int getDistrictsStationsQuantity() const;
     int getStationRadius(int aStatus) const;
     QStringList getAllNames() const;
+    QStringList getNamesForStation(int aStationId) const;
     Point findTrainPosition(const Train &aTrain, const TimePoint &aTime) const;
     void addWay(const Way &aWay);
+    void delWay(const Way &aWay);
 
 private:
     void init(int aXd, int aYd, int aXq, int aYq, int aQ, int aWaysQuantity = 0, int aTrainsQuantity = 0);

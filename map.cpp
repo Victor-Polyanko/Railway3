@@ -109,6 +109,14 @@ QStringList Map::getAllNames() const
     return mAllNames;
 }
 
+QStringList Map::getNamesForStation(int aStationId) const
+{
+    QStringList names;
+    for (auto const &id : mStations[aStationId].getConnections())
+        names.emplace_back(mAllNames[id]);
+    return names;
+}
+
 void Map::load(QDataStream &aStream)
 {
     int xDimention, yDimention, xQuantity, yQuantity, waysQuantity, trainsQuantity;
@@ -125,7 +133,7 @@ void Map::loadStations(QDataStream &aStream)
 {
     for (auto &station : mStations)
     {
-        int x, y, s, connections;
+        int x, y, s, connections; // connections is obsolete
         aStream >> x >> y >> connections >> s;
         Station::Status status = static_cast<Station::Status>(s);
         quint8 length;
@@ -139,7 +147,7 @@ void Map::loadStations(QDataStream &aStream)
         }
         else
             aStream >> name;
-        station = Station(x, y, connections, status, name);
+        station = Station(x, y, status, name);
     }
 }
 
@@ -150,6 +158,8 @@ void Map::loadWays(QDataStream &aStream)
         int x, y;
         aStream >> x >> y;
         way = Way(x, y);
+        mStations[x].addConnection(y);
+        mStations[y].addConnection(x);
     }
 }
 
@@ -195,7 +205,7 @@ void Map::saveStations(QDataStream &aStream) const
     {
         aStream << station.getX();
         aStream << station.getY();
-        aStream << station.getConnectionsSize();
+        aStream << station.getConnections().size();
         aStream << station.getStatus();
         quint8 compatibilityByte = 0;
         aStream << compatibilityByte;
@@ -245,7 +255,6 @@ void Map::generateStations()
 {
     Point districtSize = mDimention / mDistrictQuantity;
     srand(time(0));
-    int stationsQuantity2 = mStations.size() * mStations.size();
     auto station = mStations.begin();
     auto defaultStatus = Station::Status::Town;
     auto centerStatus = Station::Status::City;
@@ -273,20 +282,20 @@ void Map::generateStations()
             auto center = rand() % centerCalculation;
             auto name = (*names++)[rand() % 3].begin();
             if (center < limit)
-                *station++ = Station(left + center + centerBorder, yMiddle, stationsQuantity2, centerStatus, *name++);
+                *station++ = Station(left + center + centerBorder, yMiddle, centerStatus, *name++);
             else
-                *station++ = Station(xMiddle, top + center - limit + centerBorder, stationsQuantity2, centerStatus, *name++);
+                *station++ = Station(xMiddle, top + center - limit + centerBorder, centerStatus, *name++);
             auto findXY = [&](int aLeft, int aTop) {
                 return Point(aLeft + rand() % width, aTop + rand() % height);
             };
             auto position = findXY(leftBorder, topBorder);
-            *station++ = Station(position, stationsQuantity2, defaultStatus, *name++);
+            *station++ = Station(position, defaultStatus, *name++);
             position = findXY(leftBorder, yMiddleBorder);
-            *station++ = Station(position, stationsQuantity2, defaultStatus, *name++);
+            *station++ = Station(position, defaultStatus, *name++);
             position = findXY(xMiddleBorder, topBorder);
-            *station++ = Station(position, stationsQuantity2, defaultStatus, *name++);
+            *station++ = Station(position, defaultStatus, *name++);
             position = findXY(xMiddleBorder, yMiddleBorder);
-            *station++ = Station(position, stationsQuantity2, defaultStatus, *name++);
+            *station++ = Station(position, defaultStatus, *name++);
         }
     }
     mStations[mDistrictStationsQuantity].setStatus(static_cast<int>(Station::Status::Capital));
@@ -303,7 +312,7 @@ void Map::buildWays()
     mWays.reserve(waysSize);
     while (mWays.size() < waysSize)
     {
-        mWays.push_back(findMinWay(distances, groups, nearestStationId));
+        addWay(findMinWay(distances, groups, nearestStationId));
         int firstId = mWays.back().first;
         int secondId = mWays.back().second;
         nearestStationId[firstId]++;
@@ -513,4 +522,13 @@ Point Map::findTrainPosition(const Train &aTrain, const TimePoint &aTime) const
 void Map::addWay(const Way &aWay)
 {
     mWays.emplace_back(aWay);
+    mStations[aWay.first].addConnection(aWay.second);
+    mStations[aWay.second].addConnection(aWay.first);
+}
+
+void Map::delWay(const Way &aWay)
+{
+    mWays.removeOne(aWay);
+    mStations[aWay.first].delConnection(aWay.second);
+    mStations[aWay.second].delConnection(aWay.first);
 }

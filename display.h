@@ -27,7 +27,10 @@ public:
     void showStationsAndWays(QPainter &aPainter) const;
     void updateLastTime(const TimePoint &aTime);
     QStringList getAllNames() const;
+    QStringList getNamesForStation(int aStationId) const;
+    int getStationIdForConnection(int aStationId, int aConnectionId) const;
     void addWay(const Way &aWay);
+    void delWay(const Way &aWay);
 
 private:
     void convertColors();

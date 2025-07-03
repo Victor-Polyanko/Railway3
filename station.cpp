@@ -4,33 +4,37 @@ const QString cDefaultName("Місто N");
 
 Station::Station()
     : mStatus(Status::None)
-    , mConnectionsSize(0)
     , mName(cDefaultName)
 {
 }
 
-Station::Station(int aX, int aY, int aConnections, Status &aStatus, QString aName) : Point(aX, aY)
+Station::Station(int aX, int aY, Status &aStatus, QString aName) : Point(aX, aY)
     , mStatus(aStatus)
-    , mConnectionsSize(aConnections)
     , mName(aName.isEmpty() ? cDefaultName : aName)
 {
 }
 
-Station::Station(Point aPosition, int aConnections, Status &aStatus, QString aName) : Point(aPosition)
+Station::Station(Point aPosition, Status &aStatus, QString aName) : Point(aPosition)
     , mStatus(aStatus)
-    , mConnectionsSize(aConnections)
     , mName(aName.isEmpty() ? cDefaultName : aName)
 {
 }
 
-int Station::getConnectionsSize() const
+QList<int> Station::getConnections() const
 {
-    return mConnectionsSize;
+    return mConnectionStations;
 }
 
-void Station::incConnectionsSize()
+void Station::addConnection(int aStationId)
 {
-    ++mConnectionsSize;
+    if (!mConnectionStations.contains(aStationId))
+        mConnectionStations.emplace_back(aStationId);
+}
+
+void Station::delConnection(int aStationId)
+{
+    if (mConnectionStations.contains(aStationId))
+        mConnectionStations.removeOne(aStationId);
 }
 
 void Station::setStatus(int s)

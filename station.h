@@ -14,17 +14,18 @@ public:
 
 public:
     Station();
-    Station(int aX, int aY, int aConnections, Status &aStatus, QString aName = "");
-    Station(Point aPosition, int aConnections, Status &aStatus, QString aName = "");
-    int getConnectionsSize() const;
-    void incConnectionsSize();
+    Station(int aX, int aY, Status &aStatus, QString aName = "");
+    Station(Point aPosition, Status &aStatus, QString aName = "");
+    QList<int> getConnections() const;
+    void addConnection(int aStationId);
+    void delConnection(int aStationId);
     void setStatus(int s);
     int getStatus() const;
     QString getName() const;
 
 private:
     Status mStatus;
-    int mConnectionsSize;
+    QList<int> mConnectionStations;
     QString mName;
     QVector<Schedule> mTrains;
 
