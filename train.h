@@ -14,13 +14,13 @@ public:
 public:
     Train();
     Train(int N);
-    Train(int aNumber, int aHours, int aMinutes, int aStations, Type aType);
+    Train(int aNumber, Type aType, int aHours, int aMinutes = 0, int aStations = 0);
     int getNumber() const;
     Type getType() const;
     TimePoint getStartTime() const;
     int getStationsQuantity() const;
     QVector<Schedule> getStations() const;
-    void setStation(int aI, int aArriveHours, int aArriveMinutes, int aWait, int aDepartHours, int aDepartMinutes, int aNumber);
+    void addStation(int aArriveHours, int aArriveMinutes, int aWait, int aDepartHours, int aDepartMinutes, int aNumber);
 
 private:
     int mNumber;

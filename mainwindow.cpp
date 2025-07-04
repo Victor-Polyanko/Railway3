@@ -1,6 +1,7 @@
 #include "mainwindow.h"
 #include "ui_mainwindow.h"
-#include "dialog.h"
+#include "trainDialog.h"
+#include "wayDialog.h"
 
 #include <QFileDialog>
 #include <QMessageBox>
@@ -218,7 +219,11 @@ void MainWindow::closeEvent(QCloseEvent *aEvent)
 
 void MainWindow::launchDialog(const QString &aTitle)
 {
-    Dialog *dialog = new Dialog(aTitle, &mDisplay, this);
+    Dialog *dialog;
+    if (aTitle == cAddTrain)
+        dialog = new TrainDialog(aTitle, &mDisplay, this);
+    else
+        dialog = new WayDialog(aTitle, &mDisplay, this);
     dialog->setAttribute(Qt::WA_DeleteOnClose);
     dialog->show();
 }

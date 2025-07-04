@@ -12,12 +12,12 @@ Train::Train(int N)
     mStations.resize(N);
 }
 
-Train::Train(int aNumber, int aHours, int aMinutes, int aStations, Type aType)
+Train::Train(int aNumber, Type aType, int aHours, int aMinutes, int aStations)
     : mNumber(aNumber)
     , mType(aType)
     , mStartTime(TimePoint(aHours, aMinutes))
 {
-    mStations.resize(aStations);
+    mStations.reserve(aStations);
 }
 
 int Train::getNumber() const
@@ -45,9 +45,9 @@ QVector<Schedule> Train::getStations() const
     return mStations;
 }
 
-void Train::setStation(int aI, int aArriveHours, int aArriveMinutes,
+void Train::addStation(int aArriveHours, int aArriveMinutes,
                        int aWait, int aDepartHours, int aDepartMinutes, int aNumber)
 {
-    mStations[aI] = Schedule(aArriveHours, aArriveMinutes, aWait,
-                             aDepartHours, aDepartMinutes, aNumber);
+    mStations.emplace_back(Schedule(aArriveHours, aArriveMinutes, aWait,
+                             aDepartHours, aDepartMinutes, aNumber));
 }

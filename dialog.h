@@ -5,7 +5,6 @@
 #include <QWidget>
 
 #include "display.h"
-#include "train.h"
 
 QT_BEGIN_NAMESPACE
 namespace Ui {
@@ -24,16 +23,10 @@ public:
     explicit Dialog(const QString &aType, Display *mDisplay, QWidget *aParent = nullptr);
     ~Dialog();
 
-private:
-    void accept();
-
-private:
+protected:
     Ui::Dialog *ui;
     QString mType;
-    QString mSecondText;
     Display *mDisplay;
-    QPair<int, int> mWayResult;
-    Train mTrainResult;
 };
 
 #endif // DIALOG_H

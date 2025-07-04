@@ -170,12 +170,12 @@ void Map::loadTrains(QDataStream &aStream)
         int number, hours, minutes, stations, t;
         aStream >> number >> hours >> minutes >> stations >> t;
         Train::Type type = static_cast<Train::Type>(t);
-        train = Train(number, hours, minutes, stations, type);
+        train = Train(number, type, hours, minutes, stations);
         for (int i = 0; i < train.getStationsQuantity(); ++i)
         {
             int arriveHours, arriveMinutes, wait, departHours, departMinutes, number;
             aStream >> arriveHours >> arriveMinutes >> wait >> departHours >> departMinutes >> number;
-            train.setStation(i, arriveHours, arriveMinutes, wait, departHours, departMinutes, number);
+            train.addStation(arriveHours, arriveMinutes, wait, departHours, departMinutes, number);
         }
     }
 }
