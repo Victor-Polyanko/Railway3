@@ -22,8 +22,8 @@ public:
 
     QVector<Color> getColors() const;
     QVector<Station> getStations() const;
-    QVector<Train> getTrains() const;
-    QVector<Way> getWays() const;
+    QList<Train> getTrains() const;
+    QList<Way> getWays() const;
     Point getDimention() const;
     Point getDistrictsQuantity() const;
     int getDistrictsStationsQuantity() const;
@@ -32,8 +32,9 @@ public:
     QStringList getNamesForStation(int aStationId) const;
     Point findTrainPosition(const Train &aTrain, const TimePoint &aTime) const;
     void addTrain(const Train &aTrain);
-    void addWay(const Way &aWay);
-    void delWay(const Way &aWay);
+    void delTrain(int aTrainId);
+    void addWay(Way aWay);
+    void delWay(Way aWay);
 
 private:
     void init(int aXd, int aYd, int aXq, int aYq, int aQ, int aWaysQuantity = 0, int aTrainsQuantity = 0);
@@ -57,8 +58,8 @@ private:
     Point mDistrictQuantity;
     int mDistrictStationsQuantity;
     QVector<Station> mStations;
-    QVector<Way> mWays;
-    QVector<Train> mTrains;
+    QList<Way> mWays;
+    QList<Train> mTrains;
     QVector<Color> mColors;
     Point mTime;
     QVector<int> mStationRadius;

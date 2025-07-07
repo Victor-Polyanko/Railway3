@@ -10,6 +10,7 @@ Dialog::Dialog(const QString &aType, Display *aDisplay, QWidget *aParent) :
     , mDisplay(aDisplay)
 {
     ui->setupUi(this);
+    this->setWindowTitle(aType);
 }
 
 Dialog::~Dialog()

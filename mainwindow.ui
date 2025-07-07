@@ -103,7 +103,7 @@
   </action>
   <action name="deleteTrainAction">
    <property name="text">
-    <string>Знищити потяг</string>
+    <string>Скасувати потяг</string>
    </property>
   </action>
   <action name="watchTrainAction">

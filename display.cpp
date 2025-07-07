@@ -215,6 +215,11 @@ int Display::getStationIdForConnection(int aStationId, int aConnectionId) const
     return mMap.getStations()[aStationId].getConnections()[aConnectionId];
 }
 
+QString Display::getStationName(int aStationId) const
+{
+    return mMap.getStations()[aStationId].getName();
+}
+
 Point Display::getStationPosition(int aStationId) const
 {
     return mMap.getStations()[aStationId];
@@ -234,6 +239,12 @@ void Display::addTrain(const Train &aTrain)
 {
     mMap.addTrain(aTrain);
 }
+
+void Display::delTrain(int aTrainId)
+{
+    mMap.delTrain(aTrainId);
+}
+
 
 QVector<Way> Display::getWays() const
 {

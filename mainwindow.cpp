@@ -34,6 +34,7 @@ MainWindow::MainWindow(QWidget *parent)
     QObject::connect(ui->saveAsAction, &QAction::triggered, [&]() { saveMap(); });
     QObject::connect(ui->exitAction, &QAction::triggered, [&]() { QApplication::quit(); });
     QObject::connect(ui->createTrainAction, &QAction::triggered, [&]() { launchDialog(cAddTrain); });
+    QObject::connect(ui->deleteTrainAction, &QAction::triggered, [&]() { launchDialog(cDelTrain); });
     QObject::connect(ui->createWayAction, &QAction::triggered, [&]() { launchDialog(cAddWay); });
     QObject::connect(ui->deleteWayAction, &QAction::triggered, [&]() { launchDialog(cDelWay); });
     QObject::connect(ui->aboutSoftAction, &QAction::triggered, [&]() {
@@ -186,20 +187,15 @@ void MainWindow::updateFileName(const QString &aFileName)
                      ? (cNewPrefix + cDefaultTitle)
                      : (cDefaultTitle + " - " + mFileName);
     this->setWindowTitle(title);
-    updateTrainMenu();
-    updateWayMenu();
+    updateMenu();
 }
 
-void MainWindow::updateTrainMenu()
+void MainWindow::updateMenu()
 {
     ui->trainMenu->setEnabled(!mDisplay.getAllNames().empty());
     ui->deleteTrainAction->setEnabled(!mDisplay.getTrains().empty());
     ui->watchTrainAction->setEnabled(!mDisplay.getTrains().empty());
     ui->changeTimeAction->setEnabled(!mDisplay.getTrains().empty());
-}
-
-void MainWindow::updateWayMenu()
-{
     ui->wayMenu->setEnabled(!mDisplay.getWays().empty());
     ui->deleteWayAction->setEnabled(!mDisplay.getWays().empty());
     ui->watchRouteAction->setEnabled(!mDisplay.getWays().empty());
@@ -236,16 +232,11 @@ void MainWindow::closeEvent(QCloseEvent *aEvent)
 void MainWindow::launchDialog(const QString &aTitle)
 {
     Dialog *dialog;
-    if (aTitle == cAddTrain)
-    {
+    if (aTitle == cAddTrain || aTitle == cDelTrain)
         dialog = new TrainDialog(aTitle, &mDisplay, this);
-        connect(dialog, &Dialog::ready, this, &MainWindow::updateTrainMenu);
-    }
     else
-    {
         dialog = new WayDialog(aTitle, &mDisplay, this);
-        connect(dialog, &Dialog::ready, this, &MainWindow::updateWayMenu);
-    }
+    connect(dialog, &Dialog::ready, this, &MainWindow::updateMenu);
     dialog->setAttribute(Qt::WA_DeleteOnClose);
     dialog->show();
 }

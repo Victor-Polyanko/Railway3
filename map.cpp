@@ -524,15 +524,24 @@ void Map::addTrain(const Train &aTrain)
     mTrains.emplace_back(aTrain);
 }
 
-void Map::addWay(const Way &aWay)
+void Map::delTrain(int aTrainId)
 {
+    mTrains.removeAt(aTrainId);
+}
+
+void Map::addWay(Way aWay)
+{
+    if (aWay.first > aWay.second)
+        qSwap(aWay.first, aWay.second);
     mWays.emplace_back(aWay);
     mStations[aWay.first].addConnection(aWay.second);
     mStations[aWay.second].addConnection(aWay.first);
 }
 
-void Map::delWay(const Way &aWay)
+void Map::delWay(Way aWay)
 {
+    if (aWay.first > aWay.second)
+        qSwap(aWay.first, aWay.second);
     mWays.removeOne(aWay);
     mStations[aWay.first].delConnection(aWay.second);
     mStations[aWay.second].delConnection(aWay.first);

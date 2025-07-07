@@ -29,11 +29,13 @@ public:
     QStringList getAllNames() const;
     QStringList getNamesForStation(int aStationId) const;
     int getStationIdForConnection(int aStationId, int aConnectionId) const;
+    QString getStationName(int aStationId) const;
     Point getStationPosition(int aStationId) const;
     int getStationStatus(int aStationId) const;
-    QVector<Train> getTrains() const;
+    QList<Train> getTrains() const;
     void addTrain(const Train &aTrain);
-    QVector<Way> getWays() const;
+    void delTrain(int aTrainId);
+    QList<Way> getWays() const;
     void addWay(const Way &aWay);
     void delWay(const Way &aWay);
 

@@ -11,6 +11,7 @@ public:
 
 private:
     void accept();
+    bool deleteWayWithTrains();
 
 private:
     QPair<int, int> mWayResult;

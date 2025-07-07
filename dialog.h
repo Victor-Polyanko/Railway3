@@ -16,6 +16,7 @@ const int cNotSet = -1;
 const QString cWarning = "Халепонька";
 const QString cFirstStation = "Введіть початкову станцію";
 const QString cAddTrain = "Створення потяга №";
+const QString cDelTrain = "Скасування потяга";
 const QString cAddWay = "Створення колії";
 const QString cDelWay = "Розбирання колії";
 
