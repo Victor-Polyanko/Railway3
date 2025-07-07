@@ -127,8 +127,8 @@ void MainWindow::showInfo(const QString &aText) const
         default: details += "\nКазна який"; break;
         }
         details += " потяг №" + QString::number(train.getNumber()) + " ";
-        details += mDisplay.mMap.getStations()[train.getStations().front().number].getName() + " - " +
-                   mDisplay.mMap.getStations()[train.getStations().back().number].getName();
+        details += mDisplay.mMap.getStations()[train.getStations().front().stationId].getName() + " - " +
+                   mDisplay.mMap.getStations()[train.getStations().back().stationId].getName();
         details += " вирушає о " + QString::number(train.getStartTime().getX()) +
                    ":" + QString::number(train.getStartTime().getY());
     }

@@ -14,9 +14,10 @@ public:
 private:
     int newTrainNumber() const;
     void accept();
+    void apply();
 
 private:
-    int mTrainType;
+    Train::Type mTrainType;
     Train mTrainResult;
 };
 

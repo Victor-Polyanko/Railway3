@@ -45,9 +45,20 @@ QVector<Schedule> Train::getStations() const
     return mStations;
 }
 
-void Train::addStation(int aArriveHours, int aArriveMinutes,
-                       int aWait, int aDepartHours, int aDepartMinutes, int aNumber)
+void Train::addStation(const Schedule &aSchedule)
 {
-    mStations.emplace_back(Schedule(aArriveHours, aArriveMinutes, aWait,
-                             aDepartHours, aDepartMinutes, aNumber));
+    mStations.emplace_back(aSchedule);
+}
+
+void Train::addStation(int aStationId, const TimePoint &aArrive, int aWait, const TimePoint &aDepart)
+{
+    mStations.emplace_back(Schedule(aStationId, aArrive.getX(), aArrive.getY(),
+                                    aWait, aDepart.getX(), aDepart.getY()));
+}
+
+void Train::addStation(int aStationId, int aArriveHours, int aArriveMinutes,
+                       int aWait, int aDepartHours, int aDepartMinutes)
+{
+    mStations.emplace_back(Schedule(aStationId, aArriveHours, aArriveMinutes,
+                                    aWait, aDepartHours, aDepartMinutes));
 }

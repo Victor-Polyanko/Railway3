@@ -175,7 +175,7 @@ void Map::loadTrains(QDataStream &aStream)
         {
             int arriveHours, arriveMinutes, wait, departHours, departMinutes, number;
             aStream >> arriveHours >> arriveMinutes >> wait >> departHours >> departMinutes >> number;
-            train.addStation(arriveHours, arriveMinutes, wait, departHours, departMinutes, number);
+            train.addStation(number, arriveHours, arriveMinutes, wait, departHours, departMinutes);
         }
     }
 }
@@ -238,7 +238,7 @@ void Map::saveTrains(QDataStream &aStream) const
             aStream << station.wait;
             aStream << station.depart.getX();
             aStream << station.depart.getY();
-            aStream << station.number;
+            aStream << station.stationId;
         }
     }
 }
@@ -483,7 +483,7 @@ Point Map::findTrainPosition(const Train &aTrain, const TimePoint &aTime) const
     for (auto station = aTrain.getStations().begin() + 1; station != aTrain.getStations().end() - 1; ++station)
         if (station->arrive.isEarlierThan(aTime) && aTime.isEarlierThan(station->depart))
         {
-            trainXY = Point(mStations[station->number]);
+            trainXY = Point(mStations[station->stationId]);
             break;
         }
     //пошук між станціями
@@ -496,8 +496,8 @@ Point Map::findTrainPosition(const Train &aTrain, const TimePoint &aTime) const
                 int trainMinutes = prevStation->depart.getMinutesTo(aTime);
                 int stationMinutes = prevStation->depart.getMinutesTo(station->arrive);
                 float relation = (float)trainMinutes / stationMinutes;
-                trainXY = Point(mStations[prevStation->number].getX() + (int)((mStations[station->number].getX() - mStations[prevStation->number].getX()) * relation),
-                                mStations[prevStation->number].getY() + (int)((mStations[station->number].getY() - mStations[prevStation->number].getY()) * relation));
+                trainXY = Point(mStations[prevStation->stationId].getX() + (int)((mStations[station->stationId].getX() - mStations[prevStation->stationId].getX()) * relation),
+                                mStations[prevStation->stationId].getY() + (int)((mStations[station->stationId].getY() - mStations[prevStation->stationId].getY()) * relation));
             }
     }
     //пошук на кінцевих станціях
@@ -512,11 +512,16 @@ Point Map::findTrainPosition(const Train &aTrain, const TimePoint &aTime) const
         TimePoint secondTime = secondStation.arrive;
         secondTime.addMinutes(minutes);
         if (aTime.isEarlierThan(firstTime) && TimePoint::isLessThanHour(aTime.getMinutesTo(firstTime)))
-            trainXY = Point(mStations[firstStation.number]);
+            trainXY = Point(mStations[firstStation.stationId]);
         else if (secondTime.isEarlierThan(aTime) && TimePoint::isLessThanHour(secondTime.getMinutesTo(aTime)))
-            trainXY = Point(mStations[secondStation.number]);
+            trainXY = Point(mStations[secondStation.stationId]);
     }
     return trainXY;
+}
+
+void Map::addTrain(const Train &aTrain)
+{
+    mTrains.emplace_back(aTrain);
 }
 
 void Map::addWay(const Way &aWay)

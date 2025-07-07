@@ -1,14 +1,16 @@
 #include "schedule.h"
 
+const int cNotSet = -1;
+
 Schedule::Schedule()
-    : wait(-1)
-    , number(-1)
+    : stationId(cNotSet)
+    , wait(cNotSet)
 {
 }
 
-Schedule::Schedule(int aArriveHours, int aArriveMinutes, int aWait, int aDepartHours, int aDepartMinutes, int aNumber)
-    : arrive(aArriveHours, aArriveMinutes)
+Schedule::Schedule(int aStationId, int aArriveHours, int aArriveMinutes, int aWait, int aDepartHours, int aDepartMinutes)
+    : stationId(aStationId)
+    , arrive(aArriveHours, aArriveMinutes)
     , wait(aWait)
     , depart(aDepartHours, aDepartMinutes)
-    , number(aNumber)
 {}

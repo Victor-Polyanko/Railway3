@@ -6,12 +6,12 @@
 struct Schedule
 {
     Schedule();
-    Schedule(int aArriveHours, int aArriveMinutes, int aWait, int aDepartHours, int aDepartMinutes, int aNumber);
+    Schedule(int aStationId, int aArriveHours, int aArriveMinutes, int aWait, int aDepartHours, int aDepartMinutes);
 
+    int stationId;
     TimePoint arrive;
     int wait;
     TimePoint depart;
-    int number;
 };
 
 #endif // SCHEDULE_H

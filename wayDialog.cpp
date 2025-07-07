@@ -1,11 +1,6 @@
 #include "wayDialog.h"
 #include "ui_dialog.h"
 
-#include <qmessagebox.h>
-
-const int cNotSet = -1;
-const QString cWarning = "Халепонька";
-const QString cFirstStation = "Введіть початкову станцію";
 const QString cLastStation = "Введіть кінцеву станцію";
 
 WayDialog::WayDialog(const QString &aType, Display *aDisplay, QWidget *aParent) :
@@ -24,20 +19,8 @@ void WayDialog::accept()
         mWayResult.first = ui->comboBox->currentIndex();
         if (mType == cAddWay)
             ui->comboBox->removeItem(mWayResult.first);
-        else if (mType == cDelWay)
-        {
-            auto newList = mDisplay->getNamesForStation(mWayResult.first);
-            if (newList.empty())
-            {
-                QMessageBox::information(this, cWarning, "Ця станція не має сусідів - оберіть іншу.");
-                return;
-            }
-            else
-            {
-                ui->comboBox->clear();
-                ui->comboBox->addItems(newList);
-            }
-        }
+        else if (mType == cDelWay && !fillNeighbours())
+            return;
         ui->label->setText(cLastStation);
     }
     else

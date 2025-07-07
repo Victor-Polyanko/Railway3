@@ -7,7 +7,7 @@ class TimePoint : public Point
 {
 public:
     TimePoint();
-    TimePoint(int aMinutes, int aHours);
+    TimePoint(int aHours, int aMinutes);
 
     void addMinutes(int minutes);
     void substractMinutes(int minutes);
@@ -15,6 +15,8 @@ public:
     int getMinutesTo(const TimePoint &aTime) const;
     static bool isLessThanHour(int minutes);
     static void correctMinutes(int &minutes);
+
+    TimePoint operator+(const int &aMinutes) const;
 };
 
 #endif // TIMEPOINT_H

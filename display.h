@@ -1,7 +1,7 @@
 #ifndef DISPLAY_H
 #define DISPLAY_H
 
-#define DEBUG_MODE //comment for release
+//#define DEBUG_MODE //comment for release
 
 #include "Map.h"
 #include "TimePoint.h"
@@ -29,7 +29,10 @@ public:
     QStringList getAllNames() const;
     QStringList getNamesForStation(int aStationId) const;
     int getStationIdForConnection(int aStationId, int aConnectionId) const;
+    Point getStationPosition(int aStationId) const;
+    int getStationStatus(int aStationId) const;
     QVector<Train> getTrains() const;
+    void addTrain(const Train &aTrain);
     void addWay(const Way &aWay);
     void delWay(const Way &aWay);
 

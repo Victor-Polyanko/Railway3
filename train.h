@@ -20,7 +20,9 @@ public:
     TimePoint getStartTime() const;
     int getStationsQuantity() const;
     QVector<Schedule> getStations() const;
-    void addStation(int aArriveHours, int aArriveMinutes, int aWait, int aDepartHours, int aDepartMinutes, int aNumber);
+    void addStation(const Schedule &aSchedule);
+    void addStation(int aStationId, const TimePoint &aArrive, int aWait, const TimePoint &aDepart);
+    void addStation(int aStationId, int aArriveHours, int aArriveMinutes, int aWait, int aDepartHours, int aDepartMinutes);
 
 private:
     int mNumber;

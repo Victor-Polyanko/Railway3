@@ -31,6 +31,7 @@ public:
     QStringList getAllNames() const;
     QStringList getNamesForStation(int aStationId) const;
     Point findTrainPosition(const Train &aTrain, const TimePoint &aTime) const;
+    void addTrain(const Train &aTrain);
     void addWay(const Way &aWay);
     void delWay(const Way &aWay);
 

@@ -1,15 +1,16 @@
 #include "timePoint.h"
 
+const int cNotSet = -1;
 const int cMinutesInHour = 60;
 const int cHoursInDay = 24;
 
 TimePoint::TimePoint()
 {
-    mX = -1;
-    mY = -1;
+    mX = cNotSet;
+    mY = cNotSet;
 }
 
-TimePoint::TimePoint(int aMinutes, int aHours) : Point(aHours, aMinutes) {}
+TimePoint::TimePoint(int aHours, int aMinutes) : Point(aHours, aMinutes) {}
 
 void TimePoint::addMinutes(int minutes)
 {
@@ -72,4 +73,18 @@ void TimePoint::correctMinutes(int &aMinutes)
         aMinutes /= 2;
     else
         aMinutes = cMinutesInHour;
+}
+
+TimePoint TimePoint::operator+(const int &aMinutes) const
+{
+    auto hours = mX;
+    auto minutes = mY + aMinutes % cMinutesInHour;
+    if (minutes >= cMinutesInHour)
+    {
+        minutes -= cMinutesInHour;
+        ++hours;
+    }
+    if (hours >= cHoursInDay)
+        hours -= cHoursInDay;
+    return TimePoint(hours, minutes);
 }

@@ -12,9 +12,13 @@ class Dialog;
 }
 QT_END_NAMESPACE
 
+const int cNotSet = -1;
+const QString cWarning = "Халепонька";
+const QString cFirstStation = "Введіть початкову станцію";
 const QString cAddTrain = "Створення потяга №";
 const QString cAddWay = "Створення колії";
 const QString cDelWay = "Розбирання колії";
+
 
 class Dialog : public QDialog
 {
@@ -22,6 +26,9 @@ class Dialog : public QDialog
 public:
     explicit Dialog(const QString &aType, Display *mDisplay, QWidget *aParent = nullptr);
     ~Dialog();
+
+protected:
+    bool fillNeighbours(int aStationId = cNotSet);
 
 protected:
     Ui::Dialog *ui;
