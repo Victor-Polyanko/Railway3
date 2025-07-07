@@ -235,6 +235,11 @@ void Display::addTrain(const Train &aTrain)
     mMap.addTrain(aTrain);
 }
 
+QVector<Way> Display::getWays() const
+{
+    return mMap.getWays();
+}
+
 void Display::addWay(const Way &aWay)
 {
     mMap.addWay(aWay);

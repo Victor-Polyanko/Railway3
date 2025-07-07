@@ -27,6 +27,9 @@ public:
     explicit Dialog(const QString &aType, Display *mDisplay, QWidget *aParent = nullptr);
     ~Dialog();
 
+signals:
+    void ready();
+
 protected:
     bool fillNeighbours(int aStationId = cNotSet);
 

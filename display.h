@@ -33,6 +33,7 @@ public:
     int getStationStatus(int aStationId) const;
     QVector<Train> getTrains() const;
     void addTrain(const Train &aTrain);
+    QVector<Way> getWays() const;
     void addWay(const Way &aWay);
     void delWay(const Way &aWay);
 

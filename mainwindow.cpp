@@ -186,9 +186,25 @@ void MainWindow::updateFileName(const QString &aFileName)
                      ? (cNewPrefix + cDefaultTitle)
                      : (cDefaultTitle + " - " + mFileName);
     this->setWindowTitle(title);
-    ui->trainMenu->setEnabled(!mDisplay.getAllNames().isEmpty());
-    ui->wayMenu->setEnabled(!mDisplay.getAllNames().isEmpty());
-    ui->launchMenu->setEnabled(!mDisplay.getTrains().isEmpty());
+    updateTrainMenu();
+    updateWayMenu();
+}
+
+void MainWindow::updateTrainMenu()
+{
+    ui->trainMenu->setEnabled(!mDisplay.getAllNames().empty());
+    ui->deleteTrainAction->setEnabled(!mDisplay.getTrains().empty());
+    ui->watchTrainAction->setEnabled(!mDisplay.getTrains().empty());
+    ui->changeTimeAction->setEnabled(!mDisplay.getTrains().empty());
+}
+
+void MainWindow::updateWayMenu()
+{
+    ui->wayMenu->setEnabled(!mDisplay.getWays().empty());
+    ui->deleteWayAction->setEnabled(!mDisplay.getWays().empty());
+    ui->watchRouteAction->setEnabled(!mDisplay.getWays().empty());
+    ui->watchStationAction->setEnabled(!mDisplay.getWays().empty());
+    ui->launchMenu->setEnabled(!mDisplay.getWays().empty() || !mDisplay.getTrains().empty());
 }
 
 bool MainWindow::areNotSavedChanges() const
@@ -221,9 +237,15 @@ void MainWindow::launchDialog(const QString &aTitle)
 {
     Dialog *dialog;
     if (aTitle == cAddTrain)
+    {
         dialog = new TrainDialog(aTitle, &mDisplay, this);
+        connect(dialog, &Dialog::ready, this, &MainWindow::updateTrainMenu);
+    }
     else
+    {
         dialog = new WayDialog(aTitle, &mDisplay, this);
+        connect(dialog, &Dialog::ready, this, &MainWindow::updateWayMenu);
+    }
     dialog->setAttribute(Qt::WA_DeleteOnClose);
     dialog->show();
 }

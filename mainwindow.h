@@ -32,6 +32,8 @@ private:
     void showMessage(const QString &aTitle, const QString &aText, const QString &aDetails = "") const;
     bool keepGoing();
     void updateFileName(const QString &aFileName);
+    void updateTrainMenu();
+    void updateWayMenu();
     bool areNotSavedChanges() const;
     void markTitleWithChanges();
     void launchDialog(const QString &aTitle);

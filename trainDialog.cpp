@@ -74,5 +74,6 @@ void TrainDialog::apply()
 {
     accept();
     mDisplay->addTrain(mTrainResult);
+    emit ready();
     close();
 }

@@ -37,6 +37,7 @@ void WayDialog::accept()
             mWayResult.second = mDisplay->getStationIdForConnection(mWayResult.first, mWayResult.second);
             mDisplay->delWay(mWayResult);
         }
+        emit ready();
         close();
     }
 }
