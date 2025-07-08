@@ -245,6 +245,10 @@ void Display::delTrain(int aTrainId)
     mMap.delTrain(aTrainId);
 }
 
+void Display::setTrainTime(int aTrainId, TimePoint aTime)
+{
+    mMap.setTrainTime(aTrainId, aTime);
+}
 
 QVector<Way> Display::getWays() const
 {

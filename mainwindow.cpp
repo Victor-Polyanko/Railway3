@@ -34,6 +34,7 @@ MainWindow::MainWindow(QWidget *parent)
     QObject::connect(ui->exitAction, &QAction::triggered, [&]() { QApplication::quit(); });
     QObject::connect(ui->createTrainAction, &QAction::triggered, [&]() { openDialog<AddTrainDialog>(); });
     QObject::connect(ui->deleteTrainAction, &QAction::triggered, [&]() { openDialog<DelTrainDialog>(); });
+    QObject::connect(ui->changeTimeAction, &QAction::triggered, [&]() { openDialog<ChangeTimeDialog>(); });
     QObject::connect(ui->createWayAction, &QAction::triggered, [&]() { openDialog<AddWayDialog>(); });
     QObject::connect(ui->deleteWayAction, &QAction::triggered, [&]() { openDialog<DelWayDialog>(); });
     QObject::connect(ui->aboutSoftAction, &QAction::triggered, [&]() {

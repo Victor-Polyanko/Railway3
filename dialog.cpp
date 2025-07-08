@@ -5,19 +5,13 @@
 #include <QPushButton>
 
 const QString cWarning = "Халепонька";
-const QString cAddTrain = "Створення потяга №";
-const QString cDelTrain = "Скасування потяга";
-const QString cChangeTime = "Зміна часу відправлення";
-const QString cAddWay = "Створення колії";
-const QString cDelWay = "Розбирання колії";
-
 const QString cTrainType = "Введіть тип потяга";
 const QVector<QString> cTypeNames = {"Швидкий ", "Пасажирський ", "Приміський "};
 const QString cDepartureTime = "Введіть час відправлення";
 const QString cFirstStation = "Введіть початкову станцію";
 const QString cNextStation = "Введіть наступну станцію";
 const QString cLastStation = "Введіть кінцеву станцію";
-const QString cSelectTrain = "Оберіть, який потяг скасувати:";
+const QString cSelectTrain = "Оберіть потяг";
 
 Dialog::Dialog(Display *aDisplay, QWidget *aParent) :
     QDialog(aParent)
@@ -47,6 +41,25 @@ bool Dialog::fillNeighbours(int aStationId)
     return true;
 }
 
+void Dialog::showTrains()
+{
+    ui->label->setText(cSelectTrain);
+    for (const auto &train : mDisplay->getTrains())
+    {
+        auto firstStation = mDisplay->getStationName(train.getStations().front().stationId);
+        auto lastStation = mDisplay->getStationName(train.getStations().back().stationId);
+        ui->comboBox->addItem(cTypeNames[train.getType()] + "№" + QString::number(train.getNumber())
+                              + ". " + firstStation + " - " + lastStation);
+    }
+}
+
+void Dialog::showTimes()
+{
+    ui->label->setText(cDepartureTime);
+    ui->comboBox->clear();
+    for (int i = 0; i < 24; ++i)
+        ui->comboBox->addItem(QString::number(i) + " : 00");
+}
 
 
 AddTrainDialog::AddTrainDialog(Display *aDisplay, QWidget *aParent) :
@@ -68,10 +81,7 @@ void AddTrainDialog::accept()
     if (ui->label->text() == cTrainType)
     {
         mTrainType = static_cast<Train::Type>(ui->comboBox->currentIndex());
-        ui->label->setText(cDepartureTime);
-        ui->comboBox->clear();
-        for (int i = 0; i < 24; ++i)
-            ui->comboBox->addItem(QString::number(i) + " : 00");
+        showTimes();
         ui->comboBox->setCurrentIndex(12);
     }
     else if (ui->label->text() == cDepartureTime)
@@ -117,18 +127,12 @@ void AddTrainDialog::apply()
 }
 
 
+
 DelTrainDialog::DelTrainDialog(Display *aDisplay, QWidget *aParent) :
     Dialog(aDisplay, aParent)
 {
     this->setWindowTitle("Скасування потяга");
-    ui->label->setText(cSelectTrain);
-    for (const auto &train : mDisplay->getTrains())
-    {
-        auto firstStation = mDisplay->getStationName(train.getStations().front().stationId);
-        auto lastStation = mDisplay->getStationName(train.getStations().back().stationId);
-        ui->comboBox->addItem(cTypeNames[train.getType()] + "№" + QString::number(train.getNumber())
-                              + ". " + firstStation + " - " + lastStation);
-    }
+    showTrains();
 }
 
 void DelTrainDialog::accept()
@@ -136,6 +140,31 @@ void DelTrainDialog::accept()
     mDisplay->delTrain(ui->comboBox->currentIndex());
     emit ready();
     close();
+}
+
+
+
+ChangeTimeDialog::ChangeTimeDialog(Display *aDisplay, QWidget *aParent) :
+    Dialog(aDisplay, aParent)
+{
+    this->setWindowTitle("Зміна часу відправлення");
+    showTrains();
+}
+
+void ChangeTimeDialog::accept()
+{
+    if (ui->label->text() == cSelectTrain)
+    {
+        mTrainId = ui->comboBox->currentIndex();
+        showTimes();
+        ui->comboBox->setCurrentIndex(mDisplay->getTrains()[mTrainId].getStartTime().getX());
+    }
+    else if (ui->label->text() == cDepartureTime)
+    {
+        mDisplay->setTrainTime(mTrainId, TimePoint(ui->comboBox->currentIndex(), 0));
+        emit ready();
+        close();
+    }
 }
 
 

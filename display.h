@@ -35,6 +35,7 @@ public:
     QList<Train> getTrains() const;
     void addTrain(const Train &aTrain);
     void delTrain(int aTrainId);
+    void setTrainTime(int aTrainId, TimePoint aTime);
     QList<Way> getWays() const;
     void addWay(const Way &aWay);
     void delWay(const Way &aWay);

@@ -33,6 +33,7 @@ public:
     Point findTrainPosition(const Train &aTrain, const TimePoint &aTime) const;
     void addTrain(const Train &aTrain);
     void delTrain(int aTrainId);
+    void setTrainTime(int aTrainId, TimePoint aTime);
     void addWay(Way aWay);
     void delWay(Way aWay);
 

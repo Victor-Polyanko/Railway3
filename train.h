@@ -18,6 +18,7 @@ public:
     int getNumber() const;
     Type getType() const;
     TimePoint getStartTime() const;
+    void setStartTime(TimePoint aTime);
     int getStationsQuantity() const;
     QVector<Schedule> getStations() const;
     void addStation(const Schedule &aSchedule);

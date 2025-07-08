@@ -35,6 +35,11 @@ TimePoint Train::getStartTime() const
     return mStartTime;
 }
 
+void Train::setStartTime(TimePoint aTime)
+{
+    mStartTime = aTime;
+}
+
 int Train::getStationsQuantity() const
 {
     return mStations.size();

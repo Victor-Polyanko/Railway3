@@ -529,6 +529,11 @@ void Map::delTrain(int aTrainId)
     mTrains.removeAt(aTrainId);
 }
 
+void Map::setTrainTime(int aTrainId, TimePoint aTime)
+{
+    mTrains[aTrainId].setStartTime(aTime);
+}
+
 void Map::addWay(Way aWay)
 {
     if (aWay.first > aWay.second)

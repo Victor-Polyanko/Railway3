@@ -27,12 +27,12 @@ signals:
 
 protected:
     bool fillNeighbours(int aStationId = cNotSet);
+    void showTrains();
+    void showTimes();
 
 protected:
     Ui::Dialog *ui;
     Display *mDisplay;
-    Train::Type mTrainType;
-    Train mTrainResult;
     Way mWayResult;
 };
 
@@ -48,6 +48,10 @@ private:
     int newTrainNumber() const;
     void accept();
     void apply();
+
+private:
+    Train::Type mTrainType;
+    Train mTrainResult;
 };
 
 
@@ -72,6 +76,9 @@ public:
 
 private:
     void accept();
+
+private:
+    int mTrainId;
 };
 
 
