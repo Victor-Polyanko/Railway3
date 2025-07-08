@@ -1,7 +1,5 @@
 #include "schedule.h"
 
-const int cNotSet = -1;
-
 Schedule::Schedule()
     : stationId(cNotSet)
     , wait(cNotSet)

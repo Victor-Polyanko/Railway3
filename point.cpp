@@ -2,8 +2,8 @@
 #include <cmath>
 
 Point::Point()
-    : mX(0)
-    , mY(0)
+    : mX(cNotSet)
+    , mY(cNotSet)
     , mIsSet(false)
 {
 }

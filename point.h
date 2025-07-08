@@ -1,6 +1,8 @@
 #ifndef POINT_H
 #define POINT_H
 
+const int cNotSet = -1;
+
 class Point
 {
 public:

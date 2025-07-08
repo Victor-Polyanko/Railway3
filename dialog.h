@@ -6,7 +6,6 @@
 
 #include "map.h"
 
-const int cNotSet = -1;
 const QString cWarning = "Халепонька";
 
 QT_BEGIN_NAMESPACE

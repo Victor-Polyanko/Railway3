@@ -58,7 +58,7 @@ void Map::init(int aXd, int aYd, int aXq, int aYq, int aDistrictStationsQuantity
     mWays.resize(aWaysQuantity);
     mTrains.clear();
     mTrains.resize(aTrainsQuantity);
-    mTime = Point( -1, -1);
+    mTime = Point();
     auto multiplier = mDimention.getX() / mDistrictStationsQuantity / 20;
     for (auto i = 0; i < 4; ++i)
         mStationRadius.emplace_back(i * multiplier);
@@ -498,7 +498,7 @@ void Map::fillDistricts()
 
 Point Map::findTrainPosition(const Train &aTrain, const TimePoint &aTime) const
 {
-    auto trainXY = Point(-1,-1);
+    Point trainXY;
     //пошук на проміжних станціях
     if (aTrain.getStations().size() > 2)
     for (auto station = aTrain.getStations().begin() + 1; station != aTrain.getStations().end() - 1; ++station)
@@ -508,7 +508,7 @@ Point Map::findTrainPosition(const Train &aTrain, const TimePoint &aTime) const
             break;
         }
     //пошук між станціями
-    if (trainXY.getX() == -1)
+    if (trainXY.getX() == cNotSet)
     {
         auto prevStation = aTrain.getStations().begin();
         for (auto station = prevStation + 1; station != aTrain.getStations().end(); ++station, prevStation = station)
@@ -522,7 +522,7 @@ Point Map::findTrainPosition(const Train &aTrain, const TimePoint &aTime) const
             }
     }
     //пошук на кінцевих станціях
-    if(trainXY.getX() == -1 )
+    if(trainXY.getX() == cNotSet)
     {
         auto firstStation = aTrain.getStations().front();
         auto secondStation = aTrain.getStations().back();

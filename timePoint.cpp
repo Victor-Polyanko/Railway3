@@ -1,14 +1,11 @@
 #include "timePoint.h"
+#include "point.h"
 
-const int cNotSet = -1;
 const int cMinutesInHour = 60;
 const int cHoursInDay = 24;
 
-TimePoint::TimePoint()
-{
-    mX = cNotSet;
-    mY = cNotSet;
-}
+TimePoint::TimePoint() : Point()
+{}
 
 TimePoint::TimePoint(int aHours, int aMinutes) : Point(aHours, aMinutes) {}
 
