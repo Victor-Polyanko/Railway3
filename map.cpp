@@ -4,7 +4,7 @@
 #include <ctime>
 #include <qiodevice>
 
-const int cDefaultXDimention = 400;
+const int cDefaultXDimention = 300;
 const int cDefaultYDimention = 300;
 const int cDefaultXQuantity = 3;
 const int cDefaultYQuantity = 3;
@@ -192,7 +192,7 @@ void Map::loadTrains(QDataStream &aStream)
         aStream >> number >> hours >> minutes >> stations >> t;
         Train::Type type = static_cast<Train::Type>(t);
         train = Train(number, type, hours, minutes, stations);
-        for (int i = 0; i < train.getStationsQuantity(); ++i)
+        for (int i = 0; i < stations; ++i)
         {
             int arriveHours, arriveMinutes, wait, departHours, departMinutes, number;
             aStream >> arriveHours >> arriveMinutes >> wait >> departHours >> departMinutes >> number;

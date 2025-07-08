@@ -4,12 +4,12 @@
 #include <qmessagebox.h>
 #include <QPushButton>
 
-const QString cTrainType = "Введіть тип потяга";
+const QString cTrainType = "Оберіть тип потяга";
 const QVector<QString> cTypeNames = {"Швидкий ", "Пасажирський ", "Приміський "};
-const QString cDepartureTime = "Введіть час відправлення";
-const QString cFirstStation = "Введіть початкову станцію";
-const QString cNextStation = "Введіть наступну станцію";
-const QString cLastStation = "Введіть кінцеву станцію";
+const QString cDepartureTime = "Оберіть час відправлення";
+const QString cFirstStation = "Оберіть початкову станцію";
+const QString cNextStation = "Оберіть наступну станцію";
+const QString cLastStation = "Оберіть кінцеву станцію";
 const QString cSelectTrain = "Оберіть потяг";
 
 Dialog::Dialog(Map *aMap, QWidget *aParent) :
@@ -247,9 +247,9 @@ bool DelWayDialog::deleteWayWithTrains()
             deletedTrains.emplace_back(trainId);
     }
     if (!deletedTrains.empty() && QMessageBox::Cancel ==
-                                      QMessageBox::information(this, cWarning,
-                                                               "Розбір цієї ділянки призведе до скасування " + QString::number(deletedTrains.size())+ " потяга(ів).",
-                                                               QMessageBox::Ok | QMessageBox::Cancel))
+            QMessageBox::information(this, cWarning,
+            "Розбір цієї ділянки призведе до скасування " + QString::number(deletedTrains.size())+ " потяга(ів).",
+            QMessageBox::Ok | QMessageBox::Cancel))
         return false;
     for (auto train = deletedTrains.rbegin(); train != deletedTrains.rend(); ++ train)
         mMap->delTrain(*train);
