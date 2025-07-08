@@ -4,7 +4,6 @@
 #include <qmessagebox.h>
 #include <QPushButton>
 
-const QString cWarning = "Халепонька";
 const QString cTrainType = "Введіть тип потяга";
 const QVector<QString> cTypeNames = {"Швидкий ", "Пасажирський ", "Приміський "};
 const QString cDepartureTime = "Введіть час відправлення";
@@ -13,10 +12,10 @@ const QString cNextStation = "Введіть наступну станцію";
 const QString cLastStation = "Введіть кінцеву станцію";
 const QString cSelectTrain = "Оберіть потяг";
 
-Dialog::Dialog(Display *aDisplay, QWidget *aParent) :
+Dialog::Dialog(Map *aMap, QWidget *aParent) :
     QDialog(aParent)
     , ui(new Ui::Dialog)
-    , mDisplay(aDisplay)
+    , mMap(aMap)
 {
     ui->setupUi(this);
 }
@@ -30,7 +29,7 @@ bool Dialog::fillNeighbours(int aStationId)
 {
     if (aStationId == cNotSet)
         aStationId = ui->comboBox->currentIndex();
-    auto newList = mDisplay->getNamesForStation(aStationId);
+    auto newList = mMap->getNamesForStation(aStationId);
     if (newList.empty())
     {
         QMessageBox::information(this, cWarning, "Ця станція не має сусідів - оберіть іншу.");
@@ -44,10 +43,10 @@ bool Dialog::fillNeighbours(int aStationId)
 void Dialog::showTrains()
 {
     ui->label->setText(cSelectTrain);
-    for (const auto &train : mDisplay->getTrains())
+    for (const auto &train : mMap->getTrains())
     {
-        auto firstStation = mDisplay->getStationName(train.getStations().front().stationId);
-        auto lastStation = mDisplay->getStationName(train.getStations().back().stationId);
+        auto firstStation = mMap->getStationName(train.getStations().front().stationId);
+        auto lastStation = mMap->getStationName(train.getStations().back().stationId);
         ui->comboBox->addItem(cTypeNames[train.getType()] + "№" + QString::number(train.getNumber())
                               + ". " + firstStation + " - " + lastStation);
     }
@@ -62,8 +61,8 @@ void Dialog::showTimes()
 }
 
 
-AddTrainDialog::AddTrainDialog(Display *aDisplay, QWidget *aParent) :
-    Dialog(aDisplay, aParent)
+AddTrainDialog::AddTrainDialog(Map *aMap, QWidget *aParent) :
+    Dialog(aMap, aParent)
 {
     this->setWindowTitle("Створення потяга №" + QString::number(newTrainNumber()));
     ui->label->setText(cTrainType);
@@ -73,7 +72,7 @@ AddTrainDialog::AddTrainDialog(Display *aDisplay, QWidget *aParent) :
 
 int AddTrainDialog::newTrainNumber() const
 {
-    return mDisplay->getTrains().size() + 1;
+    return mMap->getTrains().size() + 1;
 }
 
 void AddTrainDialog::accept()
@@ -89,7 +88,7 @@ void AddTrainDialog::accept()
         mTrainResult = Train(newTrainNumber(), mTrainType, ui->comboBox->currentIndex());
         ui->label->setText(cFirstStation);
         ui->comboBox->clear();
-        ui->comboBox->addItems(mDisplay->getAllNames());
+        ui->comboBox->addItems(mMap->getAllNames());
     }
     else if (ui->label->text() == cFirstStation)
     {
@@ -106,12 +105,12 @@ void AddTrainDialog::accept()
     else if (ui->label->text() == cNextStation)
     {
         auto trainAddition = static_cast<int>(mTrainResult.getType());
-        auto stationId = mDisplay->getStationIdForConnection(mTrainResult.getStations().back().stationId, ui->comboBox->currentIndex());
+        auto stationId = mMap->getStationIdForConnection(mTrainResult.getStations().back().stationId, ui->comboBox->currentIndex());
         auto prevStation = mTrainResult.getStations().back();
-        auto minutes = prevStation.depart.getY() + (2 + trainAddition) * mDisplay->getStationPosition(stationId).distance(
-                                                       mDisplay->getStationPosition(mTrainResult.getStations().back().stationId)) / 2;
+        auto minutes = prevStation.depart.getY() + (2 + trainAddition) * mMap->getStationPosition(stationId).distance(
+                                                       mMap->getStationPosition(mTrainResult.getStations().back().stationId)) / 2;
         TimePoint arrive = prevStation.depart + minutes;
-        auto wait = 2 * (mDisplay->getStationStatus(stationId) - 1 + trainAddition);
+        auto wait = 2 * (mMap->getStationStatus(stationId) - 1 + trainAddition);
         TimePoint depart = arrive + wait;
         mTrainResult.addStation(stationId, arrive, wait, depart);
         fillNeighbours(stationId);
@@ -121,15 +120,15 @@ void AddTrainDialog::accept()
 void AddTrainDialog::apply()
 {
     accept();
-    mDisplay->addTrain(mTrainResult);
+    mMap->addTrain(mTrainResult);
     emit ready();
     close();
 }
 
 
 
-DelTrainDialog::DelTrainDialog(Display *aDisplay, QWidget *aParent) :
-    Dialog(aDisplay, aParent)
+DelTrainDialog::DelTrainDialog(Map *aMap, QWidget *aParent) :
+    Dialog(aMap, aParent)
 {
     this->setWindowTitle("Скасування потяга");
     showTrains();
@@ -137,15 +136,15 @@ DelTrainDialog::DelTrainDialog(Display *aDisplay, QWidget *aParent) :
 
 void DelTrainDialog::accept()
 {
-    mDisplay->delTrain(ui->comboBox->currentIndex());
+    mMap->delTrain(ui->comboBox->currentIndex());
     emit ready();
     close();
 }
 
 
 
-ChangeTimeDialog::ChangeTimeDialog(Display *aDisplay, QWidget *aParent) :
-    Dialog(aDisplay, aParent)
+ChangeTimeDialog::ChangeTimeDialog(Map *aMap, QWidget *aParent) :
+    Dialog(aMap, aParent)
 {
     this->setWindowTitle("Зміна часу відправлення");
     showTrains();
@@ -157,11 +156,11 @@ void ChangeTimeDialog::accept()
     {
         mTrainId = ui->comboBox->currentIndex();
         showTimes();
-        ui->comboBox->setCurrentIndex(mDisplay->getTrains()[mTrainId].getStartTime().getX());
+        ui->comboBox->setCurrentIndex(mMap->getTrains()[mTrainId].getStartTime().getX());
     }
     else if (ui->label->text() == cDepartureTime)
     {
-        mDisplay->setTrainTime(mTrainId, TimePoint(ui->comboBox->currentIndex(), 0));
+        mMap->setTrainTime(mTrainId, TimePoint(ui->comboBox->currentIndex(), 0));
         emit ready();
         close();
     }
@@ -169,12 +168,12 @@ void ChangeTimeDialog::accept()
 
 
 
-AddWayDialog::AddWayDialog(Display *aDisplay, QWidget *aParent) :
-    Dialog(aDisplay, aParent)
+AddWayDialog::AddWayDialog(Map *aMap, QWidget *aParent) :
+    Dialog(aMap, aParent)
 {
     this->setWindowTitle("Створення колії");
     ui->label->setText(cFirstStation);
-    ui->comboBox->addItems(mDisplay->getAllNames());
+    ui->comboBox->addItems(mMap->getAllNames());
     mWayResult = Way(cNotSet, cNotSet);
 }
 
@@ -191,7 +190,7 @@ void AddWayDialog::accept()
         mWayResult.second = ui->comboBox->currentIndex();
         if (mWayResult.second >= mWayResult.first)
             mWayResult.second++;
-        mDisplay->addWay(mWayResult);
+        mMap->addWay(mWayResult);
         emit ready();
         close();
     }
@@ -199,12 +198,12 @@ void AddWayDialog::accept()
 
 
 
-DelWayDialog::DelWayDialog(Display *aDisplay, QWidget *aParent) :
-    Dialog(aDisplay, aParent)
+DelWayDialog::DelWayDialog(Map *aMap, QWidget *aParent) :
+    Dialog(aMap, aParent)
 {
     this->setWindowTitle("Розбирання колії");
     ui->label->setText(cFirstStation);
-    ui->comboBox->addItems(mDisplay->getAllNames());
+    ui->comboBox->addItems(mMap->getAllNames());
     mWayResult = Way(cNotSet, cNotSet);
 }
 
@@ -220,10 +219,10 @@ void DelWayDialog::accept()
     else
     {
         mWayResult.second = ui->comboBox->currentIndex();
-        mWayResult.second = mDisplay->getStationIdForConnection(mWayResult.first, mWayResult.second);
+        mWayResult.second = mMap->getStationIdForConnection(mWayResult.first, mWayResult.second);
         if (!deleteWayWithTrains())
             return;
-        mDisplay->delWay(mWayResult);
+        mMap->delWay(mWayResult);
         emit ready();
         close();
     }
@@ -232,13 +231,13 @@ void DelWayDialog::accept()
 bool DelWayDialog::deleteWayWithTrains()
 {
     QVector<int> deletedTrains;
-    for (int trainId = 0; trainId < mDisplay->getTrains().size(); ++trainId)
+    for (int trainId = 0; trainId < mMap->getTrains().size(); ++trainId)
     {
         int first = cNotSet;
         int second = cNotSet;
-        for (int stationId = 0; stationId < mDisplay->getTrains()[trainId].getStations().size(); ++stationId)
+        for (int stationId = 0; stationId < mMap->getTrains()[trainId].getStations().size(); ++stationId)
         {
-            const auto station = mDisplay->getTrains()[trainId].getStations()[stationId];
+            const auto station = mMap->getTrains()[trainId].getStations()[stationId];
             if (station.stationId == mWayResult.first)
                 first = stationId;
             else if (station.stationId == mWayResult.second)
@@ -253,6 +252,6 @@ bool DelWayDialog::deleteWayWithTrains()
                                                                QMessageBox::Ok | QMessageBox::Cancel))
         return false;
     for (auto train = deletedTrains.rbegin(); train != deletedTrains.rend(); ++ train)
-        mDisplay->delTrain(*train);
+        mMap->delTrain(*train);
     return true;
 }

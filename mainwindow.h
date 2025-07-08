@@ -42,5 +42,6 @@ private:
     Ui::MainWindow *ui;
     QString mFileName;
     Display mDisplay;
+    Map mMap;
 };
 #endif // MAINWINDOW_H

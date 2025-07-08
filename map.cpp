@@ -104,6 +104,27 @@ int Map::getStationRadius(int aStatus) const
     return mStationRadius[aStatus];
 }
 
+
+int Map::getStationIdForConnection(int aStationId, int aConnectionId) const
+{
+    return mStations[aStationId].getConnections()[aConnectionId];
+}
+
+QString Map::getStationName(int aStationId) const
+{
+    return mStations[aStationId].getName();
+}
+
+Point Map::getStationPosition(int aStationId) const
+{
+    return mStations[aStationId];
+}
+
+int Map::getStationStatus(int aStationId) const
+{
+    return mStations[aStationId].getStatus();
+}
+
 QStringList Map::getAllNames() const
 {
     return mAllNames;

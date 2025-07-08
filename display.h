@@ -14,7 +14,7 @@ typedef QPair<double, double> Scale;
 class Display
 {
 public:
-    Display();
+    Display(Map *aMap);
 
     void generate();
     QString load(const QString &aFileName);
@@ -25,35 +25,15 @@ public:
     void showTrains(QPainter &aPainter, const TimePoint &aTime) const;
     void showDistricts(QPainter &aPainter) const;
     void showStationsAndWays(QPainter &aPainter) const;
-    void updateLastTime(const TimePoint &aTime);
-    QStringList getAllNames() const;
-    QStringList getNamesForStation(int aStationId) const;
-    int getStationIdForConnection(int aStationId, int aConnectionId) const;
-    QString getStationName(int aStationId) const;
-    Point getStationPosition(int aStationId) const;
-    int getStationStatus(int aStationId) const;
-    QList<Train> getTrains() const;
-    void addTrain(const Train &aTrain);
-    void delTrain(int aTrainId);
-    void setTrainTime(int aTrainId, TimePoint aTime);
-    QList<Way> getWays() const;
-    void addWay(const Way &aWay);
-    void delWay(const Way &aWay);
 
 private:
     void convertColors();
-
-#ifdef DEBUG_MODE
-public:
-#else
-private:
-#endif
-    Map mMap;
 
 private:
     QVector<QColor> mColors;
     TimePoint mLastTime;
     Scale mScale;
+    Map *mMap;
 };
 
 #endif // DISPLAY_H

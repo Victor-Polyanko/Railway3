@@ -20,19 +20,21 @@ const QColor cRed(0, 0, 128);
 const QColor cBlue(0, 0, 128);
 const QColor cOrange(0, 0, 128);
 
-Display::Display() {}
+Display::Display(Map *aMap) :
+    mMap(aMap)
+{}
 
 void Display::generate()
 {
-    mMap.generate();
+    mMap->generate();
     convertColors();
 }
 
 void Display::convertColors()
 {
     mColors.clear();
-    mColors.reserve(mMap.getColors().size());
-    for (auto &color : mMap.getColors())
+    mColors.reserve(mMap->getColors().size());
+    for (auto &color : mMap->getColors())
         switch (color)
         {
         case Map::Color::LavenderBlush:
@@ -59,7 +61,7 @@ QString Display::load(const QString &aFileName)
     try
     {   QDataStream stream(&file);
         stream.setByteOrder(QDataStream::LittleEndian);
-        mMap.load(stream);
+        mMap->load(stream);
         convertColors();
         file.close();
     }
@@ -78,7 +80,7 @@ QString Display::save(const QString &aFileName)
     try
     {   QDataStream stream(&file);
         stream.setByteOrder(QDataStream::LittleEndian);
-        mMap.save(stream);
+        mMap->save(stream);
         file.close();
     }
     catch (...)
@@ -92,8 +94,8 @@ void Display::calculateScale(QPainter &aPainter)
 {
     double width = static_cast<double>(aPainter.window().width());
     double height = static_cast<double>(aPainter.window().height());
-    mScale.first = width / mMap.getDimention().getX();
-    mScale.second = height / mMap.getDimention().getY();
+    mScale.first = width / mMap->getDimention().getX();
+    mScale.second = height / mMap->getDimention().getY();
 }
 
 void Display::showTrains(QPainter &aPainter, const TimePoint &aTime) const
@@ -104,11 +106,11 @@ void Display::showTrains(QPainter &aPainter, const TimePoint &aTime) const
     textPen.setColor(cWhite);
     QFont font = QFont("Arial", 8);
     aPainter.setFont(font);
-    int radius = static_cast<int>(mScale.first * mMap.getDimention().getX() / mMap.getDistrictsQuantity().getX() / 120);
+    int radius = static_cast<int>(mScale.first * mMap->getDimention().getX() / mMap->getDistrictsQuantity().getX() / 120);
     int diameter = 2 * radius;
-    for (auto &train : mMap.getTrains())
+    for (auto &train : mMap->getTrains())
     {
-        Point trainXY = mMap.findTrainPosition(train, aTime);
+        Point trainXY = mMap->findTrainPosition(train, aTime);
         if(trainXY.getX() != -1)
         {
             QPen pen;
@@ -139,17 +141,17 @@ void Display::showTrains(QPainter &aPainter, const TimePoint &aTime) const
 
 void Display::showDistricts(QPainter &aPainter) const
 {
-    if (mMap.getDimention().getX() <= 0 ||
-        mMap.getDimention().getY() <= 0 ||
+    if (mMap->getDimention().getX() <= 0 ||
+        mMap->getDimention().getY() <= 0 ||
         mColors.empty())
         return;
     auto kx = mScale.first;
     auto ky = mScale.second * cStep;
-    for(int i = 0; i < mMap.getDimention().getX() - cStep; i += cStep)
+    for(int i = 0; i < mMap->getDimention().getX() - cStep; i += cStep)
     {
         int kxi = static_cast<int>(kx * i) - cHalfWidth;
-        int n = i * mMap.getDimention().getY() / cStep2;
-        for(int j = 0; j < mMap.getDimention().getY() / cStep; ++j)
+        int n = i * mMap->getDimention().getY() / cStep2;
+        for(int j = 0; j < mMap->getDimention().getY() / cStep; ++j)
         {
             aPainter.setBrush(mColors[n + j]);
             aPainter.setPen(mColors[n + j]);
@@ -165,9 +167,9 @@ void Display::showStationsAndWays(QPainter &aPainter) const
     pen.setWidth(static_cast<int>(mScale.first + mScale.second));
     aPainter.setPen(pen);
     aPainter.setBrush(cWhite);
-    for (auto &station : mMap.getStations())
+    for (auto &station : mMap->getStations())
     {
-        int radius = static_cast<int>(mScale.first * mMap.getStationRadius(station.getStatus()));
+        int radius = static_cast<int>(mScale.first * mMap->getStationRadius(station.getStatus()));
         int diameter = radius * 2;
         aPainter.drawEllipse(static_cast<int>(mScale.first * station.getX() - radius),
                              static_cast<int>(mScale.second * station.getY() - radius), diameter, diameter);
@@ -188,79 +190,9 @@ void Display::showStationsAndWays(QPainter &aPainter) const
         aPainter.setFont(font);
         aPainter.drawText(point, station.getName());
     }
-    for (auto &way : mMap.getWays())
-        aPainter.drawLine(static_cast<int>(mScale.first * mMap.getStations()[way.first].getX()),
-                          static_cast<int>(mScale.second * mMap.getStations()[way.first].getY()),
-                          static_cast<int>(mScale.first * mMap.getStations()[way.second].getX()),
-                          static_cast<int>(mScale.second * mMap.getStations()[way.second].getY()));
-}
-
-void Display::updateLastTime(const TimePoint &aTime)
-{
-    mLastTime = aTime;
-}
-
-QStringList Display::getAllNames() const
-{
-    return mMap.getAllNames();
-}
-
-QStringList Display::getNamesForStation(int aStationId) const
-{
-    return mMap.getNamesForStation(aStationId);
-}
-
-int Display::getStationIdForConnection(int aStationId, int aConnectionId) const
-{
-    return mMap.getStations()[aStationId].getConnections()[aConnectionId];
-}
-
-QString Display::getStationName(int aStationId) const
-{
-    return mMap.getStations()[aStationId].getName();
-}
-
-Point Display::getStationPosition(int aStationId) const
-{
-    return mMap.getStations()[aStationId];
-}
-
-int Display::getStationStatus(int aStationId) const
-{
-    return mMap.getStations()[aStationId].getStatus();
-}
-
-QVector<Train> Display::getTrains() const
-{
-    return mMap.getTrains();
-}
-
-void Display::addTrain(const Train &aTrain)
-{
-    mMap.addTrain(aTrain);
-}
-
-void Display::delTrain(int aTrainId)
-{
-    mMap.delTrain(aTrainId);
-}
-
-void Display::setTrainTime(int aTrainId, TimePoint aTime)
-{
-    mMap.setTrainTime(aTrainId, aTime);
-}
-
-QVector<Way> Display::getWays() const
-{
-    return mMap.getWays();
-}
-
-void Display::addWay(const Way &aWay)
-{
-    mMap.addWay(aWay);
-}
-
-void Display::delWay(const Way &aWay)
-{
-    mMap.delWay(aWay);
+    for (auto &way : mMap->getWays())
+        aPainter.drawLine(static_cast<int>(mScale.first * mMap->getStations()[way.first].getX()),
+                          static_cast<int>(mScale.second * mMap->getStations()[way.first].getY()),
+                          static_cast<int>(mScale.first * mMap->getStations()[way.second].getX()),
+                          static_cast<int>(mScale.second * mMap->getStations()[way.second].getY()));
 }

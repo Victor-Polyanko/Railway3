@@ -4,10 +4,10 @@
 #include <QDialog>
 #include <QWidget>
 
-#include "display.h"
-#include "Train.h"
+#include "map.h"
 
 const int cNotSet = -1;
+const QString cWarning = "Халепонька";
 
 QT_BEGIN_NAMESPACE
 namespace Ui {
@@ -19,7 +19,7 @@ class Dialog : public QDialog
 {
     Q_OBJECT
 public:
-    explicit Dialog(Display *mDisplay, QWidget *aParent = nullptr);
+    explicit Dialog(Map *aMap, QWidget *aParent = nullptr);
     ~Dialog();
 
 signals:
@@ -32,7 +32,7 @@ protected:
 
 protected:
     Ui::Dialog *ui;
-    Display *mDisplay;
+    Map *mMap;
     Way mWayResult;
 };
 
@@ -42,7 +42,7 @@ class AddTrainDialog : public Dialog
 {
     Q_OBJECT
 public:
-    explicit AddTrainDialog(Display *mDisplay, QWidget *aParent = nullptr);
+    explicit AddTrainDialog(Map *aMap, QWidget *aParent = nullptr);
 
 private:
     int newTrainNumber() const;
@@ -60,7 +60,7 @@ class DelTrainDialog : public Dialog
 {
     Q_OBJECT
 public:
-    explicit DelTrainDialog(Display *mDisplay, QWidget *aParent = nullptr);
+    explicit DelTrainDialog(Map *aMap, QWidget *aParent = nullptr);
 
 private:
     void accept();
@@ -72,7 +72,7 @@ class ChangeTimeDialog : public Dialog
 {
     Q_OBJECT
 public:
-    explicit ChangeTimeDialog(Display *mDisplay, QWidget *aParent = nullptr);
+    explicit ChangeTimeDialog(Map *aMap, QWidget *aParent = nullptr);
 
 private:
     void accept();
@@ -87,7 +87,7 @@ class AddWayDialog : public Dialog
 {
     Q_OBJECT
 public:
-    explicit AddWayDialog(Display *mDisplay, QWidget *aParent = nullptr);
+    explicit AddWayDialog(Map *aMap, QWidget *aParent = nullptr);
 
 private:
     void accept();
@@ -99,7 +99,7 @@ class DelWayDialog : public Dialog
 {
     Q_OBJECT
 public:
-    explicit DelWayDialog(Display *mDisplay, QWidget *aParent = nullptr);
+    explicit DelWayDialog(Map *aMap, QWidget *aParent = nullptr);
 
 private:
     void accept();

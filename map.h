@@ -28,6 +28,10 @@ public:
     Point getDistrictsQuantity() const;
     int getDistrictsStationsQuantity() const;
     int getStationRadius(int aStatus) const;
+    int getStationIdForConnection(int aStationId, int aConnectionId) const;
+    QString getStationName(int aStationId) const;
+    Point getStationPosition(int aStationId) const;
+    int getStationStatus(int aStationId) const;
     QStringList getAllNames() const;
     QStringList getNamesForStation(int aStationId) const;
     Point findTrainPosition(const Train &aTrain, const TimePoint &aTime) const;

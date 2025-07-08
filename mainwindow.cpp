@@ -24,6 +24,7 @@ const QString cAboutGame =
 MainWindow::MainWindow(QWidget *parent)
     : QMainWindow(parent)
     , ui(new Ui::MainWindow)
+    , mDisplay(&mMap)
 {
     ui->setupUi(this);
     this->setWindowTitle(cDefaultTitle);
@@ -93,16 +94,16 @@ void MainWindow::showInfo(const QString &aText) const
 {
 #ifdef DEBUG_MODE
     QString result = aText;
-    result += "\nРозміри мапи: x = " + QString::number(mDisplay.mMap.getDimention().getX());
-    result += " y = " + QString::number(mDisplay.mMap.getDimention().getY());
-    result += "\nКількість регіонів: x = " + QString::number(mDisplay.mMap.getDistrictsQuantity().getX());
-    result += " y = " + QString::number(mDisplay.mMap.getDistrictsQuantity().getX());
-    result += "\nКількість міст в регіоні: " + QString::number(mDisplay.mMap.getDistrictsStationsQuantity());
-    result += "\nКількість станцій: " + QString::number(mDisplay.mMap.getStations().size());
-    result += "\nКількість шляхів: " + QString::number(mDisplay.mMap.getWays().size());
-    result += "\nКількість потягів: " + QString::number(mDisplay.mMap.getTrains().size());
+    result += "\nРозміри мапи: x = " + QString::number(mMap.getDimention().getX());
+    result += " y = " + QString::number(mMap.getDimention().getY());
+    result += "\nКількість регіонів: x = " + QString::number(mMap.getDistrictsQuantity().getX());
+    result += " y = " + QString::number(mMap.getDistrictsQuantity().getX());
+    result += "\nКількість міст в регіоні: " + QString::number(mMap.getDistrictsStationsQuantity());
+    result += "\nКількість станцій: " + QString::number(mMap.getStations().size());
+    result += "\nКількість шляхів: " + QString::number(mMap.getWays().size());
+    result += "\nКількість потягів: " + QString::number(mMap.getTrains().size());
     QString details = "Станції:";
-    for (const auto &station : mDisplay.mMap.getStations())
+    for (const auto &station : mMap.getStations())
     {
         switch(station.getStatus())
         {
@@ -115,12 +116,12 @@ void MainWindow::showInfo(const QString &aText) const
         details += " має " + QString::number(station.getConnections().size()) + " сполучень\t";
     }
     details += "\n\nШляхи:\n";
-    for (const auto &way : mDisplay.mMap.getWays())
-        details += mDisplay.mMap.getStations()[way.first].getName() + " - " +
-                   mDisplay.mMap.getStations()[way.second].getName() + "\t";
+    for (const auto &way : mMap.getWays())
+        details += mMap.getStations()[way.first].getName() + " - " +
+                   mMap.getStations()[way.second].getName() + "\t";
 
     details += "\n\nПотяги:\n";
-    for (const auto &train : mDisplay.mMap.getTrains())
+    for (const auto &train : mMap.getTrains())
     {
         switch(train.getType())
         {
@@ -130,15 +131,15 @@ void MainWindow::showInfo(const QString &aText) const
         default: details += "\nКазна який"; break;
         }
         details += " потяг №" + QString::number(train.getNumber()) + " ";
-        details += mDisplay.mMap.getStations()[train.getStations().front().stationId].getName() + " - " +
-                   mDisplay.mMap.getStations()[train.getStations().back().stationId].getName();
+        details += mMap.getStations()[train.getStations().front().stationId].getName() + " - " +
+                   mMap.getStations()[train.getStations().back().stationId].getName();
         details += " вирушає о " + QString::number(train.getStartTime().getX()) +
                    ":" + QString::number(train.getStartTime().getY());
     }
     showMessage("Деталі файлу", result, details);
 #else
     if (!aText.isEmpty())
-        showMessage("Помилка", aText);
+        showMessage(cWarning, aText);
 #endif
 }
 
@@ -196,15 +197,15 @@ void MainWindow::updateFileName(const QString &aFileName)
 
 void MainWindow::updateMenu()
 {
-    ui->trainMenu->setEnabled(!mDisplay.getAllNames().empty());
-    ui->deleteTrainAction->setEnabled(!mDisplay.getTrains().empty());
-    ui->watchTrainAction->setEnabled(!mDisplay.getTrains().empty());
-    ui->changeTimeAction->setEnabled(!mDisplay.getTrains().empty());
-    ui->wayMenu->setEnabled(!mDisplay.getWays().empty());
-    ui->deleteWayAction->setEnabled(!mDisplay.getWays().empty());
-    ui->watchRouteAction->setEnabled(!mDisplay.getWays().empty());
-    ui->watchStationAction->setEnabled(!mDisplay.getWays().empty());
-    ui->launchMenu->setEnabled(!mDisplay.getWays().empty() || !mDisplay.getTrains().empty());
+    ui->trainMenu->setEnabled(!mMap.getAllNames().empty());
+    ui->deleteTrainAction->setEnabled(!mMap.getTrains().empty());
+    ui->watchTrainAction->setEnabled(!mMap.getTrains().empty());
+    ui->changeTimeAction->setEnabled(!mMap.getTrains().empty());
+    ui->wayMenu->setEnabled(!mMap.getWays().empty());
+    ui->deleteWayAction->setEnabled(!mMap.getWays().empty());
+    ui->watchRouteAction->setEnabled(!mMap.getWays().empty());
+    ui->watchStationAction->setEnabled(!mMap.getWays().empty());
+    ui->launchMenu->setEnabled(!mMap.getWays().empty() || !mMap.getTrains().empty());
 }
 
 bool MainWindow::areNotSavedChanges() const
@@ -236,7 +237,7 @@ void MainWindow::closeEvent(QCloseEvent *aEvent)
 template <class T>
 void MainWindow::openDialog()
 {
-    auto dialog = new T(&mDisplay, this);
+    auto dialog = new T(&mMap, this);
     connect(dialog, &Dialog::ready, this, &MainWindow::updateMenu);
     dialog->setAttribute(Qt::WA_DeleteOnClose);
     dialog->show();
