@@ -18,9 +18,7 @@ SOURCES += \
     schedule.cpp \
     station.cpp \
     timePoint.cpp \
-    train.cpp \
-    trainDialog.cpp \
-    wayDialog.cpp
+    train.cpp
 
 HEADERS += \
     dialog.h \
@@ -31,9 +29,7 @@ HEADERS += \
     schedule.h \
     station.h \
     timePoint.h \
-    train.h \
-    trainDialog.h \
-    wayDialog.h
+    train.h
 
 FORMS += \
     dialog.ui \

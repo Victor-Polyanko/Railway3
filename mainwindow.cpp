@@ -1,7 +1,6 @@
 #include "mainwindow.h"
 #include "ui_mainwindow.h"
-#include "trainDialog.h"
-#include "wayDialog.h"
+#include "dialog.h"
 
 #include <QFileDialog>
 #include <QMessageBox>
@@ -33,14 +32,16 @@ MainWindow::MainWindow(QWidget *parent)
     QObject::connect(ui->saveAction, &QAction::triggered, [&]() { saveMap(mFileName); });
     QObject::connect(ui->saveAsAction, &QAction::triggered, [&]() { saveMap(); });
     QObject::connect(ui->exitAction, &QAction::triggered, [&]() { QApplication::quit(); });
-    QObject::connect(ui->createTrainAction, &QAction::triggered, [&]() { launchDialog(cAddTrain); });
-    QObject::connect(ui->deleteTrainAction, &QAction::triggered, [&]() { launchDialog(cDelTrain); });
-    QObject::connect(ui->createWayAction, &QAction::triggered, [&]() { launchDialog(cAddWay); });
-    QObject::connect(ui->deleteWayAction, &QAction::triggered, [&]() { launchDialog(cDelWay); });
+    QObject::connect(ui->createTrainAction, &QAction::triggered, [&]() { openDialog<AddTrainDialog>(); });
+    QObject::connect(ui->deleteTrainAction, &QAction::triggered, [&]() { openDialog<DelTrainDialog>(); });
+    QObject::connect(ui->createWayAction, &QAction::triggered, [&]() { openDialog<AddWayDialog>(); });
+    QObject::connect(ui->deleteWayAction, &QAction::triggered, [&]() { openDialog<DelWayDialog>(); });
     QObject::connect(ui->aboutSoftAction, &QAction::triggered, [&]() {
         QMessageBox::information(parent, "Про програму", cAboutSoft); });
     QObject::connect(ui->aboutGameAction, &QAction::triggered, [&]() {
         QMessageBox::information(parent, "Про гру", cAboutGame); });
+    ui->saveAction->setEnabled(false);
+    ui->saveAsAction->setEnabled(false);
     ui->trainMenu->setEnabled(false);
     ui->wayMenu->setEnabled(false);
     ui->launchMenu->setEnabled(false);
@@ -187,6 +188,8 @@ void MainWindow::updateFileName(const QString &aFileName)
                      ? (cNewPrefix + cDefaultTitle)
                      : (cDefaultTitle + " - " + mFileName);
     this->setWindowTitle(title);
+    ui->saveAction->setEnabled(true);
+    ui->saveAsAction->setEnabled(true);
     updateMenu();
 }
 
@@ -229,13 +232,10 @@ void MainWindow::closeEvent(QCloseEvent *aEvent)
         aEvent->ignore();
 }
 
-void MainWindow::launchDialog(const QString &aTitle)
+template <class T>
+void MainWindow::openDialog()
 {
-    Dialog *dialog;
-    if (aTitle == cAddTrain || aTitle == cDelTrain)
-        dialog = new TrainDialog(aTitle, &mDisplay, this);
-    else
-        dialog = new WayDialog(aTitle, &mDisplay, this);
+    auto dialog = new T(&mDisplay, this);
     connect(dialog, &Dialog::ready, this, &MainWindow::updateMenu);
     dialog->setAttribute(Qt::WA_DeleteOnClose);
     dialog->show();

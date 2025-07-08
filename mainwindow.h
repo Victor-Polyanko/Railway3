@@ -35,7 +35,8 @@ private:
     void updateMenu();
     bool areNotSavedChanges() const;
     void markTitleWithChanges();
-    void launchDialog(const QString &aTitle);
+    template <class T>
+    void openDialog();
 
 private:
     Ui::MainWindow *ui;

@@ -5,6 +5,9 @@
 #include <QWidget>
 
 #include "display.h"
+#include "Train.h"
+
+const int cNotSet = -1;
 
 QT_BEGIN_NAMESPACE
 namespace Ui {
@@ -12,20 +15,11 @@ class Dialog;
 }
 QT_END_NAMESPACE
 
-const int cNotSet = -1;
-const QString cWarning = "Халепонька";
-const QString cFirstStation = "Введіть початкову станцію";
-const QString cAddTrain = "Створення потяга №";
-const QString cDelTrain = "Скасування потяга";
-const QString cAddWay = "Створення колії";
-const QString cDelWay = "Розбирання колії";
-
-
 class Dialog : public QDialog
 {
     Q_OBJECT
 public:
-    explicit Dialog(const QString &aType, Display *mDisplay, QWidget *aParent = nullptr);
+    explicit Dialog(Display *mDisplay, QWidget *aParent = nullptr);
     ~Dialog();
 
 signals:
@@ -36,8 +30,73 @@ protected:
 
 protected:
     Ui::Dialog *ui;
-    QString mType;
     Display *mDisplay;
+    Train::Type mTrainType;
+    Train mTrainResult;
+    Way mWayResult;
+};
+
+
+
+class AddTrainDialog : public Dialog
+{
+    Q_OBJECT
+public:
+    explicit AddTrainDialog(Display *mDisplay, QWidget *aParent = nullptr);
+
+private:
+    int newTrainNumber() const;
+    void accept();
+    void apply();
+};
+
+
+
+class DelTrainDialog : public Dialog
+{
+    Q_OBJECT
+public:
+    explicit DelTrainDialog(Display *mDisplay, QWidget *aParent = nullptr);
+
+private:
+    void accept();
+};
+
+
+
+class ChangeTimeDialog : public Dialog
+{
+    Q_OBJECT
+public:
+    explicit ChangeTimeDialog(Display *mDisplay, QWidget *aParent = nullptr);
+
+private:
+    void accept();
+};
+
+
+
+class AddWayDialog : public Dialog
+{
+    Q_OBJECT
+public:
+    explicit AddWayDialog(Display *mDisplay, QWidget *aParent = nullptr);
+
+private:
+    void accept();
+};
+
+
+
+class DelWayDialog : public Dialog
+{
+    Q_OBJECT
+public:
+    explicit DelWayDialog(Display *mDisplay, QWidget *aParent = nullptr);
+
+private:
+    void accept();
+    bool deleteWayWithTrains();
 };
 
 #endif // DIALOG_H
