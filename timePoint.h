@@ -3,6 +3,8 @@
 
 #include "point.h"
 
+#include <QString>
+
 class TimePoint : public Point
 {
 public:
@@ -15,6 +17,7 @@ public:
     int getMinutesTo(const TimePoint &aTime) const;
     static bool isLessThanHour(int minutes);
     static void correctMinutes(int &minutes);
+    QString showAsString() const;
 
     TimePoint operator+(const int &aMinutes) const;
 };

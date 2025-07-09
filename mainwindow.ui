@@ -40,7 +40,7 @@
     </property>
     <addaction name="createTrainAction"/>
     <addaction name="deleteTrainAction"/>
-    <addaction name="watchTrainAction"/>
+    <addaction name="viewTrainAction"/>
     <addaction name="changeTimeAction"/>
    </widget>
    <widget class="QMenu" name="wayMenu">
@@ -106,7 +106,7 @@
     <string>Скасувати потяг</string>
    </property>
   </action>
-  <action name="watchTrainAction">
+  <action name="viewTrainAction">
    <property name="text">
     <string>Проглянути потяг</string>
    </property>

@@ -1,5 +1,6 @@
 #include "dialog.h"
 #include "ui_dialog.h"
+#include "scheduleViewer.h"
 
 #include <qmessagebox.h>
 #include <QPushButton>
@@ -107,10 +108,10 @@ void AddTrainDialog::accept()
         auto trainAddition = static_cast<int>(mTrainResult.getType());
         auto stationId = mMap->getStationIdForConnection(mTrainResult.getStations().back().stationId, ui->comboBox->currentIndex());
         auto prevStation = mTrainResult.getStations().back();
-        auto minutes = prevStation.depart.getY() + (2 + trainAddition) * mMap->getStationPosition(stationId).distance(
-                                                       mMap->getStationPosition(mTrainResult.getStations().back().stationId)) / 2;
+        auto minutes = (2 + trainAddition) * mMap->getStationPosition(stationId).distance(
+                           mMap->getStationPosition(mTrainResult.getStations().back().stationId)) / 2;
         TimePoint arrive = prevStation.depart + minutes;
-        auto wait = 2 * (mMap->getStationStatus(stationId) - 1 + trainAddition);
+        auto wait = 2 * (mMap->getStationStatus(stationId) + 1 + trainAddition);
         TimePoint depart = arrive + wait;
         mTrainResult.addStation(stationId, arrive, wait, depart);
         fillNeighbours(stationId);
@@ -119,7 +120,14 @@ void AddTrainDialog::accept()
 
 void AddTrainDialog::apply()
 {
-    accept();
+    auto trainAddition = static_cast<int>(mTrainResult.getType());
+    Schedule lastStation;
+    lastStation.stationId = mMap->getStationIdForConnection(mTrainResult.getStations().back().stationId, ui->comboBox->currentIndex());
+    auto prevStation = mTrainResult.getStations().back();
+    auto minutes = (2 + trainAddition) * mMap->getStationPosition(lastStation.stationId).distance(
+                       mMap->getStationPosition(mTrainResult.getStations().back().stationId)) / 2;
+    lastStation.arrive = prevStation.depart + minutes;
+    mTrainResult.addStation(lastStation);
     mMap->addTrain(mTrainResult);
     emit ready();
     close();
@@ -143,6 +151,22 @@ void DelTrainDialog::accept()
 
 
 
+ViewTrainDialog::ViewTrainDialog(Map *aMap, QWidget *aParent)
+    : Dialog(aMap, aParent)
+    , mViewer(new ScheduleViewer(*aMap, aParent))
+{
+    this->setWindowTitle("Перегляд розкладу потяга");
+    showTrains();
+}
+
+void ViewTrainDialog::accept()
+{
+    mViewer->showTrainSchedule(ui->comboBox->currentIndex());
+    close();
+}
+
+
+
 ChangeTimeDialog::ChangeTimeDialog(Map *aMap, QWidget *aParent) :
     Dialog(aMap, aParent)
 {
@@ -161,7 +185,6 @@ void ChangeTimeDialog::accept()
     else if (ui->label->text() == cDepartureTime)
     {
         mMap->setTrainTime(mTrainId, TimePoint(ui->comboBox->currentIndex(), 0));
-        emit ready();
         close();
     }
 }

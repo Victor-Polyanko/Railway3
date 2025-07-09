@@ -5,6 +5,7 @@
 #include <QWidget>
 
 #include "map.h"
+#include "scheduleviewer.h"
 
 const QString cWarning = "Халепонька";
 
@@ -63,6 +64,21 @@ public:
 
 private:
     void accept();
+};
+
+
+
+class ViewTrainDialog : public Dialog
+{
+    Q_OBJECT
+public:
+    explicit ViewTrainDialog(Map *aMap, QWidget *aParent = nullptr);
+
+private:
+    void accept();
+
+private:
+    ScheduleViewer *mViewer;
 };
 
 

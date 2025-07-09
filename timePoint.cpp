@@ -72,16 +72,17 @@ void TimePoint::correctMinutes(int &aMinutes)
         aMinutes = cMinutesInHour;
 }
 
+QString TimePoint::showAsString() const
+{
+    auto toString = [](int i) { return (i < 10 ? "0" : "") + QString::number(i); };
+    return toString(mX) + ":" + toString(mY);
+}
+
 TimePoint TimePoint::operator+(const int &aMinutes) const
 {
-    auto hours = mX;
-    auto minutes = mY + aMinutes % cMinutesInHour;
-    if (minutes >= cMinutesInHour)
-    {
-        minutes -= cMinutesInHour;
-        ++hours;
-    }
+    auto hours = mY + (mX + aMinutes) / cMinutesInHour;
+    auto minutes = (mY + aMinutes) % cMinutesInHour;
     if (hours >= cHoursInDay)
-        hours -= cHoursInDay;
+        hours = hours % cHoursInDay;
     return TimePoint(hours, minutes);
 }

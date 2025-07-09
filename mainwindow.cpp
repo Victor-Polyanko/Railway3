@@ -35,6 +35,7 @@ MainWindow::MainWindow(QWidget *parent)
     QObject::connect(ui->exitAction, &QAction::triggered, [&]() { QApplication::quit(); });
     QObject::connect(ui->createTrainAction, &QAction::triggered, [&]() { openDialog<AddTrainDialog>(); });
     QObject::connect(ui->deleteTrainAction, &QAction::triggered, [&]() { openDialog<DelTrainDialog>(); });
+    QObject::connect(ui->viewTrainAction, &QAction::triggered, [&]() { openDialog<ViewTrainDialog>(); });
     QObject::connect(ui->changeTimeAction, &QAction::triggered, [&]() { openDialog<ChangeTimeDialog>(); });
     QObject::connect(ui->createWayAction, &QAction::triggered, [&]() { openDialog<AddWayDialog>(); });
     QObject::connect(ui->deleteWayAction, &QAction::triggered, [&]() { openDialog<DelWayDialog>(); });
@@ -199,7 +200,7 @@ void MainWindow::updateMenu()
 {
     ui->trainMenu->setEnabled(!mMap.getAllNames().empty());
     ui->deleteTrainAction->setEnabled(!mMap.getTrains().empty());
-    ui->watchTrainAction->setEnabled(!mMap.getTrains().empty());
+    ui->viewTrainAction->setEnabled(!mMap.getTrains().empty());
     ui->changeTimeAction->setEnabled(!mMap.getTrains().empty());
     ui->wayMenu->setEnabled(!mMap.getWays().empty());
     ui->deleteWayAction->setEnabled(!mMap.getWays().empty());
@@ -240,5 +241,5 @@ void MainWindow::openDialog()
     auto dialog = new T(&mMap, this);
     connect(dialog, &Dialog::ready, this, &MainWindow::updateMenu);
     dialog->setAttribute(Qt::WA_DeleteOnClose);
-    dialog->show();
+    dialog->exec();
 }

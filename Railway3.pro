@@ -16,6 +16,7 @@ SOURCES += \
     map.cpp \
     point.cpp \
     schedule.cpp \
+    scheduleviewer.cpp \
     station.cpp \
     timePoint.cpp \
     train.cpp
@@ -27,13 +28,15 @@ HEADERS += \
     map.h \
     point.h \
     schedule.h \
+    scheduleviewer.h \
     station.h \
     timePoint.h \
     train.h
 
 FORMS += \
     dialog.ui \
-    mainwindow.ui
+    mainwindow.ui \
+    scheduleviewer.ui
 
 # Default rules for deployment.
 qnx: target.path = /tmp/$${TARGET}/bin
