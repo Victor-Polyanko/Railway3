@@ -80,7 +80,7 @@ QString TimePoint::showAsString() const
 
 TimePoint TimePoint::operator+(const int &aMinutes) const
 {
-    auto hours = mY + (mX + aMinutes) / cMinutesInHour;
+    auto hours = mX + (mY + aMinutes) / cMinutesInHour;
     auto minutes = (mY + aMinutes) % cMinutesInHour;
     if (hours >= cHoursInDay)
         hours = hours % cHoursInDay;

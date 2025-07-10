@@ -45,13 +45,15 @@ public:
     explicit AddTrainDialog(Map *aMap, QWidget *aParent = nullptr);
 
 private:
-    int newTrainNumber() const;
     void accept();
     void apply();
+    Train createNewTrain() const;
+    TimePoint calculateArrivalToStation(const Train &aTrain, int aStationId) const;
 
 private:
     Train::Type mTrainType;
     Train mTrainResult;
+    QPushButton *mApplyButton;
 };
 
 

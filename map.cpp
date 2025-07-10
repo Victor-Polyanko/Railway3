@@ -444,7 +444,7 @@ void Map::ConnectAlonesInDistricts()
                     minId = id;
                 }
             }
-            mWays.emplace_back(Way(currentId, minId));
+            addWay(Way(currentId, minId));
         }
     }
 }

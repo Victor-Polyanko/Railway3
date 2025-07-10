@@ -11,6 +11,7 @@ const QString cDepartureTime = "Оберіть час відправлення";
 const QString cFirstStation = "Оберіть початкову станцію";
 const QString cNextStation = "Оберіть наступну станцію";
 const QString cLastStation = "Оберіть кінцеву станцію";
+const QString cSecondTrain = "Якщо бажаєте додати зворотній рейс, оберіть його час відправлення";
 const QString cSelectTrain = "Оберіть потяг";
 
 Dialog::Dialog(Map *aMap, QWidget *aParent) :
@@ -59,21 +60,17 @@ void Dialog::showTimes()
     ui->comboBox->clear();
     for (int i = 0; i < 24; ++i)
         ui->comboBox->addItem(QString::number(i) + " : 00");
+    ui->comboBox->setCurrentIndex(12);
 }
 
 
 AddTrainDialog::AddTrainDialog(Map *aMap, QWidget *aParent) :
     Dialog(aMap, aParent)
 {
-    this->setWindowTitle("Створення потяга №" + QString::number(newTrainNumber()));
+    this->setWindowTitle("Створення потяга №" + QString::number(mMap->getTrains().size() + 1));
     ui->label->setText(cTrainType);
     for (const auto &type : cTypeNames)
         ui->comboBox->addItem(type);
-}
-
-int AddTrainDialog::newTrainNumber() const
-{
-    return mMap->getTrains().size() + 1;
 }
 
 void AddTrainDialog::accept()
@@ -82,11 +79,10 @@ void AddTrainDialog::accept()
     {
         mTrainType = static_cast<Train::Type>(ui->comboBox->currentIndex());
         showTimes();
-        ui->comboBox->setCurrentIndex(12);
     }
     else if (ui->label->text() == cDepartureTime)
     {
-        mTrainResult = Train(newTrainNumber(), mTrainType, ui->comboBox->currentIndex());
+        mTrainResult = createNewTrain();
         ui->label->setText(cFirstStation);
         ui->comboBox->clear();
         ui->comboBox->addItems(mMap->getAllNames());
@@ -100,37 +96,65 @@ void AddTrainDialog::accept()
         firstStation.depart = TimePoint(mTrainResult.getStartTime());
         mTrainResult.addStation(firstStation);
         ui->label->setText(cNextStation);
-        ui->buttonBox->addButton(QDialogButtonBox::Apply);
+        mApplyButton = ui->buttonBox->addButton(QDialogButtonBox::Apply);
         connect(ui->buttonBox->button(QDialogButtonBox::Apply), &QPushButton::clicked, this, &AddTrainDialog::apply);
     }
     else if (ui->label->text() == cNextStation)
     {
-        auto trainAddition = static_cast<int>(mTrainResult.getType());
         auto stationId = mMap->getStationIdForConnection(mTrainResult.getStations().back().stationId, ui->comboBox->currentIndex());
-        auto prevStation = mTrainResult.getStations().back();
-        auto minutes = (2 + trainAddition) * mMap->getStationPosition(stationId).distance(
-                           mMap->getStationPosition(mTrainResult.getStations().back().stationId)) / 2;
-        TimePoint arrive = prevStation.depart + minutes;
-        auto wait = 2 * (mMap->getStationStatus(stationId) + 1 + trainAddition);
-        TimePoint depart = arrive + wait;
+        auto arrive = calculateArrivalToStation(mTrainResult, stationId);
+        auto wait = 2 * (mMap->getStationStatus(stationId) + 1 + static_cast<int>(mTrainResult.getType()));
+        auto depart = arrive + wait;
         mTrainResult.addStation(stationId, arrive, wait, depart);
         fillNeighbours(stationId);
+    } else if (ui->label->text() == cSecondTrain)
+    {
+        auto secondTrain = createNewTrain();
+        Schedule firstStation;
+        auto stations = mTrainResult.getStations();
+        firstStation.stationId = stations.back().stationId;
+        firstStation.depart = TimePoint(mTrainResult.getStartTime());
+        secondTrain.addStation(firstStation);
+        for (auto station = stations.rbegin() + 1; station < stations.rend() - 1; ++station)
+        {
+            auto arrive = calculateArrivalToStation(secondTrain, station->stationId);
+            auto wait = station->wait;
+            auto depart = arrive + wait;
+            secondTrain.addStation(station->stationId, arrive, wait, depart);
+        }
+        Schedule lastStation;
+        lastStation.stationId = stations.front().stationId;
+        lastStation.arrive = calculateArrivalToStation(secondTrain, lastStation.stationId);
+        secondTrain.addStation(lastStation);
+        mMap->addTrain(secondTrain);
+        close();
     }
 }
 
 void AddTrainDialog::apply()
 {
-    auto trainAddition = static_cast<int>(mTrainResult.getType());
     Schedule lastStation;
     lastStation.stationId = mMap->getStationIdForConnection(mTrainResult.getStations().back().stationId, ui->comboBox->currentIndex());
-    auto prevStation = mTrainResult.getStations().back();
-    auto minutes = (2 + trainAddition) * mMap->getStationPosition(lastStation.stationId).distance(
-                       mMap->getStationPosition(mTrainResult.getStations().back().stationId)) / 2;
-    lastStation.arrive = prevStation.depart + minutes;
+    lastStation.arrive = calculateArrivalToStation(mTrainResult, lastStation.stationId);
     mTrainResult.addStation(lastStation);
     mMap->addTrain(mTrainResult);
     emit ready();
-    close();
+    showTimes();
+    ui->label->setText(cSecondTrain);
+    ui->buttonBox->removeButton(mApplyButton);
+}
+
+Train AddTrainDialog::createNewTrain() const
+{
+    return Train(mMap->getTrains().size() + 1, mTrainType, ui->comboBox->currentIndex());
+}
+
+TimePoint AddTrainDialog::calculateArrivalToStation(const Train &aTrain, int aStationId) const
+{
+    auto prevStation = aTrain.getStations().back();
+    auto minutes = (2 + static_cast<int>(aTrain.getType())) * mMap->getStationPosition(aStationId).distance(
+                       mMap->getStationPosition(aTrain.getStations().back().stationId)) / 2;
+    return prevStation.depart + minutes;
 }
 
 
