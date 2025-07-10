@@ -9,26 +9,28 @@ TimePoint::TimePoint() : Point()
 
 TimePoint::TimePoint(int aHours, int aMinutes) : Point(aHours, aMinutes) {}
 
-void TimePoint::addMinutes(int minutes)
+void TimePoint::addTime(const TimePoint &aTime)
 {
-    mY += minutes % cMinutesInHour;
+    mY += aTime.mY;
     if (mY >= cMinutesInHour)
     {
         mY -= cMinutesInHour;
         mX++;
     }
+    mX += aTime.mX;
     if (mX >= cHoursInDay)
         mX -= cHoursInDay;
 }
 
-void TimePoint::substractMinutes(int minutes)
+void TimePoint::substractTime(const TimePoint &aTime)
 {
-    mY -= minutes % cMinutesInHour;
+    mY -= aTime.mY;
     if (mY < 0)
     {
         mY += cMinutesInHour;
         mX--;
     }
+    mX -= aTime.mX;
     if (mX < 0)
         mX += cHoursInDay;
 }

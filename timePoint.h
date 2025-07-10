@@ -11,8 +11,8 @@ public:
     TimePoint();
     TimePoint(int aHours, int aMinutes);
 
-    void addMinutes(int minutes);
-    void substractMinutes(int minutes);
+    void addTime(const TimePoint &aTime);
+    void substractTime(const TimePoint &aTime);
     bool isEarlierThan(const TimePoint &aTime) const;
     int getMinutesTo(const TimePoint &aTime) const;
     static bool isLessThanHour(int minutes);

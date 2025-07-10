@@ -544,9 +544,9 @@ Point Map::findTrainPosition(const Train &aTrain, const TimePoint &aTime) const
         int minutes = secondStation.arrive.getMinutesTo(firstStation.depart);
         TimePoint::correctMinutes(minutes);
         TimePoint firstTime = firstStation.depart;
-        firstTime.substractMinutes(minutes);
+        firstTime.substractTime(TimePoint(0, minutes));
         TimePoint secondTime = secondStation.arrive;
-        secondTime.addMinutes(minutes);
+        secondTime.addTime(TimePoint(0, minutes));
         if (aTime.isEarlierThan(firstTime) && TimePoint::isLessThanHour(aTime.getMinutesTo(firstTime)))
             trainXY = Point(mStations[firstStation.stationId]);
         else if (secondTime.isEarlierThan(aTime) && TimePoint::isLessThanHour(secondTime.getMinutesTo(aTime)))

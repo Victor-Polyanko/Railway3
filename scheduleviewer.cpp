@@ -86,7 +86,6 @@ void ScheduleViewer::showStationSchedule(int aStationId)
         }
     }
     ui->tableView->setModel(model);
-    ui->tableView->sortByColumn(2, Qt::SortOrder::AscendingOrder);
     show();
 }
 
@@ -135,7 +134,6 @@ bool ScheduleViewer::showRouteSchedule(const Way &aWay)
     if (model->rowCount() == 0)
         return false;
     ui->tableView->setModel(model);
-    ui->tableView->sortByColumn(2, Qt::SortOrder::AscendingOrder);
     show();
     return true;
 }

@@ -44,6 +44,32 @@ TimePoint Train::getStartTime() const
 
 void Train::setStartTime(TimePoint aTime)
 {
+    if (mStartTime.isSet())
+    {
+        if (mStartTime.isEarlierThan(aTime))
+        {
+            auto diff = aTime - mStartTime;
+            for (auto &station : mStations)
+            {
+                if (station.arrive.isSet())
+                    station.arrive.addTime(diff);
+                if (station.depart.isSet())
+                    station.depart.addTime(diff);
+            }
+        }
+        else
+        {
+            auto diff = mStartTime - aTime;
+            for (auto &station : mStations)
+            {
+                if (station.arrive.isSet())
+                    station.arrive.substractTime(diff);
+                if (station.depart.isSet())
+                    station.depart.substractTime(diff);
+            }
+        }
+        auto diff = aTime - mStartTime;
+    }
     mStartTime = aTime;
 }
 
