@@ -99,7 +99,7 @@ void AddTrainDialog::accept()
     {
         auto stationId = mMap->getStationIdForConnection(mTrainResult.getStations().back().stationId, ui->comboBox->currentIndex());
         auto arrive = calculateArrivalToStation(mTrainResult, stationId);
-        auto wait = 2 * (mMap->getStationStatus(stationId) + 1 + static_cast<int>(mTrainResult.getType()));
+        auto wait = 2 * (mMap->getStationStatus(stationId) - 1 + static_cast<int>(mTrainResult.getType()));
         auto depart = arrive + wait;
         mTrainResult.addStation(stationId, arrive, wait, depart);
         fillNeighbours(stationId);

@@ -208,9 +208,10 @@ void Map::loadTrains(QDataStream &aStream)
         train = Train(number, type, hours, minutes, stations);
         for (int i = 0; i < stations; ++i)
         {
-            int arriveHours, arriveMinutes, wait, departHours, departMinutes, number;
-            aStream >> arriveHours >> arriveMinutes >> wait >> departHours >> departMinutes >> number;
-            train.addStation(number, arriveHours, arriveMinutes, wait, departHours, departMinutes);
+            int arriveHours, arriveMinutes, wait, departHours, departMinutes, stationId;
+            aStream >> arriveHours >> arriveMinutes >> wait >> departHours >> departMinutes >> stationId;
+            train.addStation(stationId, arriveHours, arriveMinutes, wait, departHours, departMinutes);
+            mStations[stationId].addTrainNumber(number);
         }
     }
 }

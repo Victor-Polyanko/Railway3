@@ -76,5 +76,6 @@ void ScheduleViewer::showStationSchedule(int aStationId)
         }
     }
     ui->tableView->setModel(model);
+    ui->tableView->sortByColumn(2, Qt::SortOrder::AscendingOrder);
     show();
 }
