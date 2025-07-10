@@ -241,7 +241,7 @@ void Map::saveStations(QDataStream &aStream) const
     {
         aStream << station.getX();
         aStream << station.getY();
-        aStream << station.getConnections().size();
+        aStream << static_cast<int>(station.getConnections().size());
         aStream << station.getStatus();
         quint8 compatibilityByte = 0;
         aStream << compatibilityByte;
