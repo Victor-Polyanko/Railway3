@@ -29,6 +29,8 @@ protected:
     bool fillNeighbours(int aStationId = cNotSet);
     void showTrains();
     void showTimes();
+    void showStations();
+    bool completeWay();
 
 protected:
     Ui::Dialog *ui;
@@ -130,6 +132,21 @@ class ViewStationDialog : public Dialog
     Q_OBJECT
 public:
     explicit ViewStationDialog(Map *aMap, QWidget *aParent = nullptr);
+
+private:
+    void accept();
+
+private:
+    ScheduleViewer *mViewer;
+};
+
+
+
+class ViewRouteDialog : public Dialog
+{
+    Q_OBJECT
+public:
+    explicit ViewRouteDialog(Map *aMap, QWidget *aParent = nullptr);
 
 private:
     void accept();

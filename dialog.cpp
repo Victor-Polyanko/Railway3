@@ -59,6 +59,29 @@ void Dialog::showTimes()
     ui->comboBox->setCurrentIndex(12);
 }
 
+void Dialog::showStations()
+{
+    ui->label->setText(cFirstStation);
+    ui->comboBox->addItems(mMap->getAllNames());
+    mWayResult = Way();
+}
+
+bool Dialog::completeWay()
+{
+    if (ui->label->text() == cFirstStation)
+    {
+        mWayResult.first = ui->comboBox->currentIndex();
+        ui->comboBox->removeItem(mWayResult.first);
+        ui->label->setText(cLastStation);
+        return false;
+    }
+    mWayResult.second = ui->comboBox->currentIndex();
+    if (mWayResult.second >= mWayResult.first)
+        mWayResult.second++;
+    return true;
+}
+
+
 
 AddTrainDialog::AddTrainDialog(Map *aMap, QWidget *aParent) :
     Dialog(aMap, aParent)
@@ -215,24 +238,13 @@ AddWayDialog::AddWayDialog(Map *aMap, QWidget *aParent) :
     Dialog(aMap, aParent)
 {
     this->setWindowTitle("Створення колії");
-    ui->label->setText(cFirstStation);
-    ui->comboBox->addItems(mMap->getAllNames());
-    mWayResult = Way(cNotSet, cNotSet);
+    showStations();
 }
 
 void AddWayDialog::accept()
 {
-    if (ui->label->text() == cFirstStation)
+    if (completeWay())
     {
-        mWayResult.first = ui->comboBox->currentIndex();
-        ui->comboBox->removeItem(mWayResult.first);
-        ui->label->setText(cLastStation);
-    }
-    else
-    {
-        mWayResult.second = ui->comboBox->currentIndex();
-        if (mWayResult.second >= mWayResult.first)
-            mWayResult.second++;
         mMap->addWay(mWayResult);
         emit ready();
         close();
@@ -245,9 +257,7 @@ DelWayDialog::DelWayDialog(Map *aMap, QWidget *aParent) :
     Dialog(aMap, aParent)
 {
     this->setWindowTitle("Розбирання колії");
-    ui->label->setText(cFirstStation);
-    ui->comboBox->addItems(mMap->getAllNames());
-    mWayResult = Way(cNotSet, cNotSet);
+    showStations();
 }
 
 void DelWayDialog::accept()
@@ -318,5 +328,26 @@ void ViewStationDialog::accept()
     {
         mViewer->showStationSchedule(ui->comboBox->currentIndex());
         close();
+    }
+}
+
+
+
+ViewRouteDialog::ViewRouteDialog(Map *aMap, QWidget *aParent) :
+    Dialog(aMap, aParent)
+    , mViewer(new ScheduleViewer(*aMap, aParent))
+{
+    this->setWindowTitle("Знаходження прямого сполучення між станціями");
+    showStations();
+}
+
+void ViewRouteDialog::accept()
+{
+    if (completeWay())
+    {
+        if (mViewer->showRouteSchedule(mWayResult))
+            close();
+        else
+            QMessageBox::information(this, cWarning, "З цією станцією немає прямого сполучення - оберіть іншу.");
     }
 }

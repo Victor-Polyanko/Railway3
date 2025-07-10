@@ -111,7 +111,7 @@ void Display::showTrains(QPainter &aPainter, const TimePoint &aTime) const
     for (auto &train : mMap->getTrains())
     {
         Point trainXY = mMap->findTrainPosition(train, aTime);
-        if(trainXY.getX() != cNotSet)
+        if(trainXY.isSet())
         {
             QPen pen;
             if (mLastTime.isSet())

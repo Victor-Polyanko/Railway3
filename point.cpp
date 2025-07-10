@@ -4,20 +4,18 @@
 Point::Point()
     : mX(cNotSet)
     , mY(cNotSet)
-    , mIsSet(false)
 {
 }
 
 Point::Point(int aX, int aY)
     : mX(aX)
     , mY(aY)
-    , mIsSet(true)
 {
 }
 
 bool Point::isSet() const
 {
-    return mIsSet;
+    return mX != cNotSet && mY != cNotSet;
 }
 
 int Point::getX() const

@@ -20,6 +20,7 @@ public:
     QString showAsString() const;
 
     TimePoint operator+(const int &aMinutes) const;
+    TimePoint operator-(const TimePoint &aTime) const;
 };
 
 #endif // TIMEPOINT_H

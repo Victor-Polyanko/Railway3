@@ -523,7 +523,7 @@ Point Map::findTrainPosition(const Train &aTrain, const TimePoint &aTime) const
             break;
         }
     //пошук між станціями
-    if (trainXY.getX() == cNotSet)
+    if (!trainXY.isSet())
     {
         auto prevStation = aTrain.getStations().begin();
         for (auto station = prevStation + 1; station != aTrain.getStations().end(); ++station, prevStation = station)
@@ -537,7 +537,7 @@ Point Map::findTrainPosition(const Train &aTrain, const TimePoint &aTime) const
             }
     }
     //пошук на кінцевих станціях
-    if(trainXY.getX() == cNotSet)
+    if (!trainXY.isSet())
     {
         auto firstStation = aTrain.getStations().front();
         auto secondStation = aTrain.getStations().back();

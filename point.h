@@ -19,7 +19,6 @@ public:
 protected:
     int mX;
     int mY;
-    bool mIsSet;
 };
 
 #endif // POINT_H

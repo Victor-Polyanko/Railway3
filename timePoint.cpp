@@ -86,3 +86,17 @@ TimePoint TimePoint::operator+(const int &aMinutes) const
         hours = hours % cHoursInDay;
     return TimePoint(hours, minutes);
 }
+
+TimePoint TimePoint::operator-(const TimePoint &aTime) const
+{
+    auto hours = mX - aTime.mX;
+    auto minutes = mY - aTime.mY;
+    if (minutes < 0)
+    {
+        minutes += cMinutesInHour;
+        --hours;
+    }
+    if (hours < 0)
+        hours += cHoursInDay;
+    return TimePoint(hours, minutes);
+}

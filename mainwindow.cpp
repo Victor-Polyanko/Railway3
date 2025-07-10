@@ -40,6 +40,7 @@ MainWindow::MainWindow(QWidget *parent)
     QObject::connect(ui->createWayAction, &QAction::triggered, [&]() { openDialog<AddWayDialog>(); });
     QObject::connect(ui->deleteWayAction, &QAction::triggered, [&]() { openDialog<DelWayDialog>(); });
     QObject::connect(ui->viewStationAction, &QAction::triggered, [&]() { openDialog<ViewStationDialog>(); });
+    QObject::connect(ui->viewRouteAction, &QAction::triggered, [&]() { openDialog<ViewRouteDialog>(); });
     QObject::connect(ui->aboutSoftAction, &QAction::triggered, [&]() {
         QMessageBox::information(parent, "Про програму", cAboutSoft); });
     QObject::connect(ui->aboutGameAction, &QAction::triggered, [&]() {
@@ -199,7 +200,7 @@ void MainWindow::updateMenu()
     ui->changeTimeAction->setEnabled(!mMap.getTrains().empty());
     ui->wayMenu->setEnabled(!mMap.getWays().empty());
     ui->deleteWayAction->setEnabled(!mMap.getWays().empty());
-    ui->watchRouteAction->setEnabled(!mMap.getWays().empty());
+    ui->viewRouteAction->setEnabled(!mMap.getWays().empty());
     ui->viewStationAction->setEnabled(!mMap.getWays().empty());
     ui->launchMenu->setEnabled(!mMap.getWays().empty() || !mMap.getTrains().empty());
 }

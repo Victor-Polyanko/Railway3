@@ -19,6 +19,7 @@ public:
 
     void showTrainSchedule(int aTrainId);
     void showStationSchedule(int aStationId);
+    bool showRouteSchedule(const Way &aWay);
 
 private:
     Ui::ScheduleViewer *ui;
