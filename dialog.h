@@ -123,4 +123,19 @@ private:
     bool deleteWayWithTrains();
 };
 
+
+
+class ViewStationDialog : public Dialog
+{
+    Q_OBJECT
+public:
+    explicit ViewStationDialog(Map *aMap, QWidget *aParent = nullptr);
+
+private:
+    void accept();
+
+private:
+    ScheduleViewer *mViewer;
+};
+
 #endif // DIALOG_H

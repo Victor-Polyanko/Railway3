@@ -22,12 +22,15 @@ public:
     void setStatus(int s);
     int getStatus() const;
     QString getName() const;
+    QList<int> getTrainsNumbers() const;
+    void addTrainNumber(int aTrainId);
+    void delTrainNumber(int aTrainId);
 
 private:
     Status mStatus;
     QList<int> mConnectionStations;
     QString mName;
-    QVector<Schedule> mTrains;
+    QList<int> mTrainsNumbers;
 
 };
 

@@ -17,6 +17,7 @@ public:
     Train(int aNumber, Type aType, int aHours, int aMinutes = 0, int aStations = 0);
     int getNumber() const;
     Type getType() const;
+    QString getTypeAsString() const;
     TimePoint getStartTime() const;
     void setStartTime(TimePoint aTime);
     int getStationsQuantity() const;
@@ -24,6 +25,11 @@ public:
     void addStation(const Schedule &aSchedule);
     void addStation(int aStationId, const TimePoint &aArrive, int aWait, const TimePoint &aDepart);
     void addStation(int aStationId, int aArriveHours, int aArriveMinutes, int aWait, int aDepartHours, int aDepartMinutes);
+
+    bool operator==(const Train &aTrain) const noexcept;
+
+public:
+    static const QString Types[3];
 
 private:
     int mNumber;

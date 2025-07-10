@@ -32,11 +32,13 @@ public:
     QString getStationName(int aStationId) const;
     Point getStationPosition(int aStationId) const;
     int getStationStatus(int aStationId) const;
+    QList<int> getStationTrainsNumbers(int aStationId) const;
     QStringList getAllNames() const;
     QStringList getNamesForStation(int aStationId) const;
+    QString getTrainName(const Train &aTrain) const;
     Point findTrainPosition(const Train &aTrain, const TimePoint &aTime) const;
     void addTrain(const Train &aTrain);
-    void delTrain(int aTrainId);
+    void delTrain(const Train &aTrain);
     void setTrainTime(int aTrainId, TimePoint aTime);
     void addWay(Way aWay);
     void delWay(Way aWay);

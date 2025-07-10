@@ -18,6 +18,7 @@ public:
     ~ScheduleViewer();
 
     void showTrainSchedule(int aTrainId);
+    void showStationSchedule(int aStationId);
 
 private:
     Ui::ScheduleViewer *ui;

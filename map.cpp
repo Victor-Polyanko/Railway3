@@ -104,7 +104,6 @@ int Map::getStationRadius(int aStatus) const
     return mStationRadius[aStatus];
 }
 
-
 int Map::getStationIdForConnection(int aStationId, int aConnectionId) const
 {
     return mStations[aStationId].getConnections()[aConnectionId];
@@ -125,6 +124,11 @@ int Map::getStationStatus(int aStationId) const
     return mStations[aStationId].getStatus();
 }
 
+QList<int> Map::getStationTrainsNumbers(int aStationId) const
+{
+    return mStations[aStationId].getTrainsNumbers();
+}
+
 QStringList Map::getAllNames() const
 {
     return mAllNames;
@@ -136,6 +140,16 @@ QStringList Map::getNamesForStation(int aStationId) const
     for (auto const &id : mStations[aStationId].getConnections())
         names.emplace_back(mAllNames[id]);
     return names;
+}
+
+QString Map::getTrainName(const Train &aTrain) const
+{
+    auto stations = aTrain.getStations();
+    if (stations.size() < 2)
+        return "Не призначений";
+    auto firstStation = getStationName(stations.front().stationId);
+    auto lastStation = getStationName(stations.back().stationId);
+    return firstStation + " - " + lastStation;
 }
 
 void Map::load(QDataStream &aStream)
@@ -543,11 +557,15 @@ Point Map::findTrainPosition(const Train &aTrain, const TimePoint &aTime) const
 void Map::addTrain(const Train &aTrain)
 {
     mTrains.emplace_back(aTrain);
+    for (const auto &station : aTrain.getStations())
+        mStations[station.stationId].addTrainNumber(aTrain.getNumber());
 }
 
-void Map::delTrain(int aTrainId)
+void Map::delTrain(const Train &aTrain)
 {
-    mTrains.removeAt(aTrainId);
+    mTrains.removeOne(aTrain);
+    for (const auto &station : aTrain.getStations())
+        mStations[station.stationId].delTrainNumber(aTrain.getNumber());
 }
 
 void Map::setTrainTime(int aTrainId, TimePoint aTime)

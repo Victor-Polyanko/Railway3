@@ -51,3 +51,18 @@ QString Station::getName() const
 {
     return mName;
 }
+
+QList<int> Station::getTrainsNumbers() const
+{
+    return mTrainsNumbers;
+}
+
+void Station::addTrainNumber(int aTrainNumber)
+{
+    mTrainsNumbers.emplace_back(aTrainNumber);
+}
+
+void Station::delTrainNumber(int aTrainNumber)
+{
+    mTrainsNumbers.removeOne(aTrainNumber);
+}

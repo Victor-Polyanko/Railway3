@@ -49,7 +49,7 @@
     </property>
     <addaction name="createWayAction"/>
     <addaction name="deleteWayAction"/>
-    <addaction name="watchStationAction"/>
+    <addaction name="viewStationAction"/>
     <addaction name="watchRouteAction"/>
    </widget>
    <widget class="QMenu" name="launchMenu">
@@ -126,7 +126,7 @@
     <string>Розібрати колію</string>
    </property>
   </action>
-  <action name="watchStationAction">
+  <action name="viewStationAction">
    <property name="text">
     <string>Проглянути станцію</string>
    </property>

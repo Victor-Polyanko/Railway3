@@ -39,6 +39,7 @@ MainWindow::MainWindow(QWidget *parent)
     QObject::connect(ui->changeTimeAction, &QAction::triggered, [&]() { openDialog<ChangeTimeDialog>(); });
     QObject::connect(ui->createWayAction, &QAction::triggered, [&]() { openDialog<AddWayDialog>(); });
     QObject::connect(ui->deleteWayAction, &QAction::triggered, [&]() { openDialog<DelWayDialog>(); });
+    QObject::connect(ui->viewStationAction, &QAction::triggered, [&]() { openDialog<ViewStationDialog>(); });
     QObject::connect(ui->aboutSoftAction, &QAction::triggered, [&]() {
         QMessageBox::information(parent, "Про програму", cAboutSoft); });
     QObject::connect(ui->aboutGameAction, &QAction::triggered, [&]() {
@@ -124,13 +125,7 @@ void MainWindow::showInfo(const QString &aText) const
     details += "\n\nПотяги:\n";
     for (const auto &train : mMap.getTrains())
     {
-        switch(train.getType())
-        {
-        case Train::Fast: details += "\nШвидкий"; break;
-        case Train::Passenger: details += "\nПасажирський"; break;
-        case Train::Local: details += "\nПриміський"; break;
-        default: details += "\nКазна який"; break;
-        }
+        details += "\n"+train.getTypeAsString();
         details += " потяг №" + QString::number(train.getNumber()) + " ";
         details += mMap.getStations()[train.getStations().front().stationId].getName() + " - " +
                    mMap.getStations()[train.getStations().back().stationId].getName();
@@ -205,7 +200,7 @@ void MainWindow::updateMenu()
     ui->wayMenu->setEnabled(!mMap.getWays().empty());
     ui->deleteWayAction->setEnabled(!mMap.getWays().empty());
     ui->watchRouteAction->setEnabled(!mMap.getWays().empty());
-    ui->watchStationAction->setEnabled(!mMap.getWays().empty());
+    ui->viewStationAction->setEnabled(!mMap.getWays().empty());
     ui->launchMenu->setEnabled(!mMap.getWays().empty() || !mMap.getTrains().empty());
 }
 

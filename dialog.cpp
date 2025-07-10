@@ -6,13 +6,13 @@
 #include <QPushButton>
 
 const QString cTrainType = "Оберіть тип потяга";
-const QVector<QString> cTypeNames = {"Швидкий ", "Пасажирський ", "Приміський "};
 const QString cDepartureTime = "Оберіть час відправлення";
 const QString cFirstStation = "Оберіть початкову станцію";
 const QString cNextStation = "Оберіть наступну станцію";
 const QString cLastStation = "Оберіть кінцеву станцію";
 const QString cSecondTrain = "Якщо бажаєте додати зворотній рейс, оберіть його час відправлення";
 const QString cSelectTrain = "Оберіть потяг";
+const QString cSelectStation = "Оберіть станцію";
 
 Dialog::Dialog(Map *aMap, QWidget *aParent) :
     QDialog(aParent)
@@ -46,12 +46,8 @@ void Dialog::showTrains()
 {
     ui->label->setText(cSelectTrain);
     for (const auto &train : mMap->getTrains())
-    {
-        auto firstStation = mMap->getStationName(train.getStations().front().stationId);
-        auto lastStation = mMap->getStationName(train.getStations().back().stationId);
-        ui->comboBox->addItem(cTypeNames[train.getType()] + "№" + QString::number(train.getNumber())
-                              + ". " + firstStation + " - " + lastStation);
-    }
+        ui->comboBox->addItem(train.getTypeAsString() + "№" + QString::number(train.getNumber())
+                              + ". " + mMap->getTrainName(train));
 }
 
 void Dialog::showTimes()
@@ -69,7 +65,7 @@ AddTrainDialog::AddTrainDialog(Map *aMap, QWidget *aParent) :
 {
     this->setWindowTitle("Створення потяга №" + QString::number(mMap->getTrains().size() + 1));
     ui->label->setText(cTrainType);
-    for (const auto &type : cTypeNames)
+    for (const auto &type : Train::Types)
         ui->comboBox->addItem(type);
 }
 
@@ -113,7 +109,7 @@ void AddTrainDialog::accept()
         Schedule firstStation;
         auto stations = mTrainResult.getStations();
         firstStation.stationId = stations.back().stationId;
-        firstStation.depart = TimePoint(mTrainResult.getStartTime());
+        firstStation.depart = TimePoint(secondTrain.getStartTime());
         secondTrain.addStation(firstStation);
         for (auto station = stations.rbegin() + 1; station < stations.rend() - 1; ++station)
         {
@@ -168,7 +164,7 @@ DelTrainDialog::DelTrainDialog(Map *aMap, QWidget *aParent) :
 
 void DelTrainDialog::accept()
 {
-    mMap->delTrain(ui->comboBox->currentIndex());
+    mMap->delTrain(mMap->getTrains()[ui->comboBox->currentIndex()]);
     emit ready();
     close();
 }
@@ -301,4 +297,26 @@ bool DelWayDialog::deleteWayWithTrains()
     for (auto train = deletedTrains.rbegin(); train != deletedTrains.rend(); ++ train)
         mMap->delTrain(*train);
     return true;
+}
+
+
+
+ViewStationDialog::ViewStationDialog(Map *aMap, QWidget *aParent) :
+    Dialog(aMap, aParent)
+    , mViewer(new ScheduleViewer(*aMap, aParent))
+{
+    this->setWindowTitle("Перегляд станції");
+    ui->label->setText(cSelectStation);
+    ui->comboBox->addItems(mMap->getAllNames());
+}
+
+void ViewStationDialog::accept()
+{
+    if (mMap->getStationTrainsNumbers(ui->comboBox->currentIndex()).empty())
+        QMessageBox::information(this, cWarning, "Через цю станцію не проходить жоден потяг - оберіть іншу.");
+    else
+    {
+        mViewer->showStationSchedule(ui->comboBox->currentIndex());
+        close();
+    }
 }

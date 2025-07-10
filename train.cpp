@@ -2,6 +2,8 @@
 
 const TimePoint cDefaultTime(12, 0);
 
+const QString Train::Types[3] = {"Швидкий ", "Пасажирський ", "Приміський "};
+
 Train::Train() {}
 
 Train::Train(int N)
@@ -28,6 +30,11 @@ int Train::getNumber() const
 Train::Type Train::getType() const
 {
     return mType;
+}
+
+QString Train::getTypeAsString() const
+{
+    return Types[mType];
 }
 
 TimePoint Train::getStartTime() const
@@ -67,3 +74,8 @@ void Train::addStation(int aStationId, int aArriveHours, int aArriveMinutes,
     mStations.emplace_back(Schedule(aStationId, aArriveHours, aArriveMinutes,
                                     aWait, aDepartHours, aDepartMinutes));
 }
+
+bool Train::operator==(const Train &aTrain) const noexcept
+{
+    return this->mNumber == aTrain.mNumber;
+};
