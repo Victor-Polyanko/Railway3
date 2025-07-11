@@ -107,13 +107,13 @@ bool ScheduleViewer::showRouteSchedule(const Way &aWay)
         {
             if (!departure.isSet() &&
                 aWay.first == station.stationId &&
-                station.arrive.isSet())
+                station.depart.isSet())
             {
                 departure = station.depart;
             }
             else if (!arrival.isSet() &&
                        aWay.second == station.stationId &&
-                       station.depart.isSet())
+                       station.arrive.isSet())
             {
                 arrival = station.arrive;
                 break;
