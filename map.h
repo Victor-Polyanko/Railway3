@@ -9,6 +9,7 @@
 #include <qvector.h>
 
 typedef QPair<int, int> Way;
+typedef QPair<float, float> Position;
 
 class Map
 {
@@ -36,7 +37,7 @@ public:
     QStringList getAllNames() const;
     QStringList getNamesForStation(int aStationId) const;
     QString getTrainName(const Train &aTrain) const;
-    Point findTrainPosition(const Train &aTrain, const TimePoint &aTime) const;
+    Position findTrainPosition(const Train &aTrain, const TimePoint &aTime) const;
     void addTrain(const Train &aTrain);
     void delTrain(const Train &aTrain);
     void setTrainTime(int aTrainId, TimePoint aTime);
@@ -59,9 +60,9 @@ private:
     void ConnectAlonesInDistricts();
     void collectAllNames();
     void fillDistricts();
-    Point findTrainAtMiddleStations(const Train &aTrain, const TimePoint &aTime) const;
-    Point findTrainBetweenStations(const Train &aTrain, const TimePoint &aTime) const;
-    Point findTrainAtEdgeStations(const Train &aTrain, const TimePoint &aTime) const;
+    Position findTrainAtMiddleStations(const Train &aTrain, const TimePoint &aTime) const;
+    Position findTrainBetweenStations(const Train &aTrain, const TimePoint &aTime) const;
+    Position findTrainAtEdgeStations(const Train &aTrain, const TimePoint &aTime) const;
 
 private:
     Point mDimention;

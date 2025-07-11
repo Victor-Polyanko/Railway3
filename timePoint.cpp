@@ -9,7 +9,7 @@ TimePoint::TimePoint() : Point()
 
 TimePoint::TimePoint(int aHours, int aMinutes) : Point(aHours, aMinutes) {}
 
-void TimePoint::addTime(const TimePoint &aTime)
+TimePoint& TimePoint::operator+=(const TimePoint &aTime)
 {
     mY += aTime.mY;
     if (mY >= cMinutesInHour)
@@ -20,9 +20,10 @@ void TimePoint::addTime(const TimePoint &aTime)
     mX += aTime.mX;
     if (mX >= cHoursInDay)
         mX -= cHoursInDay;
+    return *this;
 }
 
-void TimePoint::substractTime(const TimePoint &aTime)
+TimePoint& TimePoint::operator-=(const TimePoint &aTime)
 {
     mY -= aTime.mY;
     if (mY < 0)
@@ -33,9 +34,10 @@ void TimePoint::substractTime(const TimePoint &aTime)
     mX -= aTime.mX;
     if (mX < 0)
         mX += cHoursInDay;
+    return *this;
 }
 
-bool TimePoint::isEarlierThan(const TimePoint &aTime) const
+bool TimePoint::operator<(const TimePoint &aTime) const
 {
     if (mX == aTime.getX())
     {
@@ -61,31 +63,23 @@ int TimePoint::getMinutesTo(const TimePoint &aTime) const
     return minutes;
 }
 
-bool TimePoint::isLessThanHour(int aMinutes)
-{
-    return aMinutes < cMinutesInHour;
-}
-
-void TimePoint::correctMinutes(int &aMinutes)
-{
-    if (aMinutes < cMinutesInHour * 2)
-        aMinutes /= 2;
-    else
-        aMinutes = cMinutesInHour;
-}
-
 QString TimePoint::showAsString() const
 {
     auto toString = [](int i) { return (i < 10 ? "0" : "") + QString::number(i); };
     return toString(mX) + ":" + toString(mY);
 }
 
-TimePoint TimePoint::operator+(const int &aMinutes) const
+TimePoint TimePoint::operator+(const TimePoint &aTime) const
 {
-    auto hours = mX + (mY + aMinutes) / cMinutesInHour;
-    auto minutes = (mY + aMinutes) % cMinutesInHour;
-    if (hours >= cHoursInDay)
-        hours = hours % cHoursInDay;
+    auto hours = mX + aTime.mX;
+    auto minutes = mY + aTime.mY;
+    if (minutes > cMinutesInHour)
+    {
+        minutes -= cMinutesInHour;
+        ++hours;
+    }
+    if (hours > cHoursInDay)
+        hours -= cHoursInDay;
     return TimePoint(hours, minutes);
 }
 

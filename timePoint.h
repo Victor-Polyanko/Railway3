@@ -11,16 +11,15 @@ public:
     TimePoint();
     TimePoint(int aHours, int aMinutes);
 
-    void addTime(const TimePoint &aTime);
-    void substractTime(const TimePoint &aTime);
-    bool isEarlierThan(const TimePoint &aTime) const;
     int getMinutesTo(const TimePoint &aTime) const;
-    static bool isLessThanHour(int minutes);
-    static void correctMinutes(int &minutes);
     QString showAsString() const;
 
-    TimePoint operator+(const int &aMinutes) const;
+    //TimePoint operator+(const int &aMinutes) const;
+    TimePoint operator+(const TimePoint &aTime) const;
+    TimePoint& operator+=(const TimePoint &aTime);
     TimePoint operator-(const TimePoint &aTime) const;
+    TimePoint& operator-=(const TimePoint &aTime);
+    bool operator<(const TimePoint &aTime) const;
 };
 
 #endif // TIMEPOINT_H

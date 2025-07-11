@@ -124,7 +124,7 @@ void AddTrainDialog::accept()
         auto stationId = mMap->getStationIdForConnection(mTrainResult.getStations().back().stationId, ui->comboBox->currentIndex());
         auto arrive = calculateArrivalToStation(mTrainResult, stationId);
         auto wait = 2 * (mMap->getStationStatus(stationId) - 1 + static_cast<int>(mTrainResult.getType()));
-        auto depart = arrive + wait;
+        auto depart = arrive + TimePoint(0, wait);
         mTrainResult.addStation(stationId, arrive, wait, depart);
         fillNeighbours(stationId);
     } else if (ui->label->text() == cSecondTrain)
@@ -139,7 +139,7 @@ void AddTrainDialog::accept()
         {
             auto arrive = calculateArrivalToStation(secondTrain, station->stationId);
             auto wait = station->wait;
-            auto depart = arrive + wait;
+            auto depart = arrive + TimePoint(0, wait);
             secondTrain.addStation(station->stationId, arrive, wait, depart);
         }
         Schedule lastStation;
@@ -174,7 +174,7 @@ TimePoint AddTrainDialog::calculateArrivalToStation(const Train &aTrain, int aSt
     auto prevStation = aTrain.getStations().back();
     auto minutes = (2 + static_cast<int>(aTrain.getType())) * mMap->getStationPosition(aStationId).distance(
                        mMap->getStationPosition(aTrain.getStations().back().stationId)) / 2;
-    return prevStation.depart + minutes;
+    return prevStation.depart + TimePoint(0, minutes);
 }
 
 

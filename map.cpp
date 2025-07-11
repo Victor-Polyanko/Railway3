@@ -511,59 +511,58 @@ void Map::fillDistricts()
     }
 }
 
-Point Map::findTrainPosition(const Train &aTrain, const TimePoint &aTime) const
+Position Map::findTrainPosition(const Train &aTrain, const TimePoint &aTime) const
 {
-    Point trainXY = findTrainAtMiddleStations(aTrain, aTime);
-    if (trainXY.isSet())
+    auto trainXY = findTrainAtMiddleStations(aTrain, aTime);
+    if (trainXY.first != cNotSet)
         return trainXY;
     trainXY = findTrainBetweenStations(aTrain, aTime);
-    //if (trainXY.isSet())
+    if (trainXY.first != cNotSet)
         return trainXY;
     return findTrainAtEdgeStations(aTrain, aTime);
 }
 
-Point Map::findTrainAtMiddleStations(const Train &aTrain, const TimePoint &aTime) const
+Position Map::findTrainAtMiddleStations(const Train &aTrain, const TimePoint &aTime) const
 {
     for (const auto &station : aTrain.getStations())
-        if (station.arrive.isSet() && station.arrive.isEarlierThan(aTime) &&
-            station.depart.isSet() && aTime.isEarlierThan(station.depart))
-            return Point(mStations[station.stationId]);
-    return Point();
+        if (station.arrive.isSet() && station.arrive < aTime &&
+            station.depart.isSet() && aTime < station.depart)
+            return Position(mStations[station.stationId].getX(), mStations[station.stationId].getY());
+    return Position(cNotSet, cNotSet);
 }
 
-Point Map::findTrainBetweenStations(const Train &aTrain, const TimePoint &aTime) const
+Position Map::findTrainBetweenStations(const Train &aTrain, const TimePoint &aTime) const
 {
     auto prevStation = aTrain.getStations().front();
     for (const auto &station : aTrain.getStations())
     {
-        if (aTime.isEarlierThan(station.arrive) && prevStation.depart.isEarlierThan(aTime))
+        if (aTime < station.arrive && prevStation.depart < aTime)
         {
             int trainMinutes = prevStation.depart.getMinutesTo(aTime);
             int stationMinutes = prevStation.depart.getMinutesTo(station.arrive);
             float relation = (float)trainMinutes / stationMinutes;
-            return Point(mStations[prevStation.stationId].getX() + (int)((mStations[station.stationId].getX() - mStations[prevStation.stationId].getX()) * relation),
-                         mStations[prevStation.stationId].getY() + (int)((mStations[station.stationId].getY() - mStations[prevStation.stationId].getY()) * relation));
+            return Position(mStations[prevStation.stationId].getX()
+                + (mStations[station.stationId].getX() - mStations[prevStation.stationId].getX()) * relation,
+                            mStations[prevStation.stationId].getY()
+                + (mStations[station.stationId].getY() - mStations[prevStation.stationId].getY()) * relation);
         }
         prevStation = station;
     }
-    return Point();
+    return Position(cNotSet, cNotSet);
 }
 
-Point Map::findTrainAtEdgeStations(const Train &aTrain, const TimePoint &aTime) const
+Position Map::findTrainAtEdgeStations(const Train &aTrain, const TimePoint &aTime) const
 {
+    auto waitTime = TimePoint(0, 40);
     auto firstStation = aTrain.getStations().front();
     auto secondStation = aTrain.getStations().back();
-    int minutes = secondStation.arrive.getMinutesTo(firstStation.depart);
-    TimePoint::correctMinutes(minutes);
     TimePoint firstTime = firstStation.depart;
-    firstTime.substractTime(TimePoint(0, minutes));
     TimePoint secondTime = secondStation.arrive;
-    secondTime.addTime(TimePoint(0, minutes));
-    if (aTime.isEarlierThan(firstTime) && TimePoint::isLessThanHour(aTime.getMinutesTo(firstTime)))
-        return Point(mStations[firstStation.stationId]);
-    else if (secondTime.isEarlierThan(aTime) && TimePoint::isLessThanHour(secondTime.getMinutesTo(aTime)))
-        return Point(mStations[secondStation.stationId]);
-    return Point();
+    if (aTime < firstTime && firstTime < aTime + waitTime)
+        return Position(mStations[firstStation.stationId].getX(), mStations[firstStation.stationId].getY());
+    else if (secondTime < aTime && aTime < secondTime + waitTime)
+        return Position(mStations[secondStation.stationId].getX(), mStations[secondStation.stationId].getY());
+    return Position(cNotSet, cNotSet);
 }
 
 void Map::addTrain(const Train &aTrain)

@@ -46,15 +46,15 @@ void Train::setStartTime(TimePoint aTime)
 {
     if (mStartTime.isSet())
     {
-        if (mStartTime.isEarlierThan(aTime))
+        if (mStartTime < aTime)
         {
             auto diff = aTime - mStartTime;
             for (auto &station : mStations)
             {
                 if (station.arrive.isSet())
-                    station.arrive.addTime(diff);
+                    station.arrive += diff;
                 if (station.depart.isSet())
-                    station.depart.addTime(diff);
+                    station.depart += diff;
             }
         }
         else
@@ -63,9 +63,9 @@ void Train::setStartTime(TimePoint aTime)
             for (auto &station : mStations)
             {
                 if (station.arrive.isSet())
-                    station.arrive.substractTime(diff);
+                    station.arrive -= diff;
                 if (station.depart.isSet())
-                    station.depart.substractTime(diff);
+                    station.depart -= diff;
             }
         }
         auto diff = aTime - mStartTime;
