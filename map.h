@@ -59,6 +59,9 @@ private:
     void ConnectAlonesInDistricts();
     void collectAllNames();
     void fillDistricts();
+    Point findTrainAtMiddleStations(const Train &aTrain, const TimePoint &aTime) const;
+    Point findTrainBetweenStations(const Train &aTrain, const TimePoint &aTime) const;
+    Point findTrainAtEdgeStations(const Train &aTrain, const TimePoint &aTime) const;
 
 private:
     Point mDimention;

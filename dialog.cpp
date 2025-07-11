@@ -13,6 +13,7 @@ const QString cLastStation = "Оберіть кінцеву станцію";
 const QString cSecondTrain = "Якщо бажаєте додати зворотній рейс, оберіть його час відправлення";
 const QString cSelectTrain = "Оберіть потяг";
 const QString cSelectStation = "Оберіть станцію";
+const QString cSelectSpeed = "Оберіть швидкість анімації";
 
 Dialog::Dialog(Map *aMap, QWidget *aParent) :
     QDialog(aParent)
@@ -350,4 +351,40 @@ void ViewRouteDialog::accept()
         else
             QMessageBox::information(this, cWarning, "З цією станцією немає прямого сполучення - оберіть іншу.");
     }
+}
+
+
+
+SpeedDialog::SpeedDialog(Map *aMap, QWidget *aParent) :
+    Dialog(aMap, aParent)
+{
+    this->setWindowTitle("Швидкість анімації");
+    ui->label->setText(cSelectSpeed);
+    ui->comboBox->clear();
+    for (int i = 0; i < 10; ++i)
+        ui->comboBox->addItem(QString::number(i + 1));
+    ui->comboBox->setCurrentIndex(0);
+}
+
+void SpeedDialog::accept()
+{
+    auto speed = ui->comboBox->currentText().toInt();
+    emit setSpeed(speed);
+    close();
+}
+
+
+
+LaunchDialog::LaunchDialog(Map *aMap, QWidget *aParent) :
+    Dialog(aMap, aParent)
+{
+    this->setWindowTitle("Запуск анімації");
+    showTimes();
+}
+
+void LaunchDialog::accept()
+{
+    auto time = TimePoint(ui->comboBox->currentIndex(), 0);
+    emit setTime(time);
+    close();
 }

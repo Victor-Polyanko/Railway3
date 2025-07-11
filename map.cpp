@@ -513,46 +513,57 @@ void Map::fillDistricts()
 
 Point Map::findTrainPosition(const Train &aTrain, const TimePoint &aTime) const
 {
-    Point trainXY;
-    //пошук на проміжних станціях
-    if (aTrain.getStations().size() > 2)
-    for (auto station = aTrain.getStations().begin() + 1; station != aTrain.getStations().end() - 1; ++station)
-        if (station->arrive.isEarlierThan(aTime) && aTime.isEarlierThan(station->depart))
+    Point trainXY = findTrainAtMiddleStations(aTrain, aTime);
+    if (trainXY.isSet())
+        return trainXY;
+    trainXY = findTrainBetweenStations(aTrain, aTime);
+    //if (trainXY.isSet())
+        return trainXY;
+    return findTrainAtEdgeStations(aTrain, aTime);
+}
+
+Point Map::findTrainAtMiddleStations(const Train &aTrain, const TimePoint &aTime) const
+{
+    for (const auto &station : aTrain.getStations())
+        if (station.arrive.isSet() && station.arrive.isEarlierThan(aTime) &&
+            station.depart.isSet() && aTime.isEarlierThan(station.depart))
+            return Point(mStations[station.stationId]);
+    return Point();
+}
+
+Point Map::findTrainBetweenStations(const Train &aTrain, const TimePoint &aTime) const
+{
+    auto prevStation = aTrain.getStations().front();
+    for (const auto &station : aTrain.getStations())
+    {
+        if (aTime.isEarlierThan(station.arrive) && prevStation.depart.isEarlierThan(aTime))
         {
-            trainXY = Point(mStations[station->stationId]);
-            break;
+            int trainMinutes = prevStation.depart.getMinutesTo(aTime);
+            int stationMinutes = prevStation.depart.getMinutesTo(station.arrive);
+            float relation = (float)trainMinutes / stationMinutes;
+            return Point(mStations[prevStation.stationId].getX() + (int)((mStations[station.stationId].getX() - mStations[prevStation.stationId].getX()) * relation),
+                         mStations[prevStation.stationId].getY() + (int)((mStations[station.stationId].getY() - mStations[prevStation.stationId].getY()) * relation));
         }
-    //пошук між станціями
-    if (!trainXY.isSet())
-    {
-        auto prevStation = aTrain.getStations().begin();
-        for (auto station = prevStation + 1; station != aTrain.getStations().end(); ++station, prevStation = station)
-            if (aTime.isEarlierThan(station->arrive) && prevStation->depart.isEarlierThan(aTime))
-            {
-                int trainMinutes = prevStation->depart.getMinutesTo(aTime);
-                int stationMinutes = prevStation->depart.getMinutesTo(station->arrive);
-                float relation = (float)trainMinutes / stationMinutes;
-                trainXY = Point(mStations[prevStation->stationId].getX() + (int)((mStations[station->stationId].getX() - mStations[prevStation->stationId].getX()) * relation),
-                                mStations[prevStation->stationId].getY() + (int)((mStations[station->stationId].getY() - mStations[prevStation->stationId].getY()) * relation));
-            }
+        prevStation = station;
     }
-    //пошук на кінцевих станціях
-    if (!trainXY.isSet())
-    {
-        auto firstStation = aTrain.getStations().front();
-        auto secondStation = aTrain.getStations().back();
-        int minutes = secondStation.arrive.getMinutesTo(firstStation.depart);
-        TimePoint::correctMinutes(minutes);
-        TimePoint firstTime = firstStation.depart;
-        firstTime.substractTime(TimePoint(0, minutes));
-        TimePoint secondTime = secondStation.arrive;
-        secondTime.addTime(TimePoint(0, minutes));
-        if (aTime.isEarlierThan(firstTime) && TimePoint::isLessThanHour(aTime.getMinutesTo(firstTime)))
-            trainXY = Point(mStations[firstStation.stationId]);
-        else if (secondTime.isEarlierThan(aTime) && TimePoint::isLessThanHour(secondTime.getMinutesTo(aTime)))
-            trainXY = Point(mStations[secondStation.stationId]);
-    }
-    return trainXY;
+    return Point();
+}
+
+Point Map::findTrainAtEdgeStations(const Train &aTrain, const TimePoint &aTime) const
+{
+    auto firstStation = aTrain.getStations().front();
+    auto secondStation = aTrain.getStations().back();
+    int minutes = secondStation.arrive.getMinutesTo(firstStation.depart);
+    TimePoint::correctMinutes(minutes);
+    TimePoint firstTime = firstStation.depart;
+    firstTime.substractTime(TimePoint(0, minutes));
+    TimePoint secondTime = secondStation.arrive;
+    secondTime.addTime(TimePoint(0, minutes));
+    if (aTime.isEarlierThan(firstTime) && TimePoint::isLessThanHour(aTime.getMinutesTo(firstTime)))
+        return Point(mStations[firstStation.stationId]);
+    else if (secondTime.isEarlierThan(aTime) && TimePoint::isLessThanHour(secondTime.getMinutesTo(aTime)))
+        return Point(mStations[secondStation.stationId]);
+    return Point();
 }
 
 void Map::addTrain(const Train &aTrain)

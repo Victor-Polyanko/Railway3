@@ -24,6 +24,8 @@ public:
 
 signals:
     void ready();
+    void setSpeed(int &aSpeed);
+    void setTime(TimePoint &aTime);
 
 protected:
     bool fillNeighbours(int aStationId = cNotSet);
@@ -153,6 +155,30 @@ private:
 
 private:
     ScheduleViewer *mViewer;
+};
+
+
+
+class SpeedDialog : public Dialog
+{
+    Q_OBJECT
+public:
+    explicit SpeedDialog(Map *aMap, QWidget *aParent = nullptr);
+
+private:
+    void accept();
+};
+
+
+
+class LaunchDialog : public Dialog
+{
+    Q_OBJECT
+public:
+    explicit LaunchDialog(Map *aMap, QWidget *aParent = nullptr);
+
+private:
+    void accept();
 };
 
 #endif // DIALOG_H

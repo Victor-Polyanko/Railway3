@@ -37,11 +37,14 @@ private:
     void markTitleWithChanges();
     template <class T>
     void openDialog();
+    void processAnimation();
 
 private:
     Ui::MainWindow *ui;
     QString mFileName;
     Display mDisplay;
     Map mMap;
+    TimePoint mTime;
+    int mSpeed;
 };
 #endif // MAINWINDOW_H

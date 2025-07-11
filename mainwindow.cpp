@@ -25,6 +25,7 @@ MainWindow::MainWindow(QWidget *parent)
     : QMainWindow(parent)
     , ui(new Ui::MainWindow)
     , mDisplay(&mMap)
+    , mSpeed(1)
 {
     ui->setupUi(this);
     this->setWindowTitle(cDefaultTitle);
@@ -41,6 +42,8 @@ MainWindow::MainWindow(QWidget *parent)
     QObject::connect(ui->deleteWayAction, &QAction::triggered, [&]() { openDialog<DelWayDialog>(); });
     QObject::connect(ui->viewStationAction, &QAction::triggered, [&]() { openDialog<ViewStationDialog>(); });
     QObject::connect(ui->viewRouteAction, &QAction::triggered, [&]() { openDialog<ViewRouteDialog>(); });
+    QObject::connect(ui->speedAction, &QAction::triggered, [&]() { openDialog<SpeedDialog>(); });
+    QObject::connect(ui->launchAction, &QAction::triggered, [&]() { processAnimation(); });
     QObject::connect(ui->aboutSoftAction, &QAction::triggered, [&]() {
         QMessageBox::information(parent, "Про програму", cAboutSoft); });
     QObject::connect(ui->aboutGameAction, &QAction::triggered, [&]() {
@@ -203,6 +206,7 @@ void MainWindow::updateMenu()
     ui->viewRouteAction->setEnabled(!mMap.getWays().empty());
     ui->viewStationAction->setEnabled(!mMap.getWays().empty());
     ui->launchMenu->setEnabled(!mMap.getWays().empty() || !mMap.getTrains().empty());
+    update();
 }
 
 bool MainWindow::areNotSavedChanges() const
@@ -221,6 +225,13 @@ void MainWindow::paintEvent(QPaintEvent*)
     mDisplay.calculateScale(painter);
     mDisplay.showDistricts(painter);
     mDisplay.showStationsAndWays(painter);
+    if (mTime.isSet())
+    {
+        ui->launchMenu->setTitle(mTime.showAsString());
+        mDisplay.showTrains(painter, mTime);
+        mTime.addTime(TimePoint(0, mSpeed));
+        update();
+    }
 }
 
 void MainWindow::closeEvent(QCloseEvent *aEvent)
@@ -236,6 +247,23 @@ void MainWindow::openDialog()
 {
     auto dialog = new T(&mMap, this);
     connect(dialog, &Dialog::ready, this, &MainWindow::updateMenu);
+    connect(dialog, &Dialog::setSpeed, this, [&](int &aSpeed) { mSpeed = aSpeed; } );
+    connect(dialog, &Dialog::setTime, this, [&](TimePoint &aTime) { mTime = aTime; } );
     dialog->setAttribute(Qt::WA_DeleteOnClose);
     dialog->exec();
+}
+
+void MainWindow::processAnimation()
+{
+    if (mTime.isSet())
+    {
+        mTime = TimePoint();
+        ui->launchMenu->setTitle("Анімація");
+        ui->launchAction->setText("Запустити");
+    }
+    else
+    {
+        ui->launchAction->setText("Зупинити");
+        openDialog<LaunchDialog>();
+    }
 }

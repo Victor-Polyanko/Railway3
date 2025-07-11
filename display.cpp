@@ -100,8 +100,6 @@ void Display::calculateScale(QPainter &aPainter)
 
 void Display::showTrains(QPainter &aPainter, const TimePoint &aTime) const
 {
-    if (!aTime.isSet())
-        return;
     QPen textPen;
     textPen.setColor(cWhite);
     QFont font = QFont("Arial", 8);
@@ -111,31 +109,27 @@ void Display::showTrains(QPainter &aPainter, const TimePoint &aTime) const
     for (auto &train : mMap->getTrains())
     {
         Point trainXY = mMap->findTrainPosition(train, aTime);
-        if(trainXY.isSet())
+        if (!trainXY.isSet())
+            continue;
+        QPen pen;
+        switch(train.getType())
         {
-            QPen pen;
-            if (mLastTime.isSet())
-            switch(train.getType())
-            {
-                case Train::Fast: pen.setColor(cRed);
-                    break;
-                case Train::Passenger: pen.setColor(cBlue);
-                    break;
-                default: pen.setColor(cOrange);
-                    break;
-            }
-            else
-                pen.setColor(cWhite);
-            float x = mScale.first * trainXY.getX();
-            float y = mScale.second * trainXY.getY();
-            pen.setWidth(8);
-            aPainter.setPen(pen);
-            aPainter.drawEllipse(static_cast<int>(x - radius), static_cast<int>(y - radius), diameter, diameter);
-            QPointF point(static_cast<float>(x - ((train.getNumber() < 10) ? 3 : 5) * radius / 2),
-                          static_cast<float>(y - 5 * radius / 2));
-            aPainter.setPen(textPen);
-            aPainter.drawText(point, QString::number(train.getNumber()));
+            case Train::Fast: pen.setColor(cRed);
+                break;
+            case Train::Passenger: pen.setColor(cBlue);
+                break;
+            default: pen.setColor(cOrange);
+                break;
         }
+        float x = mScale.first * trainXY.getX();
+        float y = mScale.second * trainXY.getY();
+        pen.setWidth(8);
+        aPainter.setPen(pen);
+        aPainter.drawEllipse(static_cast<int>(x - radius), static_cast<int>(y - radius), diameter, diameter);
+        QPointF point(static_cast<float>(x - ((train.getNumber() < 10) ? 3 : 5) * radius / 2),
+                      static_cast<float>(y - 5 * radius / 2));
+        aPainter.setPen(textPen);
+        aPainter.drawText(point, QString::number(train.getNumber()));
     }
 }
 

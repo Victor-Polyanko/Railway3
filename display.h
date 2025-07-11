@@ -31,7 +31,6 @@ private:
 
 private:
     QVector<QColor> mColors;
-    TimePoint mLastTime;
     Scale mScale;
     Map *mMap;
 };
