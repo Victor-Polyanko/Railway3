@@ -40,19 +40,15 @@ TimePoint& TimePoint::operator-=(const TimePoint &aTime)
 bool TimePoint::operator<(const TimePoint &aTime) const
 {
     if (mX == aTime.getX())
-    {
-        if (mY <= aTime.getY())
-            return true;
-        else
-            return false;
-    }
-    else
-    {
-        if (mX < aTime.getX())
-            return true;
-        else
-            return false;
-    }
+        return mY < aTime.getY();
+    return mX < aTime.getX();
+}
+
+bool TimePoint::isBetween(const TimePoint &aFirst, const TimePoint &aSecond) const
+{
+    return aFirst.isSet() && aSecond.isSet() &&
+           ((aFirst < aSecond && !(*this < aFirst) && !(aSecond < *this)) ||
+            (aSecond < aFirst && (aFirst < *this || *this < aSecond)));
 }
 
 int TimePoint::getMinutesTo(const TimePoint &aTime) const
@@ -73,13 +69,22 @@ TimePoint TimePoint::operator+(const TimePoint &aTime) const
 {
     auto hours = mX + aTime.mX;
     auto minutes = mY + aTime.mY;
-    if (minutes > cMinutesInHour)
+    if (minutes >= cMinutesInHour)
     {
         minutes -= cMinutesInHour;
         ++hours;
     }
-    if (hours > cHoursInDay)
+    if (hours >= cHoursInDay)
         hours -= cHoursInDay;
+    return TimePoint(hours, minutes);
+}
+
+TimePoint TimePoint::operator+(int aMinutes) const
+{
+    auto hours = mX + (mY + aMinutes) / cMinutesInHour;
+    auto minutes = (mY + aMinutes) % cMinutesInHour;
+    if (hours >= cHoursInDay)
+        hours = hours % cHoursInDay;
     return TimePoint(hours, minutes);
 }
 

@@ -11,11 +11,12 @@ public:
     TimePoint();
     TimePoint(int aHours, int aMinutes);
 
+    bool isBetween(const TimePoint &aFirst, const TimePoint &aSecond) const;
     int getMinutesTo(const TimePoint &aTime) const;
     QString showAsString() const;
 
-    //TimePoint operator+(const int &aMinutes) const;
     TimePoint operator+(const TimePoint &aTime) const;
+    TimePoint operator+(int aMinutes) const;
     TimePoint& operator+=(const TimePoint &aTime);
     TimePoint operator-(const TimePoint &aTime) const;
     TimePoint& operator-=(const TimePoint &aTime);

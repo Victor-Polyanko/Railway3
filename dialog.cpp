@@ -174,7 +174,7 @@ TimePoint AddTrainDialog::calculateArrivalToStation(const Train &aTrain, int aSt
     auto prevStation = aTrain.getStations().back();
     auto minutes = (2 + static_cast<int>(aTrain.getType())) * mMap->getStationPosition(aStationId).distance(
                        mMap->getStationPosition(aTrain.getStations().back().stationId)) / 2;
-    return prevStation.depart + TimePoint(0, minutes);
+    return prevStation.depart + minutes;
 }
 
 

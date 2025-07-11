@@ -525,8 +525,7 @@ Position Map::findTrainPosition(const Train &aTrain, const TimePoint &aTime) con
 Position Map::findTrainAtMiddleStations(const Train &aTrain, const TimePoint &aTime) const
 {
     for (const auto &station : aTrain.getStations())
-        if (station.arrive.isSet() && station.arrive < aTime &&
-            station.depart.isSet() && aTime < station.depart)
+        if (aTime.isBetween(station.arrive, station.depart))
             return Position(mStations[station.stationId].getX(), mStations[station.stationId].getY());
     return Position(cNotSet, cNotSet);
 }
@@ -536,7 +535,7 @@ Position Map::findTrainBetweenStations(const Train &aTrain, const TimePoint &aTi
     auto prevStation = aTrain.getStations().front();
     for (const auto &station : aTrain.getStations())
     {
-        if (aTime < station.arrive && prevStation.depart < aTime)
+        if (aTime.isBetween(prevStation.depart, station.arrive))
         {
             int trainMinutes = prevStation.depart.getMinutesTo(aTime);
             int stationMinutes = prevStation.depart.getMinutesTo(station.arrive);
@@ -558,9 +557,9 @@ Position Map::findTrainAtEdgeStations(const Train &aTrain, const TimePoint &aTim
     auto secondStation = aTrain.getStations().back();
     TimePoint firstTime = firstStation.depart;
     TimePoint secondTime = secondStation.arrive;
-    if (aTime < firstTime && firstTime < aTime + waitTime)
+    if (aTime.isBetween(firstTime - waitTime, firstTime))
         return Position(mStations[firstStation.stationId].getX(), mStations[firstStation.stationId].getY());
-    else if (secondTime < aTime && aTime < secondTime + waitTime)
+    else if (aTime.isBetween(secondTime, secondTime + waitTime))
         return Position(mStations[secondStation.stationId].getX(), mStations[secondStation.stationId].getY());
     return Position(cNotSet, cNotSet);
 }
