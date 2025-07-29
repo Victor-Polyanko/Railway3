@@ -248,7 +248,7 @@ template <class T>
 void MainWindow::openDialog()
 {
     auto dialog = new T(&mMap, this);
-    connect(dialog, &Dialog::ready, this, &MainWindow::updateMenu);
+    connect(dialog, &Dialog::ready, this, [&]() { updateMenu(); markTitleWithChanges(); });
     connect(dialog, &Dialog::setSpeed, this, [&](int &aSpeed) { mSpeed = aSpeed; } );
     connect(dialog, &Dialog::setTime, this, [&](TimePoint &aTime) { mTime = aTime; } );
     dialog->setAttribute(Qt::WA_DeleteOnClose);
