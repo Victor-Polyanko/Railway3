@@ -9,6 +9,7 @@ const int cDefaultYDimention = 300;
 const int cDefaultXQuantity = 3;
 const int cDefaultYQuantity = 3;
 const int cDefaultDistrictStationsQuantity = 5;
+const TimePoint cShiftTime = TimePoint(0, 3);
 
 const QVector<QVector<QVector<QString>>> cNames = {
     {{"Луцьк", "Ковель", "Володимир", "Камінь-Каширський", "Ківерці"},
@@ -162,6 +163,7 @@ void Map::load(QDataStream &aStream)
     loadTrains(aStream);
     collectAllNames();
     fillDistricts();
+    fillTimeTable();
 }
 
 void Map::loadStations(QDataStream &aStream)
@@ -285,6 +287,7 @@ void Map::generate()
     buildWays();
     collectAllNames();
     fillDistricts();
+    fillTimeTable();
 }
 
 void Map::generateStations()
@@ -564,11 +567,39 @@ Position Map::findTrainAtEdgeStations(const Train &aTrain, const TimePoint &aTim
     return Position(cNotSet, cNotSet);
 }
 
+void Map::fillTimeTable()
+{
+    mTimeTable.clear();
+    mTimeTable.resize(mStations.size());
+    for (auto &station : mTimeTable)
+        station.resize(mStations.size());
+    for (auto &train : mTrains)
+    {
+        auto prevStation = train.getStations().front();
+        for (auto &station : train.getStations())
+        {
+            if (station.arrive.isSet())
+                mTimeTable[prevStation.stationId][station.stationId].append(
+                    std::make_tuple(train.getNumber(), prevStation.depart, station.arrive));
+            prevStation = station;
+        }
+    }
+    shiftAllTrains();
+}
+
 void Map::addTrain(const Train &aTrain)
 {
     mTrains.emplace_back(aTrain);
     for (const auto &station : aTrain.getStations())
         mStations[station.stationId].addTrainNumber(aTrain.getNumber());
+    for (auto id = 1; id < aTrain.getStations().size(); ++id)
+    {
+        auto prevStation = aTrain.getStations()[id - 1];
+        auto currStation = aTrain.getStations()[id];
+        mTimeTable[prevStation.stationId][currStation.stationId].append(
+            std::make_tuple(aTrain.getNumber(), prevStation.depart, currStation.arrive));
+    }
+    shiftAllTrains();
 }
 
 void Map::delTrain(const Train &aTrain)
@@ -576,6 +607,65 @@ void Map::delTrain(const Train &aTrain)
     mTrains.removeOne(aTrain);
     for (const auto &station : aTrain.getStations())
         mStations[station.stationId].delTrainNumber(aTrain.getNumber());
+    for (auto id = 1; id < aTrain.getStations().size(); ++id)
+    {
+        auto prevStation = aTrain.getStations()[id - 1];
+        auto currStation = aTrain.getStations()[id];
+        mTimeTable[prevStation.stationId][currStation.stationId].removeIf(
+            [&](std::tuple<int, TimePoint, TimePoint> aTime)
+            { return std::get<0>(aTime) == aTrain.getNumber(); });
+    }
+}
+
+void Map::shiftAllTrains()
+{
+    shiftTrains(Train::Fast);
+    shiftTrains(Train::Passenger);
+    shiftTrains(Train::Local);
+}
+
+void Map::shiftTrains(Train::Type aType)
+{
+    if (!aType)
+        return;
+    for (auto &train : mTrains)
+    {
+        if (train.getType() != aType)
+            continue;
+        for (auto id = 1; id < train.getStations().size(); ++id)
+        {
+            auto prevStationId = train.getStations()[id - 1].stationId;
+            auto stationId = train.getStations()[id].stationId;
+            for (const auto &times : mTimeTable[prevStationId][stationId])
+            {
+                auto anotherTrainNumber = std::get<0>(times);
+                auto anotherTrain = std::find_if(mTrains.begin(), mTrains.end(),
+                    [&](Train &aTrain) { return aTrain.getNumber() == anotherTrainNumber; });
+                auto depart = train.getStations()[id - 1].depart - cShiftTime;
+                auto arrive = train.getStations()[id].arrive + cShiftTime;
+                if (aType > anotherTrain->getType()
+                    && std::get<1>(times).isBetween(depart, arrive)
+                    && std::get<2>(times).isBetween(depart, arrive))
+                {
+                    auto diff = std::get<1>(times) - depart;
+                    train.shiftTimes(id - 1, diff);
+                    for (auto j = id; j < train.getStations().size(); ++j)
+                    {
+                        auto &prev = train.getStations()[j - 1];
+                        auto &curr = train.getStations()[j];
+                        //TODO remove Continue and fix crash here
+                        continue;
+                        auto &times = mTimeTable[prev.stationId][curr.stationId];
+                        auto newTimes = std::find_if(times.begin(), times.end(),
+                                            [&](std::tuple<int, TimePoint, TimePoint> aTime)
+                                            { return std::get<0>(aTime) == train.getNumber(); });
+                        if (newTimes != times.end())
+                            *newTimes = std::make_tuple(train.getNumber(), prev.depart, curr.arrive);
+                    }
+                }
+            }
+        }
+    }
 }
 
 void Map::setTrainTime(int aTrainId, TimePoint aTime)

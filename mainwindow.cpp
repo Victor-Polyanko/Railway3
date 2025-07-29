@@ -6,10 +6,12 @@
 #include <QMessageBox>
 
 const QString cNewPrefix = "* ";
-const QString cDefaultTitle = "Залізниця 3.0";
+const QString cDefaultTitle = "Залізниця 3.1";
 const QString cAboutSoft =
     "Програму '" + cDefaultTitle + "' стоврив\nВіктор Полянко\n" \
-    "11 червня - 11 липня 2025 року.\nPolyanko_Victor@ukr.net";
+    "11 червня - 11 липня 2025 року.\n" \
+    "Правка 3.1 (очікування потягів) - 29 липня 2025 року" \
+    "Polyanko_Victor@ukr.net";
 const QString cAboutGame =
     "Це - гра-спостереження.\nНадається можливість змоделювати карту,\n" \
     "прокласти по ній маршрути потягів і спостерігати як вони рухаються.\n" \

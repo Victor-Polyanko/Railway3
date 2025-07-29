@@ -7,6 +7,7 @@
 
 #include <QDataStream>
 #include <qvector.h>
+#include <tuple>
 
 typedef QPair<int, int> Way;
 typedef QPair<float, float> Position;
@@ -63,6 +64,9 @@ private:
     Position findTrainAtMiddleStations(const Train &aTrain, const TimePoint &aTime) const;
     Position findTrainBetweenStations(const Train &aTrain, const TimePoint &aTime) const;
     Position findTrainAtEdgeStations(const Train &aTrain, const TimePoint &aTime) const;
+    void fillTimeTable();
+    void shiftAllTrains();
+    void shiftTrains(Train::Type aType);
 
 private:
     Point mDimention;
@@ -75,6 +79,7 @@ private:
     Point mTime;
     QVector<int> mStationRadius;
     QStringList mAllNames;
+    QVector<QVector<QList<std::tuple<int, TimePoint, TimePoint>>>> mTimeTable;
 };
 
 #endif // MAP_H

@@ -25,6 +25,7 @@ public:
     void addStation(const Schedule &aSchedule);
     void addStation(int aStationId, const TimePoint &aArrive, int aWait, const TimePoint &aDepart);
     void addStation(int aStationId, int aArriveHours, int aArriveMinutes, int aWait, int aDepartHours, int aDepartMinutes);
+    void shiftTimes(int aStationId, const TimePoint &aShift);
 
     bool operator==(const Train &aTrain) const noexcept;
 

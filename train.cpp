@@ -101,6 +101,17 @@ void Train::addStation(int aStationId, int aArriveHours, int aArriveMinutes,
                                     aWait, aDepartHours, aDepartMinutes));
 }
 
+void Train::shiftTimes(int aStationId, const TimePoint &aShift)
+{
+    if (mStations[aStationId].wait != cNotSet)
+        mStations[aStationId].wait += TimePoint(0, 0).getMinutesTo(aShift);
+    for (auto id = aStationId + 1; id < mStations.size(); ++id)
+    {
+        mStations[id - 1].depart += aShift;
+        mStations[id].arrive += aShift;
+    }
+}
+
 bool Train::operator==(const Train &aTrain) const noexcept
 {
     return this->mNumber == aTrain.mNumber;
