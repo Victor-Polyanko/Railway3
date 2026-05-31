@@ -24,9 +24,9 @@ Display::Display(Map *aMap) :
     mMap(aMap)
 {}
 
-void Display::generate()
+void Display::generate(bool areShortestWays, bool areAdditionalWays)
 {
-    mMap->generate();
+    mMap->generate(areShortestWays, areAdditionalWays);
     convertColors();
 }
 

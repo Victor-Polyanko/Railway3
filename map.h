@@ -18,7 +18,7 @@ public:
     enum Color {LavenderBlush, Lavender, Honeydew, MistyRose};
 public:
     Map();
-    void generate();
+    void generate(bool areShortestWays, bool areAdditionalWays);
     void load(QDataStream &aStream);
     void save(QDataStream &aStream) const;
 
@@ -55,7 +55,8 @@ private:
     void saveWays(QDataStream &aStream) const;
     void saveTrains(QDataStream &aStream) const;
     void generateStations();
-    void buildWays();
+    void buildShortestWays(bool areAdditionalWays);
+    void buildCentralizedWays(bool areAdditionalWays);
     QVector<QVector<QPair<int, int>>> findAllDistances() const;
     Way findMinWay(QVector<QVector<QPair<int, int>>> &aDistances, QVector<int> &aGroups, QVector<int> &aNearestStationId) const;
     void ConnectAlonesInDistricts();

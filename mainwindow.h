@@ -25,7 +25,7 @@ public:
     virtual void closeEvent(QCloseEvent *) override;
 
 private:
-    void generateMap();
+    void generateMap(bool areShortestWays = true);
     void loadMap();
     void saveMap(const QString &aFileName = "");
     void showInfo(const QString &aText) const;

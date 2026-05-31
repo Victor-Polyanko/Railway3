@@ -27,7 +27,15 @@
     <property name="title">
      <string>Головне меню</string>
     </property>
-    <addaction name="generateAction"/>
+    <widget class="QMenu" name="menu">
+     <property name="title">
+      <string>Згенерувати Україну</string>
+     </property>
+     <addaction name="generateShortestWaysAction"/>
+     <addaction name="generateCentralizedWaysAction"/>
+     <addaction name="additionalWaysAction"/>
+    </widget>
+    <addaction name="menu"/>
     <addaction name="loadAction"/>
     <addaction name="saveAction"/>
     <addaction name="saveAsAction"/>
@@ -73,11 +81,6 @@
    <addaction name="aboutMenu"/>
   </widget>
   <widget class="QStatusBar" name="statusbar"/>
-  <action name="generateAction">
-   <property name="text">
-    <string>Згенерувати Україну</string>
-   </property>
-  </action>
   <action name="loadAction">
    <property name="text">
     <string>Завантажити мапу</string>
@@ -156,6 +159,27 @@
   <action name="speedAction">
    <property name="text">
     <string>Швидкість анімації</string>
+   </property>
+  </action>
+  <action name="generateShortestWaysAction">
+   <property name="text">
+    <string>Найкоротші шляхи</string>
+   </property>
+  </action>
+  <action name="generateCentralizedWaysAction">
+   <property name="text">
+    <string>Централізовані шляхи</string>
+   </property>
+  </action>
+  <action name="additionalWaysAction">
+   <property name="checkable">
+    <bool>true</bool>
+   </property>
+   <property name="checked">
+    <bool>true</bool>
+   </property>
+   <property name="text">
+    <string>Додаткові шляхи</string>
    </property>
   </action>
  </widget>

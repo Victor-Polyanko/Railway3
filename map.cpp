@@ -281,10 +281,13 @@ void Map::saveTrains(QDataStream &aStream) const
     }
 }
 
-void Map::generate()
+void Map::generate(bool areShortestWays, bool areAdditionalWays)
 {
     generateStations();
-    buildWays();
+    if (areShortestWays)
+        buildShortestWays(areAdditionalWays);
+    else
+        buildCentralizedWays(areAdditionalWays);
     collectAllNames();
     fillDistricts();
     fillTimeTable();
@@ -340,7 +343,7 @@ void Map::generateStations()
     mStations[mDistrictStationsQuantity].setStatus(static_cast<int>(Station::Status::Capital));
 }
 
-void Map::buildWays()
+void Map::buildShortestWays(bool areAdditionalWays)
 {
     auto distances = findAllDistances();
     auto waysSize = mStations.size() - 1;
@@ -374,7 +377,8 @@ void Map::buildWays()
                     g = newValue;
         }
     }
-    ConnectAlonesInDistricts();
+    if (areAdditionalWays)
+        ConnectAlonesInDistricts();
 }
 
 QVector<QVector<QPair<int, int>>> Map::findAllDistances() const
@@ -465,6 +469,11 @@ void Map::ConnectAlonesInDistricts()
             addWay(Way(currentId, minId));
         }
     }
+}
+
+void Map::buildCentralizedWays(bool areAdditionalWays)
+{
+    buildShortestWays(areAdditionalWays);
 }
 
 void Map::collectAllNames()

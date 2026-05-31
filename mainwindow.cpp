@@ -6,11 +6,12 @@
 #include <QMessageBox>
 
 const QString cNewPrefix = "* ";
-const QString cDefaultTitle = "Залізниця 3.1";
+const QString cDefaultTitle = "Залізниця 3.2";
 const QString cAboutSoft =
     "Програму '" + cDefaultTitle + "' стоврив\nВіктор Полянко\n" \
     "11 червня - 11 липня 2025 року.\n" \
     "Правка 3.1 (очікування потягів) - 29 липня 2025 року" \
+    "Розширення 3.2 (варіант з централізованими шляхами) - 31 травня 2026 року" \
     "Polyanko_Victor@ukr.net";
 const QString cAboutGame =
     "Це - гра-спостереження.\nНадається можливість змоделювати карту,\n" \
@@ -31,7 +32,8 @@ MainWindow::MainWindow(QWidget *parent)
 {
     ui->setupUi(this);
     this->setWindowTitle(cDefaultTitle);
-    QObject::connect(ui->generateAction, &QAction::triggered, [&]() { generateMap(); });
+    QObject::connect(ui->generateShortestWaysAction, &QAction::triggered, [&]() { generateMap(); });
+    QObject::connect(ui->generateCentralizedWaysAction, &QAction::triggered, [&]() { generateMap(false); });
     QObject::connect(ui->loadAction, &QAction::triggered, [&]() { loadMap(); });
     QObject::connect(ui->saveAction, &QAction::triggered, [&]() { saveMap(mFileName); });
     QObject::connect(ui->saveAsAction, &QAction::triggered, [&]() { saveMap(); });
@@ -62,11 +64,11 @@ MainWindow::~MainWindow()
     delete ui;
 }
 
-void MainWindow::generateMap()
+void MainWindow::generateMap(bool areShortestWays)
 {
     if (!keepGoing())
         return;
-    mDisplay.generate();
+    mDisplay.generate(areShortestWays, ui->additionalWaysAction->isChecked());
     updateFileName("");
 }
 

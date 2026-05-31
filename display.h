@@ -16,7 +16,7 @@ class Display
 public:
     Display(Map *aMap);
 
-    void generate();
+    void generate(bool areShortestWays, bool areAdditionalWays);
     QString load(const QString &aFileName);
     QString save(const QString &aFileName);
 
