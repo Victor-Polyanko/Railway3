@@ -12,33 +12,33 @@ const int cDefaultDistrictStationsQuantity = 5;
 const TimePoint cShiftTime = TimePoint(0, 3);
 
 const QVector<QVector<QVector<QString>>> cNames = {
-    {{"Луцьк", "Ковель", "Володимир", "Камінь-Каширський", "Ківерці"},
-     {"Рівне", "Вараш", "Дубно", "Сарни", "Костопіль"},
-     {"Житомир", "Коростень", "Новоград-Волинський", "Малин", "Бердичів"}},
-    {{"Київ", "Буча", "Біла Церква", "Вишгород", "Боярка"},
-     {"Київ", "Вишневе", "Фастів", "Бориспіль", "Обухів"},
-     {"Київ", "Ірпінь", "Васильків", "Бровари", "Переяслав"}},
-    {{"Чернігів", "Корюківка", "Ніжин", "Новгород-Сіверський", "Прилуки"},
-     {"Суми", "Конотоп", "Ромни", "Шостка", "Охтирка"},
-     {"Полтава", "Лубни", "Кременчук", "Миргород", "Горішні Плавні"}},
-    {{"Львів", "Самбір", "Дрогобич","Шептицький","Стрий"},
-     {"Тернопіль", "Бережани", "Чортків", "Кременець", "Збараж"},
-     {"Хмельницький", "Нетішин", "Славута", "Шепетівка", "Кам'янець-Подільський"}},
-    {{"Вінниця", "Жмеринка", "Могилів-Подільський", "Хмільник", "Гайсин"},
-     {"Черкаси", "Звенигородка", "Умань", "Канів", "Золотоноша"},
-     {"Кропивницький", "Знам'янка", "Долинська", "Світловодськ", "Олександрія"}},
-    {{"Дніпро", "Кам'янське", "Кривий Ріг", "Павлоград", "Нікополь"},
-     {"Харків", "Первомайський", "Лозова", "Чугуїв", "Ізюм"},
-     {"Луганськ", "Лисичанськ", "Алчевськ", "Сіверськодонецьк", "Хрустальний"}},
-    {{"Ужгород", "Мукачеве", "Берегове", "Хуст", "Виноградів"},
-     {"Івано-Франківськ", "Калуш", "Надвірна", "Коломия", "Косів"},
-     {"Чернівці", "Сторожинець", "Красноїльськ", "Новодністровськ", "Хотин"}},
-    {{"Одеса", "Подільськ", "Ізмаїл", "Чорноморськ", "Білгород-Дністровський"},
-     {"Миколаїв", "Первомайськ", "Південноукраїнськ", "Новий Буг", "Вознесенськ"},
-     {"Сімферополь", "Євпаторія", "Севастополь", "Керч", "Ялта"}},
-    {{"Херсон", "Берислав", "Скадовськ", "Нова Каховка", "Генічеськ"},
-     {"Запоріжжя", "Василівка", "Мелітополь", "Пологи", "Бердянськ"},
-     {"Донецьк", "Краматорськ", "Маріуполь", "Горлівка", "Макіївка"}}};
+    {{"Луцьк", "Ковель", "Володимир", "Ківерці", "Камінь-Каширський"},
+     {"Рівне", "Вараш", "Дубно", "Костопіль", "Сарни"},
+     {"Житомир", "Коростень", "Новоград-Волинський", "Бердичів", "Малин"}},
+    {{"Київ", "Буча", "Біла Церква", "Боярка", "Вишгород"},
+     {"Київ", "Вишневе", "Фастів", "Обухів", "Бориспіль"},
+     {"Київ", "Ірпінь", "Васильків", "Переяслав", "Бровари"}},
+    {{"Чернігів", "Корюківка", "Ніжин", "Прилуки", "Новгород-Сіверський"},
+     {"Суми", "Конотоп", "Ромни", "Охтирка", "Шостка"},
+     {"Полтава", "Лубни", "Кременчук", "Горішні Плавні", "Миргород"}},
+    {{"Львів", "Самбір", "Дрогобич", "Стрий", "Шептицький"},
+     {"Тернопіль", "Бережани", "Чортків", "Збараж", "Кременець"},
+     {"Хмельницький", "Нетішин", "Славута", "Кам'янець-Подільський", "Шепетівка"}},
+    {{"Вінниця", "Жмеринка", "Могилів-Подільський", "Гайсин", "Хмільник"},
+     {"Черкаси", "Звенигородка", "Умань", "Золотоноша", "Канів"},
+     {"Кропивницький", "Знам'янка", "Долинська", "Олександрія", "Світловодськ"}},
+    {{"Дніпро", "Кам'янське", "Кривий Ріг", "Нікополь", "Павлоград"},
+     {"Харків", "Первомайський", "Лозова", "Ізюм", "Чугуїв"},
+     {"Луганськ", "Лисичанськ", "Алчевськ", "Хрустальний", "Сіверськодонецьк"}},
+    {{"Ужгород", "Мукачеве", "Берегове", "Виноградів", "Хуст"},
+     {"Івано-Франківськ", "Калуш", "Надвірна", "Косів", "Коломия"},
+     {"Чернівці", "Сторожинець", "Красноїльськ", "Хотин", "Новодністровськ"}},
+    {{"Одеса", "Подільськ", "Ізмаїл", "Білгород-Дністровський", "Чорноморськ"},
+     {"Миколаїв", "Первомайськ", "Південноукраїнськ", "Вознесенськ", "Новий Буг"},
+     {"Сімферополь", "Євпаторія", "Севастополь", "Ялта", "Керч"}},
+    {{"Херсон", "Берислав", "Скадовськ", "Генічеськ", "Нова Каховка"},
+     {"Запоріжжя", "Василівка", "Мелітополь", "Бердянськ", "Пологи"},
+     {"Донецьк", "Краматорськ", "Маріуполь", "Макіївка", "Горлівка"}}};
 
 Map::Map()
 {
@@ -334,9 +334,9 @@ void Map::generateStations()
             *station++ = Station(position, defaultStatus, *name++);
             position = findXY(leftBorder, yMiddleBorder);
             *station++ = Station(position, defaultStatus, *name++);
-            position = findXY(xMiddleBorder, topBorder);
-            *station++ = Station(position, defaultStatus, *name++);
             position = findXY(xMiddleBorder, yMiddleBorder);
+            *station++ = Station(position, defaultStatus, *name++);
+            position = findXY(xMiddleBorder, topBorder);
             *station++ = Station(position, defaultStatus, *name++);
         }
     }
@@ -473,12 +473,12 @@ void Map::ConnectAlonesInDistricts()
 
 void Map::buildCentralizedWays(bool aAreAdditionalWays)
 {
-    auto distances2 = findAllDistances2();
-    connectInsideDistrincts(distances2);
-    connectOutsideDistricts(distances2, aAreAdditionalWays);
+    findAllDistances2();
+    connectInsideDistrincts();
+    connectOutsideDistricts(aAreAdditionalWays);
 }
 
-void Map::connectInsideDistrincts(const QVector<QVector<size_t>> &aDistances2)
+void Map::connectInsideDistrincts()
 {
     mWays.clear();
     mWays.reserve(mStations.size() - 1);
@@ -490,9 +490,9 @@ void Map::connectInsideDistrincts(const QVector<QVector<size_t>> &aDistances2)
             auto currentId = centerId + k;
             auto prevId = centerId + (k > 1 ? k - 1 : last);
             auto nextId = centerId + (k < last ? k + 1 : 1);
-            auto prevDist = aDistances2[centerId][prevId] + aDistances2[currentId][prevId];
-            auto currentDist = aDistances2[centerId][currentId];
-            auto nextDist = aDistances2[centerId][nextId] + aDistances2[currentId][nextId];
+            auto prevDist = mDistances2[centerId][prevId] + mDistances2[currentId][prevId];
+            auto currentDist = mDistances2[centerId][currentId];
+            auto nextDist = mDistances2[centerId][nextId] + mDistances2[currentId][nextId];
             if (currentDist < prevDist && currentDist < nextDist)
                 addWay(Way(currentId, centerId));
             else if (prevDist < nextDist)
@@ -503,29 +503,35 @@ void Map::connectInsideDistrincts(const QVector<QVector<size_t>> &aDistances2)
     }
 }
 
-void Map::connectOutsideDistricts(const QVector<QVector<size_t>> &aDistances2, bool aAreAllConnected)
+void Map::connectOutsideDistricts(bool aAreAllConnected)
 {
 
 }
 
-QVector<QVector<size_t>> Map::findAllDistances2() const
+void Map::findAllDistances2()
 {
-    QVector<QVector<size_t>> distances2;
-    distances2.reserve(mStations.size());
+    mDistances2.clear();
+    mDistances2.reserve(mStations.size());
     for (auto station = mStations.begin(); station != mStations.end(); ++station)
     {
         QVector<size_t> currentDistances2;
         currentDistances2.reserve(mStations.size());
         auto currId = station - mStations.begin();
         for (auto id = 0; id < currId; ++id)
-            currentDistances2.push_back(distances2[id][currId]);
+            currentDistances2.push_back(mDistances2[id][currId]);
         currentDistances2.push_back(0);
         for (auto anotherStation = station + 1; anotherStation != mStations.end(); ++anotherStation)
             currentDistances2.push_back(station->distance2(*anotherStation));
-        distances2.push_back(currentDistances2);
+        mDistances2.push_back(currentDistances2);
     }
-    return distances2;
 }
+
+#ifdef DEBUG_MODE
+QVector<QVector<size_t>> Map::getAllDistances2()
+{
+    return mDistances2;
+}
+#endif
 
 void Map::collectAllNames()
 {

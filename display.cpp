@@ -191,3 +191,10 @@ void Display::showStationsAndWays(QPainter &aPainter) const
                           static_cast<int>(mScale.first * mMap->getStations()[way.second].getX()),
                           static_cast<int>(mScale.second * mMap->getStations()[way.second].getY()));
 }
+
+#ifdef DEBUG_MODE
+QVector<QVector<size_t>> Display::getAllDistances2()
+{
+    return mMap->getAllDistances2();
+}
+#endif

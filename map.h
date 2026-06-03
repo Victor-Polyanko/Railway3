@@ -1,6 +1,8 @@
 #ifndef MAP_H
 #define MAP_H
 
+//#define DEBUG_MODE //comment for release
+
 #include "TimePoint.h"
 #include "Station.h"
 #include "Train.h"
@@ -44,6 +46,9 @@ public:
     void setTrainTime(int aTrainId, TimePoint aTime);
     void addWay(Way aWay);
     void delWay(Way aWay);
+#ifdef DEBUG_MODE
+    QVector<QVector<size_t>> getAllDistances2();
+#endif
 
 private:
     void init(int aXd, int aYd, int aXq, int aYq, int aQ, int aWaysQuantity = 0, int aTrainsQuantity = 0);
@@ -60,9 +65,9 @@ private:
     QVector<QVector<QPair<int, int>>> findAllDistances() const;
     Way findMinWay(QVector<QVector<QPair<int, int>>> &aDistances, QVector<int> &aGroups, QVector<int> &aNearestStationId) const;
     void ConnectAlonesInDistricts();
-    void connectInsideDistrincts(const QVector<QVector<size_t>> &aDistances2);
-    void connectOutsideDistricts(const QVector<QVector<size_t>> &aDistances2, bool aAreAllConnected);
-    QVector<QVector<size_t>> findAllDistances2() const;
+    void connectInsideDistrincts();
+    void connectOutsideDistricts(bool aAreAllConnected);
+    void findAllDistances2();
     void collectAllNames();
     void fillDistricts();
     Position findTrainAtMiddleStations(const Train &aTrain, const TimePoint &aTime) const;
@@ -84,6 +89,7 @@ private:
     QVector<int> mStationRadius;
     QStringList mAllNames;
     QVector<QVector<QList<std::tuple<int, TimePoint, TimePoint>>>> mTimeTable;
+    QVector<QVector<size_t>> mDistances2;
 };
 
 #endif // MAP_H

@@ -70,6 +70,21 @@ void MainWindow::generateMap(bool aAreShortestWays)
         return;
     mDisplay.generate(aAreShortestWays, ui->additionalWaysAction->isChecked());
     updateFileName("");
+
+#ifdef DEBUG_MODE
+    if (aAreShortestWays)
+        return;
+    QString result;
+    size_t id = 0;
+    for (auto const &row : mDisplay.getAllDistances2())
+    {
+        result += "\n" + mMap.getStationName(id) +" (" + QString::number(mMap.getStationPosition(id).getX()) + ", " + QString::number(mMap.getStationPosition(id).getY()) + ")\n";
+        for (auto const &val : row)
+            result += "\t " + QString::number(val);
+        ++id;
+    }
+    showMessage("Таблиця відстаней", result);
+#endif
 }
 
 void MainWindow::loadMap()
