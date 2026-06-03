@@ -15,6 +15,7 @@ public:
     Point operator*(const Point &p) const;
     Point operator/(const Point &p) const;
     int distance(const Point &p) const;
+    int distance2(const Point &p) const;
 
 protected:
     int mX;

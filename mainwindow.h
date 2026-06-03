@@ -17,7 +17,7 @@ class MainWindow : public QMainWindow
     Q_OBJECT
 
 public:
-    MainWindow(QWidget *parent = nullptr);
+    MainWindow(QWidget *aParent = nullptr);
     ~MainWindow();
 
 public:
@@ -25,7 +25,7 @@ public:
     virtual void closeEvent(QCloseEvent *) override;
 
 private:
-    void generateMap(bool areShortestWays = true);
+    void generateMap(bool aAreShortestWays = true);
     void loadMap();
     void saveMap(const QString &aFileName = "");
     void showInfo(const QString &aText) const;

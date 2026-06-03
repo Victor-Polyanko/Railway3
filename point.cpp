@@ -45,7 +45,12 @@ Point Point::operator/(const Point &p) const
 
 int Point::distance(const Point &p) const
 {
+    return static_cast<int>(round(sqrt(distance2(p))));
+}
+
+int Point::distance2(const Point &p) const
+{
     int dx = mX - p.mX;
     int dy = mY - p.mY;
-    return static_cast<int>(round(sqrt(dx * dx + dy * dy)));
+    return dx * dx + dy * dy;
 }

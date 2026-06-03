@@ -343,7 +343,7 @@ void Map::generateStations()
     mStations[mDistrictStationsQuantity].setStatus(static_cast<int>(Station::Status::Capital));
 }
 
-void Map::buildShortestWays(bool areAdditionalWays)
+void Map::buildShortestWays(bool aAreAdditionalWays)
 {
     auto distances = findAllDistances();
     auto waysSize = mStations.size() - 1;
@@ -377,7 +377,7 @@ void Map::buildShortestWays(bool areAdditionalWays)
                     g = newValue;
         }
     }
-    if (areAdditionalWays)
+    if (aAreAdditionalWays)
         ConnectAlonesInDistricts();
 }
 
@@ -471,9 +471,60 @@ void Map::ConnectAlonesInDistricts()
     }
 }
 
-void Map::buildCentralizedWays(bool areAdditionalWays)
+void Map::buildCentralizedWays(bool aAreAdditionalWays)
 {
-    buildShortestWays(areAdditionalWays);
+    auto distances2 = findAllDistances2();
+    connectInsideDistrincts(distances2);
+    connectOutsideDistricts(distances2, aAreAdditionalWays);
+}
+
+void Map::connectInsideDistrincts(const QVector<QVector<size_t>> &aDistances2)
+{
+    mWays.clear();
+    mWays.reserve(mStations.size() - 1);
+    auto last = mDistrictStationsQuantity - 1;
+    for (size_t centerId = 0; centerId < mStations.size(); centerId += mDistrictStationsQuantity)
+    {
+        for (int k = 1; k <= last; ++k)
+        {
+            auto currentId = centerId + k;
+            auto prevId = centerId + (k > 1 ? k - 1 : last);
+            auto nextId = centerId + (k < last ? k + 1 : 1);
+            auto prevDist = aDistances2[centerId][prevId] + aDistances2[currentId][prevId];
+            auto currentDist = aDistances2[centerId][currentId];
+            auto nextDist = aDistances2[centerId][nextId] + aDistances2[currentId][nextId];
+            if (currentDist < prevDist && currentDist < nextDist)
+                addWay(Way(currentId, centerId));
+            else if (prevDist < nextDist)
+                addWay(Way(currentId, prevId));
+            else
+                addWay(Way(currentId, nextId));
+        }
+    }
+}
+
+void Map::connectOutsideDistricts(const QVector<QVector<size_t>> &aDistances2, bool aAreAllConnected)
+{
+
+}
+
+QVector<QVector<size_t>> Map::findAllDistances2() const
+{
+    QVector<QVector<size_t>> distances2;
+    distances2.reserve(mStations.size());
+    for (auto station = mStations.begin(); station != mStations.end(); ++station)
+    {
+        QVector<size_t> currentDistances2;
+        currentDistances2.reserve(mStations.size());
+        auto currId = station - mStations.begin();
+        for (auto id = 0; id < currId; ++id)
+            currentDistances2.push_back(distances2[id][currId]);
+        currentDistances2.push_back(0);
+        for (auto anotherStation = station + 1; anotherStation != mStations.end(); ++anotherStation)
+            currentDistances2.push_back(station->distance2(*anotherStation));
+        distances2.push_back(currentDistances2);
+    }
+    return distances2;
 }
 
 void Map::collectAllNames()

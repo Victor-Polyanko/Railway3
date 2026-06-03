@@ -24,8 +24,8 @@ const QString cAboutGame =
     "як дістатися з однієї станції до іншої.\n\n" \
     "Приємного часопроведення! :-)";
 
-MainWindow::MainWindow(QWidget *parent)
-    : QMainWindow(parent)
+MainWindow::MainWindow(QWidget *aParent)
+    : QMainWindow(aParent)
     , ui(new Ui::MainWindow)
     , mDisplay(&mMap)
     , mSpeed(1)
@@ -49,9 +49,9 @@ MainWindow::MainWindow(QWidget *parent)
     QObject::connect(ui->speedAction, &QAction::triggered, [&]() { openDialog<SpeedDialog>(); });
     QObject::connect(ui->launchAction, &QAction::triggered, [&]() { processAnimation(); });
     QObject::connect(ui->aboutSoftAction, &QAction::triggered, [&]() {
-        QMessageBox::information(parent, "Про програму", cAboutSoft); });
+        QMessageBox::information(aParent, "Про програму", cAboutSoft); });
     QObject::connect(ui->aboutGameAction, &QAction::triggered, [&]() {
-        QMessageBox::information(parent, "Про гру", cAboutGame); });
+        QMessageBox::information(aParent, "Про гру", cAboutGame); });
     ui->saveAction->setEnabled(false);
     ui->saveAsAction->setEnabled(false);
     ui->trainMenu->setEnabled(false);
@@ -64,11 +64,11 @@ MainWindow::~MainWindow()
     delete ui;
 }
 
-void MainWindow::generateMap(bool areShortestWays)
+void MainWindow::generateMap(bool aAreShortestWays)
 {
     if (!keepGoing())
         return;
-    mDisplay.generate(areShortestWays, ui->additionalWaysAction->isChecked());
+    mDisplay.generate(aAreShortestWays, ui->additionalWaysAction->isChecked());
     updateFileName("");
 }
 

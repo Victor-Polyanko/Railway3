@@ -55,11 +55,14 @@ private:
     void saveWays(QDataStream &aStream) const;
     void saveTrains(QDataStream &aStream) const;
     void generateStations();
-    void buildShortestWays(bool areAdditionalWays);
-    void buildCentralizedWays(bool areAdditionalWays);
+    void buildShortestWays(bool aAreAdditionalWays);
+    void buildCentralizedWays(bool aAreAdditionalWays);
     QVector<QVector<QPair<int, int>>> findAllDistances() const;
     Way findMinWay(QVector<QVector<QPair<int, int>>> &aDistances, QVector<int> &aGroups, QVector<int> &aNearestStationId) const;
     void ConnectAlonesInDistricts();
+    void connectInsideDistrincts(const QVector<QVector<size_t>> &aDistances2);
+    void connectOutsideDistricts(const QVector<QVector<size_t>> &aDistances2, bool aAreAllConnected);
+    QVector<QVector<size_t>> findAllDistances2() const;
     void collectAllNames();
     void fillDistricts();
     Position findTrainAtMiddleStations(const Train &aTrain, const TimePoint &aTime) const;
