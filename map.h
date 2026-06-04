@@ -68,6 +68,8 @@ private:
     void connectInsideDistrincts();
     void connectOutsideDistricts(bool aAreAllConnected);
     void findAllDistances2();
+    Way findMinWay(QVector<size_t> firstGroup, QVector<size_t> secondGroup);
+    Way findMinWay(const QVector<Way> &aWays);
     void collectAllNames();
     void fillDistricts();
     Position findTrainAtMiddleStations(const Train &aTrain, const TimePoint &aTime) const;
