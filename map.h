@@ -66,10 +66,14 @@ private:
     Way findMinWay(QVector<QVector<QPair<int, int>>> &aDistances, QVector<int> &aGroups, QVector<int> &aNearestStationId) const;
     void ConnectAlonesInDistricts();
     void connectInsideDistrincts();
-    void connectOutsideDistricts(bool aAreAllConnected);
+    void connectMaximalOutsideDistricts(const QVector<QVector<Way>> &aHorizontalMinWays, const QVector<QVector<Way>> &aVerticalMinWays);
+    void connectMinimalOutsideDistricts(const QVector<QVector<Way>> &aHorizontalMinWays, const QVector<QVector<Way>> &aVerticalMinWays);
     void findAllDistances2();
-    Way findMinWay(QVector<size_t> firstGroup, QVector<size_t> secondGroup);
+    QVector<QVector<Way>> collectMinWays(size_t aXSize, size_t aYSize, size_t aShift, size_t aCurr, size_t aNext);
+    Way findMinWay(QVector<size_t> aFirstGroup, QVector<size_t> aSecondGroup);
     Way findMinWay(const QVector<Way> &aWays);
+    Way leftBotDiagonal(size_t aX, size_t aY);
+    Way rightBotDiagonal(size_t aX, size_t aY);
     void collectAllNames();
     void fillDistricts();
     Position findTrainAtMiddleStations(const Train &aTrain, const TimePoint &aTime) const;

@@ -475,7 +475,12 @@ void Map::buildCentralizedWays(bool aAreAdditionalWays)
 {
     findAllDistances2();
     connectInsideDistrincts();
-    connectOutsideDistricts(aAreAdditionalWays);
+    auto horizontalMinWays = collectMinWays(mDistrictQuantity.getX() - 1, mDistrictQuantity.getY(), mDistrictStationsQuantity, 4, 2);
+    auto verticalMinWays = collectMinWays(mDistrictQuantity.getX(), mDistrictQuantity.getY() - 1, mDistrictStationsQuantity * mDistrictQuantity.getX(), 2, 4);
+    if (aAreAdditionalWays)
+        connectMaximalOutsideDistricts(horizontalMinWays, verticalMinWays);
+    else
+        connectMinimalOutsideDistricts(horizontalMinWays, verticalMinWays);
 }
 
 void Map::connectInsideDistrincts()
@@ -503,93 +508,71 @@ void Map::connectInsideDistrincts()
     }
 }
 
-void Map::connectOutsideDistricts(bool aAreAllConnected)
+void Map::connectMaximalOutsideDistricts(const QVector<QVector<Way>> &aHorizontalMinWays, const QVector<QVector<Way>> &aVerticalMinWays)
 {
-    QVector<QVector<Way>> horizontalMinWays(mDistrictQuantity.getX() - 1);
-    size_t leftXcenterId = 0;
-    for (auto &minWays : horizontalMinWays)
-    {
-        auto step = mDistrictStationsQuantity * mDistrictQuantity.getX();
-        auto last = leftXcenterId + step * mDistrictQuantity.getY();
-        for (size_t currLeftXcenterId = leftXcenterId; currLeftXcenterId < last; currLeftXcenterId += step)
+    auto xSize = mDistrictQuantity.getX() - 1;
+    auto ySize = mDistrictQuantity.getY() - 1;
+    for (size_t x = 0; x < xSize; ++x)
+        for (size_t y = 0; y < ySize; ++y)
         {
-            auto currRightXcenterId = currLeftXcenterId + mDistrictStationsQuantity;
-            QVector<size_t> leftX = {currLeftXcenterId, currLeftXcenterId + 3, currLeftXcenterId + 4};
-            QVector<size_t> rightX = {currRightXcenterId, currRightXcenterId + 1, currRightXcenterId + 2};
-            minWays.push_back(findMinWay(leftX, rightX));
+            addWay(aHorizontalMinWays[x][y]);
+            addWay(aVerticalMinWays[x][y]);
         }
-        leftXcenterId += mDistrictStationsQuantity;
-    }
-    QVector<QVector<Way>> verticalMinWays(mDistrictQuantity.getX());
-    size_t topYcenterId = 0;
-    for (auto &minWays : verticalMinWays)
-    {
-        size_t step = mDistrictStationsQuantity * mDistrictQuantity.getX();
-        size_t last = topYcenterId + step * (mDistrictQuantity.getY() - 1);
-        for (size_t currTopYcenterId = topYcenterId; currTopYcenterId < last; currTopYcenterId += step)
+    for (size_t x = 0; x < xSize; ++x)
+        addWay(aHorizontalMinWays[x][ySize]);
+    for (size_t y = 0; y < ySize; ++y)
+        addWay(aVerticalMinWays[xSize][y]);
+    for (size_t y = 0; y < mDistrictQuantity.getY() - 1; ++y)
+        for (size_t x = 0; x < mDistrictQuantity.getX() - 1; ++x)
         {
-            auto currBotYcenterId = currTopYcenterId + mDistrictStationsQuantity * mDistrictQuantity.getX();
-            QVector<size_t> topY = {currTopYcenterId, currTopYcenterId + 2, currTopYcenterId + 3};
-            QVector<size_t> botY = {currBotYcenterId, currBotYcenterId + 1, currBotYcenterId + 4};
-            minWays.push_back(findMinWay(topY, botY));
+            auto left = leftBotDiagonal(x + 1, y);
+            auto right = rightBotDiagonal(x, y);
+            if (mStations[left.first].distance2(mStations[left.second]) <
+                mStations[right.first].distance2(mStations[right.second]))
+                addWay(left);
+            else
+                addWay(right);
         }
-        topYcenterId += mDistrictStationsQuantity;
-    }
-    auto leftBotDiagonal = [&](size_t x, size_t y) {
-        auto first = mDistrictStationsQuantity * (x + y * cDefaultXQuantity) + 2;
-        auto second = mDistrictStationsQuantity * (x - 1 + (y + 1) * cDefaultXQuantity) + 4;
-        return Way(first, second);
-    };
-    auto rightBotDiagonal = [&](size_t x, size_t y) {
-        auto first = mDistrictStationsQuantity * (x + y * cDefaultXQuantity) + 3;
-        auto second = mDistrictStationsQuantity * (x + 1 + (y + 1) * cDefaultXQuantity) + 1;
-        return Way(first, second);
-    };
+}
 
+void Map::connectMinimalOutsideDistricts(const QVector<QVector<Way>> &aHorizontalMinWays, const QVector<QVector<Way>> &aVerticalMinWays)
+{
     auto leftWay = [&](size_t top) {
-        return findMinWay({horizontalMinWays[0][top + 1], verticalMinWays[0][top], leftBotDiagonal(1, top)});
+        return findMinWay({aHorizontalMinWays[0][top + 1], aVerticalMinWays[0][top], leftBotDiagonal(1, top)});
     };
     auto rightWay = [&](size_t top) {
-        return findMinWay({horizontalMinWays[1][top + 1], verticalMinWays[2][top], rightBotDiagonal(1, top)});
+        return findMinWay({aHorizontalMinWays[1][top + 1], aVerticalMinWays[2][top], rightBotDiagonal(1, top)});
     };
-    if (aAreAllConnected)
-    {
-        auto xSize = mDistrictQuantity.getX() - 1;
-        auto ySize = mDistrictQuantity.getY() - 1;
-        for (size_t x = 0; x < xSize; ++x)
-            for (size_t y = 0; y < ySize; ++y)
-            {
-                addWay(horizontalMinWays[x][y]);
-                addWay(verticalMinWays[x][y]);
-            }
-        for (size_t x = 0; x < xSize; ++x)
-            addWay(horizontalMinWays[x][ySize]);
-        for (size_t y = 0; y < ySize; ++y)
-            addWay(verticalMinWays[xSize][y]);
-        for (size_t y = 0; y < mDistrictQuantity.getY() - 1; ++y)
-            for (size_t x = 0; x < mDistrictQuantity.getX() - 1; ++x)
-            {
-                auto left = leftBotDiagonal(x + 1, y);
-                auto right = rightBotDiagonal(x, y);
-                if (mStations[left.first].distance2(mStations[left.second]) <
-                    mStations[right.first].distance2(mStations[right.second]))
-                    addWay(left);
-                else
-                    addWay(right);
-            }
-    }
-    else
-    {
-        addWay(horizontalMinWays[0][0]);
-        addWay(horizontalMinWays[1][0]);
-        addWay(verticalMinWays[1][0]);
-        addWay(verticalMinWays[1][1]);
-        addWay(leftWay(0));
-        addWay(leftWay(1));
-        addWay(rightWay(0));
-        addWay(rightWay(1));
-    }
+    addWay(aHorizontalMinWays[0][0]);
+    addWay(aHorizontalMinWays[1][0]);
+    addWay(aVerticalMinWays[1][0]);
+    addWay(aVerticalMinWays[1][1]);
+    addWay(leftWay(0));
+    addWay(leftWay(1));
+    addWay(rightWay(0));
+    addWay(rightWay(1));
 }
+
+QVector<QVector<Way>> Map::collectMinWays(size_t aXSize, size_t aYSize, size_t aShift, size_t aCurr, size_t aNext)
+{
+    QVector<QVector<Way>> allMinWays(aXSize);
+    size_t prevCenterId = 0;
+    for (auto &minWays : allMinWays)
+    {
+        auto step = mDistrictStationsQuantity * mDistrictQuantity.getX();
+        auto last = prevCenterId + step * aYSize;
+        for (size_t currCenterId = prevCenterId; currCenterId < last; currCenterId += step)
+        {
+            auto nextCenterId = currCenterId + aShift;
+            QVector<size_t> leftX = {currCenterId, currCenterId + 3, currCenterId + aCurr};
+            QVector<size_t> rightX = {nextCenterId, nextCenterId + 1, nextCenterId + aNext};
+            minWays.push_back(findMinWay(leftX, rightX));
+        }
+        prevCenterId += mDistrictStationsQuantity;
+    }
+    return allMinWays;
+}
+
 Way Map::findMinWay(QVector<size_t> firstGroup, QVector<size_t> secondGroup)
 {
     Way result(0, 0);
@@ -621,6 +604,20 @@ Way Map::findMinWay(const QVector<Way> &aWays)
         }
     }
     return result;
+}
+
+Way Map::leftBotDiagonal(size_t x, size_t y)
+{
+    auto first = mDistrictStationsQuantity * (x + y * mDistrictQuantity.getX()) + 2;
+    auto second = mDistrictStationsQuantity * (x - 1 + (y + 1) * mDistrictQuantity.getX()) + 4;
+    return Way(first, second);
+}
+
+Way Map::rightBotDiagonal(size_t x, size_t y)
+{
+    auto first = mDistrictStationsQuantity * (x + y * mDistrictQuantity.getX()) + 3;
+    auto second = mDistrictStationsQuantity * (x + 1 + (y + 1) * mDistrictQuantity.getX()) + 1;
+    return Way(first, second);
 }
 
 void Map::findAllDistances2()
